@@ -189,6 +189,8 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 bool Application::Initialise_DX10(HINSTANCE _hInstance)
 {
+	UINT texID = 0;
+
 	// Initialise the Renderer
 	m_pDX10_Renderer = new DX10_Renderer();
 	VALIDATE(m_pDX10_Renderer->Initialise(m_clientWidth, m_clientHeight, m_hWnd));
@@ -197,20 +199,32 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera = new DX10_Camera_FirstPerson();
 	m_pCamera->Initialise(m_pDX10_Renderer, _hInstance, m_hWnd);
 
-	m_pCubeMesh = new DX10_Mesh_Rect_Prism();
-	TVertexNormalUV vert;
-	VALIDATE(m_pCubeMesh->Initialise(m_pDX10_Renderer, vert, { 1, 1, 1 }));
-
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
 
-	UINT texID = 0;
-	m_pDX10_Renderer->CreateTexture("FireAnim/Fire001.bmp", &texID);
+	m_pTerrainMesh = new DX10_Mesh_Rect_Prism();
+	TVertexNormalUV vertNormalUV;
+	VALIDATE(m_pTerrainMesh->Initialise(m_pDX10_Renderer, vertNormalUV, { 100, 100, 1 }));
+
+	m_pAvatarMesh = new DX10_Mesh_Rect_Prism();
+	VALIDATE(m_pAvatarMesh->Initialise(m_pDX10_Renderer, vertNormalUV, { 1, 1, 1 }));
+
+	
+
+
+
+	m_pDX10_Renderer->CreateTexture("Flare.dds", &texID);
 	std::vector<UINT>* pTexVec = new std::vector < UINT > ;
 	pTexVec->push_back(texID);
+	m_pTerrain = new DX10_Obj_LitTex();
+	VALIDATE(m_pTerrain->Initialise(m_pDX10_Renderer, m_pTerrainMesh, m_pShader_LitTex, pTexVec));
+	m_pTerrain->SetPosition({ 0, 0, 100 });
 
-	m_pCube = new DX10_Obj_LitTex();
-	VALIDATE(m_pCube->Initialise(m_pDX10_Renderer, m_pCubeMesh, m_pShader_LitTex, pTexVec));
+	m_pDX10_Renderer->CreateTexture("WoodCrate02.dds", &texID);
+	pTexVec = new std::vector < UINT > ;
+	pTexVec->push_back(texID);
+	m_pAvatar = new DX10_Obj_LitTex();
+	VALIDATE(m_pAvatar->Initialise(m_pDX10_Renderer, m_pAvatarMesh, m_pShader_LitTex, pTexVec));
 
 	return true;
 }
@@ -237,8 +251,10 @@ void Application::ShutDown()
 		// DX10 pointers to release
 		ReleasePtr(m_pShader_LitTex);
 		ReleasePtr(m_pCamera);
-		ReleasePtr(m_pCubeMesh);
-		ReleasePtr(m_pCube);
+		ReleasePtr(m_pTerrainMesh);
+		ReleasePtr(m_pAvatarMesh);
+		ReleasePtr(m_pTerrain);
+		ReleasePtr(m_pAvatar);
 
 		m_pDX10_Renderer->ShutDown();
 		ReleasePtr(m_pDX10_Renderer);
@@ -286,7 +302,8 @@ bool Application::Process(float _dt)
 		ProcessShaders();
 
 		m_pCamera->Process(_dt);
-		m_pCube->Process(_dt);
+		m_pTerrain->Process(_dt);
+		m_pAvatar->Process(_dt);
 	}
 
 	return true;
@@ -309,7 +326,8 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		m_pCube->Render();
+		m_pTerrain->Render();
+		m_pAvatar->Render();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();

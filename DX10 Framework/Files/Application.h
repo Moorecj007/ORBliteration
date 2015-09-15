@@ -199,10 +199,12 @@ private:
 	DX10_Camera_FirstPerson* m_pCamera;
 
 	// Objects
-	DX10_Obj_LitTex* m_pCube;
+	DX10_Obj_LitTex* m_pTerrain;
+	DX10_Obj_LitTex* m_pAvatar;
 
 	// Meshes
-	DX10_Mesh_Generic* m_pCubeMesh;
+	DX10_Mesh_Generic* m_pTerrainMesh;
+	DX10_Mesh_Generic* m_pAvatarMesh;
 	
 	// Shaders
 	DX10_Shader_LitTex* m_pShader_LitTex;
