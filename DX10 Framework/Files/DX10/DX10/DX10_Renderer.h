@@ -117,11 +117,11 @@ public:
 	* @author: Callan Moore
 	* @Parameter: _fxFileName: Name of the Effects file to retrieve
 	* @Parameter: _technique: Name of the Technique to Retrieve from the FX file
-	* @Parameter: _pFX: Storage value to hold the created or found Pointer to the FX file
-	* @Parameter: _pTech: Storage value to hold the created or found Pointer to the Technique
+	* @Parameter: _prFX: Storage value to hold the created or found Pointer to the FX file
+	* @Parameter: _prTech: Storage value to hold the created or found Pointer to the Technique
 	* @return: bool: Successful or not
 	********************/
-	bool BuildFX(std::string _fxFileName, std::string _technique, ID3D10Effect* _pFX, ID3D10EffectTechnique* _pTech);
+	bool BuildFX(std::string _fxFileName, std::string _technique, ID3D10Effect*& _prFX, ID3D10EffectTechnique*& _prTech);
 
 	/***********************
 	* CreateVertexLayout: Create the Vertex Layout for an Object
@@ -129,11 +129,11 @@ public:
 	* @parameter: _vertexDesc: Description of the Vertices's
 	* @parameter: _elementCount: Number of elements in the Vertex Description
 	* @parameter: _pTech: Technique to base the layout on
-	* @Parameter: _pVertexLayout: Storage variable to hold the Pointer to the created Vertex Layout
+	* @Parameter: _prVertexLayout: Storage variable to hold the Pointer to the created Vertex Layout
 	* @Parameter: _passNum: The pass number for the technique. Default to 0
 	* @return: bool: Successful or not
 	********************/
-	bool CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout* _pVertexLayout, UINT _passNum = 0);
+	bool CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout*& _prVertexLayout, UINT _passNum = 0);
 
 	/***********************
 	* CreateBuffer: Creates a buffer that holds all information for Vertex and Index Buffers for an Mesh
@@ -175,10 +175,10 @@ public:
 	* CreateTexture: Create a Texture from a file and store it on the Renderer
 	* @author: Callan Moore
 	* @parameter: _texFileName: The filename of the texture
-	* @parameter: _pTex: Storage variable to hold the Pointer to the created Texture
+	* @parameter: _prTex: Storage variable to hold the Pointer to the created Texture
 	* @return: bool: Successful or not
 	********************/
-	bool CreateTexture(std::string _texFileName, ID3D10ShaderResourceView* _pTex);
+	bool CreateTexture(std::string _texFileName, ID3D10ShaderResourceView*& _prTex);
 
 	/***********************
 	* RenderBuffer: Renders an Buffer to the screen

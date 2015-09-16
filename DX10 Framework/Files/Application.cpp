@@ -173,7 +173,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_showMenu = false;
+	m_showMenu = true;
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;

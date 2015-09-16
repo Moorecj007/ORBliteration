@@ -351,7 +351,7 @@ void DX10_Renderer::TurnZBufferOff()
 	m_pDX10Device->OMSetDepthStencilState(m_pDepthStencilStateZDisabled, 1);
 }
 
-bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _techniqueName, ID3D10Effect* _pFX, ID3D10EffectTechnique* _pTech)
+bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _techniqueName, ID3D10Effect*& _prFX, ID3D10EffectTechnique*& _prTech)
 {	
 	ID3D10Effect* pFX = 0;
 	ID3D10EffectTechnique* pTech = 0;
@@ -433,6 +433,11 @@ bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _techniqueName,
 	{
 		// Technique has not been created so Retrieve the Tech from the FX file
 		pTech = pFX->GetTechniqueByName(_techniqueName.c_str());
+		if (pTech == NULL)
+		{
+			// technique was not found
+			return false;
+		}
 
 		// Create pairs to store in the Technique Maps
 		std::map<std::string, ID3D10EffectTechnique*> innerTechMap;
@@ -444,29 +449,31 @@ bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _techniqueName,
 	}
 
 	// Save the FX and Technique IDs in the memory passed by the Object.
-	_pFX = pFX;
-	_pTech = pTech;
+	_prFX = pFX;
+	_prTech = pTech;
 	return true;
 }
 
-bool DX10_Renderer::CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout* _pVertexLayout, UINT _passNum)
+bool DX10_Renderer::CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout*& _prVertexLayout, UINT _passNum)
 {
+	ID3D10InputLayout* pVertexLayout;
 	// Create the input layout
 	D3D10_PASS_DESC passDesc;
 	_pTech->GetPassByIndex(_passNum)->GetDesc(&passDesc);
 
 	VALIDATEHR(m_pDX10Device->CreateInputLayout(_vertexDesc, _elementNum, passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize, &_pVertexLayout));
+		passDesc.IAInputSignatureSize, &pVertexLayout));
 
 	// Add the Vertex Layout to the Map
 	UINT inputLayerID = ++m_nextInputLayoutID;
-	std::pair<UINT, ID3D10InputLayout*> inputLayerPair(inputLayerID, _pVertexLayout);
+	std::pair<UINT, ID3D10InputLayout*> inputLayerPair(inputLayerID, pVertexLayout);
 	VALIDATE(m_inputLayouts.insert(inputLayerPair).second);
 
+	_prVertexLayout = pVertexLayout;
 	return true;
 }
 
-bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResourceView* _pTex)
+bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResourceView*& _prTex)
 {
 	ID3D10ShaderResourceView* pTexture = 0;
 
@@ -494,7 +501,7 @@ bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResource
 		VALIDATE(m_textures.insert(texPair).second);
 	}
 
-	_pTex = pTexture;
+	_prTex = pTexture;
 	return true;
 }
 
