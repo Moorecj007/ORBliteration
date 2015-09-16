@@ -17,7 +17,6 @@
 #define __CINPUT_GAMEPAD_H__
 
 // Library Link
-
 //#pragma comment(lib, "Xinput.lib")
 #pragma comment(lib, "XInput9_1_0.lib")
 
@@ -204,8 +203,7 @@ public:
 	* @return: void:
 	********************/
 	void PostProcess(); 
-
-
+	
 	// Thumbstick Functions 
 	
 	/***********************
@@ -236,9 +234,21 @@ public:
 	********************/
 	v2float	GetRStickAxis();
 
-	// TO DO JC: 
-	bool GetStickDirectionPressed(int _Direction);
-	bool GetStickDirectionDown(int _Direction);
+	/***********************
+	* GetStickDirectionPressed: Get whether a stick has been pressed in a certian direction based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction: The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction is pressed (True if the Stick Direction is pressed)
+	********************/
+	bool GetStickDirectionPressed(int _direction);
+
+	/***********************
+	* GetButtonDown: Get whether a stick has been pressed in a certian direction was pressed (gone down) in this frame based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction:  The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction was pressed (gone down) in this frame (True if the Stick Direction is down)
+	********************/
+	bool GetStickDirectionDown(int _direction);
 
 	// Trigger Functions 
 
@@ -261,7 +271,7 @@ public:
 	/***********************
 	* GetButtonPressed: Get whether the button is pressed based on the passed in button ID 
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button is pressed (True if the button is pressed)
 	********************/
 	bool GetButtonPressed(int _button);
@@ -269,7 +279,7 @@ public:
 	/***********************
 	* GetButtonDown: Get whether the button was pressed (gone down) in this frame based on the passed in button ID
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button was pressed (gone down) in this frame (True if the button is down)
 	********************/
 	bool GetButtonDown(int _button); 
@@ -293,7 +303,6 @@ public:
 	void StopVibrate();
 
 	// Utility Functions 
-
 	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
 	* @author: Jc Fowles
@@ -315,8 +324,8 @@ private:
 	* @author: Jc Fowles
 	* @return: XINPUT_STATE: The Current Gamepad State
 	********************/
-	// TO DO: Abstract the state
 	XINPUT_STATE GetState();
+
 	  // Member Variables
 public:
 protected:

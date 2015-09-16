@@ -179,6 +179,10 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
+	// TO DO CAL - remove
+	m_pGame = new Game();
+	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+
 	m_online = true;
 
 	// Initialise all time keeping variables to default (zero) state
@@ -199,10 +203,10 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise the Objects
 	m_pCamera = new DX10_Camera_Debug();
+	VALIDATE(m_pCamera->Initialise(m_pDX10_Renderer));
 	m_pCamera->SetPostionVec({ 0, 0, -100.0f });
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
-	VALIDATE(m_pCamera->Initialise(m_pDX10_Renderer));
 
 	// Intialise Menu
 	m_mainMenu = new Menu();
@@ -360,6 +364,9 @@ void Application::Render()
 		m_pDX10_Renderer->StartRender();
 
 		m_mainMenu->Draw();
+
+		// TO DO CAL - Remove
+		m_pGame->Render();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();

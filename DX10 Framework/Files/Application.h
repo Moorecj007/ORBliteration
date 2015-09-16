@@ -208,7 +208,6 @@ private:
 
 	// Menu Objects
 	Menu*	m_mainMenu;
-
 };
 
 #endif // __APPLICATION_H__
