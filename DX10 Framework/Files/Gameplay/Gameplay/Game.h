@@ -20,6 +20,9 @@
 // Local Includes
 #include "../../DX10/DX10/DX10_Renderer.h"
 #include "Arena/ArenaFloor.h"
+#include "Orbs\Orb.h"
+#include "../../Input/InputGamePad.h"
+
 
 class Game
 {
@@ -42,10 +45,25 @@ public:
 	void Process(float _dt);
 	void Render();
 
+	// TO DO JC
+	void HandleInput();
+
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	ArenaFloor* m_pArenaFloor;
 	DX10_Shader_LitTex* m_pShader_LitTex;
+
+	// Contollers
+	static const int m_maxPlayers = 4;
+	XButtonIDs m_XButtons;
+	XStickDirectionIDs m_XStickDirections;
+	std::vector<InputGamePad*> m_pContollers;
+
+	// Player Controller Orbs
+	std::vector<Orb*> m_pOrbs;
+
+	DX10_Mesh_Generic* m_pOrbMesh;
+
 };
 #endif	//__GAME_H__
 
