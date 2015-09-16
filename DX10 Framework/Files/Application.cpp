@@ -18,8 +18,16 @@
 // Static Variables
 Application* Application::s_pApp = 0;
 
+// Global Variables
+FILE* g_file;
+
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _cmdShow)
 {
+	if (AllocConsole())
+	{
+		freopen_s(&g_file, "conout$", "w", stdout);
+	}
+
 	// Set the client width and height
 	int clientWidth = 1000;
 	int clientHeight = 1000;
@@ -266,8 +274,9 @@ void Application::ExecuteOneFrame()
 			m_online = false;
 			return;
 		}
-		Render();
 
+		Render();
+		
 		m_deltaTick = 0;
 		m_fps++;
 	}	
@@ -339,7 +348,6 @@ bool Application::Process(float _dt)
 		m_pCamera->Process();
 
 		ProcessShaders();
-
 		m_mainMenu->Process(_dt);
 	}
 
@@ -362,7 +370,7 @@ void Application::Render()
 		m_mainMenu->Draw();
 
 		// Tell the Renderer the data input is over and present the outcome
-		m_pDX10_Renderer->EndRender();
+		m_pDX10_Renderer->EndRender();	
 	}
 }
 
