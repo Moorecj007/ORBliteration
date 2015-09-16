@@ -201,8 +201,9 @@ private:
 	DX10_Camera_Debug* m_pCamera;
 
 	// Sprite
+	UINT m_menuItem;
 	DXSprite* m_pSprite;
-	GUI_Button* m_pButton;
+	std::vector<GUI_Button*> m_buttons;
 	DX10_Shader_Sprite* m_pShader_Sprite;
 
 	// Game Pad Input

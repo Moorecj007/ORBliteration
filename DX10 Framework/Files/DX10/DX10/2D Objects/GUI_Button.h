@@ -62,7 +62,7 @@ class GUI_Button
 		@parameter:	_out		- The position of the object
 		@return:	void
 		********************/
-		virtual void GetPosition(D3DXVECTOR2& _out);
+		virtual void GetPosition(v2float& _out);
 
 		/*******************
 		-> Gets the objects current state
@@ -112,6 +112,14 @@ class GUI_Button
 		@return:	void
 		********************/
 		virtual void Process(float _deltaTime);
+
+		/*******************
+		-> This checks if a position is within the object bounds
+		@author:	Juran Griffith.
+		@parameter:	_point	- The point to check if its within the objects bounds. Good for mouse input.
+		@return:	void
+		********************/
+		virtual bool IsInBounds(v2float _point);
 	protected:
 	private:
 	

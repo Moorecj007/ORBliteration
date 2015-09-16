@@ -169,6 +169,9 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_clientWidth = _clientWidth;
 	m_clientHeight = _clientHeight;
 
+	// Intialize the menu item position
+	m_menuItem = -1;
+
 	// Initialise boolean array for KeyDown to false
 	m_pKeyDown = new bool[255];
 	memset(m_pKeyDown, false, 255);
@@ -208,10 +211,16 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	VALIDATE(m_pShader_Sprite->Initialize(m_pDX10_Renderer, &m_hWnd));
 
 	m_pSprite = new DXSprite();
-	VALIDATE(m_pSprite->Initialize(&m_hWnd, m_pDX10_Renderer, m_pShader_Sprite, "Button/button_exit.png", 280, 345));
+	VALIDATE(m_pSprite->Initialize(&m_hWnd, m_pDX10_Renderer, m_pShader_Sprite, "Button/button_exit.png", 280, 345, 1, 3));
 
-	m_pButton = new GUI_Button();
-	VALIDATE(m_pButton->Initialize(m_pDX10_Renderer, m_pSprite, 0.0f, 0.0f, 280.0f, 345.0f / 3.0f));
+	float offset = 345.0f / 3.0f;
+	float scale = 0.5f;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		m_buttons.push_back(new GUI_Button());
+		VALIDATE(m_buttons.back()->Initialize(m_pDX10_Renderer, m_pSprite, 0.0f, offset * i * scale, 280.0f * scale, 345.0f * scale));
+	}
 
 	return true;
 }
@@ -238,11 +247,20 @@ void Application::ShutDown()
 		// DX10 pointers to release
 		ReleasePtr(m_pCamera);
 
-		// Sprite Stuff
+		// Gamepad input memory release
+		ReleasePtr(m_pGamepadPlayerOne);
+
+		// Release all sprite related resources
 		ReleasePtr(m_pShader_Sprite);
 		ReleasePtr(m_pSprite);
-		ReleasePtr(m_pButton);
 
+		while (!m_buttons.empty())
+		{
+			ReleasePtr(m_buttons.back());
+			m_buttons.pop_back();
+		}
+
+		// Release the renderers resources
 		m_pDX10_Renderer->ShutDown();
 		ReleasePtr(m_pDX10_Renderer);
 	}	
@@ -295,22 +313,41 @@ bool Application::Process(float _dt)
 	//		// 
 	//	}
 	//
-	//	if (m_pGamepadPlayerOne->GetButtonPressed(m_XButtons.DPad_Down))
-	//	{
-	//
-	//	}
 	//}
 
-	m_pGamepadPlayerOne->PostProcess();
+	if(m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Down))
+	{
+		if (m_menuItem < m_buttons.size())
+		{
+			m_menuItem++;
+			m_buttons[m_menuItem - 1]->SetState(BUTTON_STATE_DEFAULT);
+			m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
+		}
+	}
+	/*else if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Up))
+	{
+		if (m_menuItem > 0)
+		{
+			m_menuItem--;
+			m_buttons[m_menuItem + 1]->SetState(BUTTON_STATE_DEFAULT);
+			m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
+		}
+	}*/
 
+	m_pGamepadPlayerOne->PostProcess();
 
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
 		m_pCamera->Process();
 
-		ProcessShaders();	
-		m_pButton->Process(_dt);
+		ProcessShaders();
+		
+		// Process all the buttons
+		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
+		{
+			(*button)->Process(_dt);
+		}
 	}
 
 	return true;
@@ -320,7 +357,7 @@ void Application::ProcessShaders()
 {
 	if (m_pShader_Sprite != 0)
 	{
-		m_pShader_Sprite->Update(0.0f);
+		m_pShader_Sprite->Update(m_deltaTick);
 	}
 }
 
@@ -332,16 +369,17 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		
-
-
 		// Turn the z buffer off
 		m_pDX10_Renderer->TurnZBufferOff();
 
-		m_pButton->Draw();
+		// Process all the buttons
+		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
+		{
+			(*button)->Draw();
+		}
 
 		// Turn the z buffer on
-		m_pDX10_Renderer->TurnZBufferOn();
+		//m_pDX10_Renderer->TurnZBufferOn();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();
