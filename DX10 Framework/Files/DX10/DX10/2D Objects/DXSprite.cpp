@@ -21,7 +21,7 @@ DXSprite::DXSprite():
 	m_previousPosX(-1),
 	m_previousPosY(-1),
 	m_pDX10_Renderer(0),
-	m_texID(0)
+	m_pTex(0)
 {
 }
 
@@ -85,7 +85,7 @@ bool DXSprite::Initialize(HWND* _pHWnd, DX10_Renderer* _pDX10_Renderer, DX10_Sha
 	if (!InitializeBuffers())
 		return false;
 
-	VALIDATE(m_pDX10_Renderer->CreateTexture(m_strFilename, &m_texID));
+	VALIDATE(m_pDX10_Renderer->CreateTexture(m_strFilename, m_pTex));
 
 	return true;
 }
@@ -147,7 +147,7 @@ void DXSprite::Render()
 	// Set the type of primitive
 	m_pDX10_Renderer->SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	m_pShader->Render(m_buffID, m_texID);
+	m_pShader->Render(m_buffID, m_pTex);
 }
 
 bool DXSprite::InitializeBuffers()

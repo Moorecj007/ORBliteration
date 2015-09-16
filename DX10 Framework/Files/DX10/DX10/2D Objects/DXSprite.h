@@ -199,7 +199,7 @@ class DXSprite
 		float					m_offsetV;
 
 		DX10_Renderer*			m_pDX10_Renderer;
-		UINT					m_texID;
+		ID3D10ShaderResourceView*	m_pTex;
 		UINT					m_buffID;
 		DX10_Shader_Sprite*		m_pShader;
 };

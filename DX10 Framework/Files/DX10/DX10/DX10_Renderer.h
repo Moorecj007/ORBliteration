@@ -117,32 +117,23 @@ public:
 	* @author: Callan Moore
 	* @Parameter: _fxFileName: Name of the Effects file to retrieve
 	* @Parameter: _technique: Name of the Technique to Retrieve from the FX file
-	* @Parameter: _fxID: Storage value to hold the created or found ID of the FX file
-	* @Parameter: _techID: Storage value to hold the created or found ID of the Technique
+	* @Parameter: _prFX: Storage value to hold the created or found Pointer to the FX file
+	* @Parameter: _prTech: Storage value to hold the created or found Pointer to the Technique
 	* @return: bool: Successful or not
 	********************/
-	bool BuildFX(std::string _fxFileName, std::string _technique, UINT* _pFXID, UINT* _pTechID);
-
-	/***********************
-	* GetFXVariable: Retrieve a FX Variable
-	* @author: Callan Moore
-	* @Parameter: _fxID: ID of the FX file to access
-	* @Parameter: _techVar: Name of the variable to retrieve
-	* @return: ID3D10EffectVariable*: The Retrieved Effect Variable
-	********************/
-	ID3D10EffectVariable* GetFXVariable(UINT _fxID, std::string _techVar);
+	bool BuildFX(std::string _fxFileName, std::string _technique, ID3D10Effect*& _prFX, ID3D10EffectTechnique*& _prTech);
 
 	/***********************
 	* CreateVertexLayout: Create the Vertex Layout for an Object
 	* @author: Callan Moore
 	* @parameter: _vertexDesc: Description of the Vertices's
 	* @parameter: _elementCount: Number of elements in the Vertex Description
-	* @parameter: _techID: Technique ID to base the layout on
-	* @Parameter: _vertexLayoutID: Storage variable to hold the ID of the created Vertex Layout
+	* @parameter: _pTech: Technique to base the layout on
+	* @Parameter: _prVertexLayout: Storage variable to hold the Pointer to the created Vertex Layout
 	* @Parameter: _passNum: The pass number for the technique. Default to 0
 	* @return: bool: Successful or not
 	********************/
-	bool CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementCount, UINT _techID, UINT* _pVertexLayoutID, UINT _passNum = 0);
+	bool CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout*& _prVertexLayout, UINT _passNum = 0);
 
 	/***********************
 	* CreateBuffer: Creates a buffer that holds all information for Vertex and Index Buffers for an Mesh
@@ -184,10 +175,10 @@ public:
 	* CreateTexture: Create a Texture from a file and store it on the Renderer
 	* @author: Callan Moore
 	* @parameter: _texFileName: The filename of the texture
-	* @parameter: _pTexID: Storage variable to hold the ID of the created Texture
+	* @parameter: _prTex: Storage variable to hold the Pointer to the created Texture
 	* @return: bool: Successful or not
 	********************/
-	bool CreateTexture(std::string _texFileName, UINT* _pTexID);
+	bool CreateTexture(std::string _texFileName, ID3D10ShaderResourceView*& _prTex);
 
 	/***********************
 	* RenderBuffer: Renders an Buffer to the screen
@@ -229,10 +220,10 @@ public:
 	/***********************
 	* SetInputLayout: Set the Vertex Layout as the Input Layout on the Renderer
 	* @author: Callan Moore
-	* @parameter: _vertexLayoutID: Vertex Layout ID
+	* @parameter: _pVertexLayout: Vertex Layout to set
 	* @return: bool: Successful or not
 	********************/
-	bool SetInputLayout(UINT _vertexLayoutID);
+	bool SetInputLayout(ID3D10InputLayout* _pVertexLayout);
 
 	/***********************
 	* SetViewMatrix: Set the View Matrix for use in Renderering
@@ -251,35 +242,14 @@ public:
 	void SetEyePosition(D3DXVECTOR3 _eyePos) { m_eyePos = _eyePos; };
 
 	/***********************
-	* GetTechnique: Retrieve the Technique for the given ID
-	* @author: Callan Moore
-	* @parameter: _techID: ID of the Technique
-	* @return: ID3D10EffectTechnique*: DX10 Technique
-	********************/
-	ID3D10EffectTechnique* GetTechnique(UINT _techID);
-
-	/***********************
-	* SetTexture: Retrieve the Texture from the ID
-	* @author: Callan Moore
-	* @parameter: _texID: Texture ID
-	* @return: ID3D10ShaderResourceView*: The Texture
-	********************/
-	ID3D10ShaderResourceView* GetTexture(UINT _texID);
-
-	/***********************
-	* GetVertexBuffer: Retrieve the vertex buffer
-	* @author: Callan Moore
-	* @parameter: _buffID: The ID to the package buffer
-	* @return: ID3D10Buffer*: The vertex buffer linked to the ID
-	********************/
-	ID3D10Buffer* GetVertexBuffer(UINT _buffID);
-
-	/***********************
 	* CalcProjMatrix: Calculate the Projection Matrix for use in Renderering
 	* @author: Callan Moore
 	* @return: void
 	********************/
 	void CalcProjMatrix();
+
+	// TO DO CAL
+	ID3D10Buffer* GetVertexBuffer(UINT _buffID);
 	
 	/***********************
 	* GetViewMatrix: Retrieve the View Matrix
@@ -316,6 +286,8 @@ public:
 	********************/
 	Light* GetActiveLight() { return &m_activeLight; };
 
+	
+
 private:
 	// Window Variables
 	HWND m_hWnd;
@@ -343,14 +315,10 @@ private:
 	D3DXCOLOR m_clearColor;
 
 	// Map of FX files
-	UINT m_nextEffectID;
-	std::map<std::string, UINT> m_effectIDs;
-	std::map<UINT, ID3D10Effect*> m_effectsByID;
+	std::map<std::string, ID3D10Effect*> m_fxFiles;
 
 	// Map of Techniques
-	UINT m_nextTechniqueID;
-	std::map<UINT, std::map<std::string, UINT>> m_techniqueIDs;
-	std::map<UINT, ID3D10EffectTechnique*> m_techniquesByID;
+	std::map<std::string, std::map<std::string, ID3D10EffectTechnique*>> m_techniques;
 
 	// Map of Input Layouts
 	UINT m_nextInputLayoutID;
@@ -362,8 +330,7 @@ private:
 
 	// Map of all Textures
 	UINT m_nextTextureID;
-	std::map<std::string, UINT> m_textureIDs;
-	std::map<UINT, ID3D10ShaderResourceView*> m_texturesByID;
+	std::map<std::string, ID3D10ShaderResourceView*> m_textures;
 
 	// Lighting
 	Light m_activeLight;

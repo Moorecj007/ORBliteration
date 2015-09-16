@@ -133,6 +133,7 @@
     <ClCompile Include="Files\Physics\2D Physics\Physics_Rope_2D.cpp" />
     <ClCompile Include="Files\Physics\2D Physics\Physics_Pulley_2D.cpp" />
     <ClCompile Include="Files\Utility\DirectInput.cpp" />
+    <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp" />
     <ClCompile Include="Files\Utility\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +169,7 @@
     <ClInclude Include="Files\Physics\2D Physics\Physics_Utilities.h" />
     <ClInclude Include="Files\Physics\Physics_2D.h" />
     <ClInclude Include="Files\Utility\DirectInput.h" />
+    <ClInclude Include="Files\Utility\Mutex_Semaphore.h" />
     <ClInclude Include="Files\Utility\Timer.h" />
     <ClInclude Include="Files\Utility\Utilities.h" />
     <ClInclude Include="Files\Utility\Utility_Math.h" />
