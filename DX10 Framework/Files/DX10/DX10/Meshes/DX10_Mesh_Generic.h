@@ -96,11 +96,27 @@ public:
 	********************/
 	D3D_PRIMITIVE_TOPOLOGY GetPrimTopology() { return m_primTopology; };
 
+	/***********************
+	* GetScale: Gets the Scale of the Mesh
+	* @author: Jc Fowles
+	* @return: float: The Scale of the Mesh
+	********************/
+	float GetScale(){ return m_scale; };
+
+	/***********************
+	* SetScale: Sets the Scale of the Mesh
+	* @author: Jc Fowles
+	* @return: float: The Scale of the Mesh
+	********************/
+	void SetScale(){ /* TO DO CAL: Possible name Resize()*/ };
+
 protected:
 	DX10_Renderer* m_pRenderer;
 	UINT m_bufferID;
 	eVertexType m_vertType;
 	D3D_PRIMITIVE_TOPOLOGY m_primTopology;
+
+	float m_scale;
 };
 
 #endif	// __DX10_MESH_GENERIC_H__
