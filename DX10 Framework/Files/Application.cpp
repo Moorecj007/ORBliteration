@@ -179,10 +179,6 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
-	// TO DO CAL - remove
-	m_pGame = new Game();
-	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
-
 	m_online = true;
 
 	// Initialise all time keeping variables to default (zero) state
@@ -364,9 +360,6 @@ void Application::Render()
 		m_pDX10_Renderer->StartRender();
 
 		m_mainMenu->Draw();
-
-		// TO DO CAL - Remove
-		m_pGame->Render();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();
