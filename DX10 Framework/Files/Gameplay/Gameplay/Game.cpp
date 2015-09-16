@@ -62,9 +62,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 	v3float orbScale = { 3, 3, 3 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, tempVertNormUV, orbScale));
 
-	UINT tempTexID;
-	VALIDATE(m_pDX10_Renderer->CreateTexture("Flare.dds", &tempTexID));
-
 	// TO DO JC: This will be based on the number of players selected for a given match
 	// Create the Contollers and the player orbs
 	for (int i = 0; i < m_maxPlayers; i++)
@@ -73,7 +70,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, tempTexID, 1.0f,1.0f, 10.0f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 1.0f,1.0f, 10.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 	}
 
