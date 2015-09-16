@@ -43,7 +43,7 @@ class DX10_Shader_Sprite
 			m_pEmvWorld = 0;
 			m_pEsrvTexture = 0;
 
-			D3DXMatrixIdentity(&m_pMatWorld);
+			D3DXMatrixIdentity(&m_matWorld);
 		}
 
 		/*******************
@@ -102,34 +102,32 @@ class DX10_Shader_Sprite
 
 			m_pDX10_Renderer->CreateVertexLayout(layout, layoutElements, m_techID, &m_vertexLayoutID);
 
+			// Save the screen size.
+			RECT rect;
+			if (GetClientRect(*_pHWnd, &rect))
+			{
+				// Create an orthographic projection matrix for 2D rendering.
+				D3DXMatrixOrthoLH(&m_matOrtho, static_cast<float>(rect.right - rect.left), static_cast<float>(rect.bottom - rect.top), 0.1f, 100.0f);
+			}
+
+			m_matView = *m_pDX10_Renderer->GetViewMatrix();
+
 			return true;
 		}
 
 		/*******************
-		-> This updates the world, view and projection constant buffer variables on the graphics for this effect. 
+		-> This updates the world, view and projection constant buffer variables for the effect to use when rendering 
 		@author:	Juran Griffith.
-		@parameter: _worldMatrix		- The world matrix of the application.
-		@parameter: _viewMatrix			- The view matrix (which camera).
-		@parameter: _projectionMatrix	- The projection matrix.
-		@parameter: _delta				- The current delta time.
+		@parameter: _deltaTime	- The current delta time.
 		@return:	void
 		********************/
-		void Update(float _delta)
+		void Update(float _deltaTime)
 		{
-			m_pEmvView->SetMatrix((float*)m_pDX10_Renderer->GetViewMatrix());
-			m_pEmvProjection->SetMatrix((float*)m_pDX10_Renderer->GetProjMatrix());
-
-			// Set the world matrix variable inside the shader.
-			m_pEmvWorld->SetMatrix((float*)&m_pMatWorld);
-
-			// Set the view matrix variable inside the shader.
-			//m_pEmvView->SetMatrix((float*)&_viewMatrix);
-
-			// Set the projection matrix variable inside the shader.
-			//m_pEmvProjection->SetMatrix((float*)&_projectionMatrix);
-
-			// Set the delta time inside the shader
-			m_pEvDeltaTime->SetRawValue(&_delta, 0, sizeof(float));
+			// Update the constant buffer variables on the shader
+			m_pEmvView->SetMatrix((float*)&m_matView);
+			m_pEmvProjection->SetMatrix((float*)&m_matOrtho);
+			m_pEmvWorld->SetMatrix((float*)&m_matWorld);
+			m_pEvDeltaTime->SetRawValue(&_deltaTime, 0, sizeof(float));
 		}
 
 		/*******************
@@ -157,7 +155,6 @@ class DX10_Shader_Sprite
 				for (UINT p = 0; p < techDesc.Passes; ++p)
 				{
 					pTech->GetPassByIndex(p)->Apply(0);
-					//m_pDX10_Renderer->RenderSprite(_buffID);
 					m_pDX10_Renderer->RenderBuffer(_buffID);
 				}
 			}
@@ -181,7 +178,9 @@ class DX10_Shader_Sprite
 		UINT m_fxID;
 		UINT m_techID;
 		UINT m_vertexLayoutID;
-		D3DXMATRIX							m_pMatWorld;
+		D3DXMATRIX							m_matWorld;
+		D3DXMATRIX							m_matView;
+		D3DXMATRIX							m_matOrtho;
 };
 
 #endif	// __DX10_SHADER_SPRITE_H__

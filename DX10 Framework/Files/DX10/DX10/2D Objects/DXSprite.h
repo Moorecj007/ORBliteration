@@ -148,8 +148,6 @@ class DXSprite
 	private:
 		UINT			m_vertexCount;
 		UINT			m_indexCount;
-		UINT			m_stride;
-		UINT			m_offset;
 
 		std::string		m_strFilename;
 
