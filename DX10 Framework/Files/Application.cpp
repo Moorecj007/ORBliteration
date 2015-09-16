@@ -237,6 +237,9 @@ void Application::ShutDown()
 	{ 
 		// DX10 pointers to release
 		ReleasePtr(m_pCamera);
+		
+		// Gamepad input memory release
+		ReleasePtr(m_pGamepadPlayerOne);
 
 		// Sprite Stuff
 		ReleasePtr(m_pShader_Sprite);

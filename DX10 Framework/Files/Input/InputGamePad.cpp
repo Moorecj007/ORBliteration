@@ -18,7 +18,7 @@
 
 // Define the 'XButtonIDs' struct as 'XButtons'
 XButtonIDs XButtons;
-
+XStickDirectionIDs XStickDirections;
 
 InputGamePad::InputGamePad()
 {
@@ -48,6 +48,14 @@ bool InputGamePad::Initialise(int _gamepadIndex)
 		Gamepad_ButtonsDown[i] = false;
 	}
 
+	// Initialise the Button Arrays
+	for (int i = 0; i < StickCount; i++)
+	{
+		Prev_StickStates[i] = false;
+		StickStates[i] = false;
+		Gamepad_StickDown[i] = false;
+	}
+
 	// return succesful initialization
 	return true;
 }
@@ -66,12 +74,142 @@ void InputGamePad::PreProcess()
 		// Set 'DOWN' state for current frame
 		Gamepad_ButtonsDown[i] = ((!Prev_ButtonStates[i]) && (ButtonStates[i]));
 	}
+
+	// Iterate through all gamepad Stick
+	for (int i = 0; i < StickCount; i++)
+	{
+		if (!LStick_InDeadZone())
+		{
+			v2float LeftAxis = GetLStickAxis();
+			v2float RightAxis = GetRStickAxis();
+			
+			switch (i)
+			{
+				case 0:		// LJoyStick_Up
+				{
+					if (LeftAxis.y > 0.8f)
+					{
+						// Left Stick is Up
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 1:		// LJoyStick_Down
+				{
+					if (LeftAxis.y < -0.8f)
+					{
+						// Left Stick is Down
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 2:		// LJoyStick_left
+				{
+					if (LeftAxis.x < -0.8f)
+					{
+						// Left Stick is Left
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 3:		// LJoyStick_right
+				{
+					if (LeftAxis.x > 0.8f)
+					{
+						// Left Stick is Right
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 4:		// RJoyStick_Up
+				{
+					if (RightAxis.y > 0.8f)
+					{
+						// Right Stick is Up
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 5:		// RJoyStick_Down
+				{
+					if (RightAxis.y < -0.8f)
+					{
+						// Right Stick is Down
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 6:		// RJoyStick_Left
+				{
+					if (RightAxis.x < -0.8f)
+					{
+						// Right Stick is Left
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				case 7:		// RJoyStick_Right
+				{
+					if (RightAxis.x > 0.8f)
+					{
+						// Right Stick is Right
+						StickStates[i] = true;
+					}
+					else
+					{
+						StickStates[i] = false;
+					}
+				}
+					break;
+				default: break;
+			}
+			
+		}
+		else
+		{
+			StickStates[i] = false;
+		}
+		
+		// Set 'DOWN' state for current frame
+		Gamepad_StickDown[i] = ((!Prev_StickStates[i]) && (StickStates[i]));
+	}
 }
 
 void InputGamePad::PostProcess()
 {
 	// Store the current frames button values in previous button states
 	memcpy(Prev_ButtonStates, ButtonStates,	sizeof(Prev_ButtonStates));
+
+	// Store the current frames Stick Direction values in previous button states
+	memcpy(Prev_StickStates, StickStates, sizeof(Prev_StickStates));
 }
 
 // Thumbstick Functions
@@ -129,7 +267,7 @@ bool InputGamePad::RStick_InDeadZone()
 	return true;
 }
 
-v2float	InputGamePad::GetLStickXY()
+v2float	InputGamePad::GetLStickAxis()
 {
 	// Get the X and Y axis of the left stick
 	short X = m_gamepadState.Gamepad.sThumbLX;
@@ -145,7 +283,7 @@ v2float	InputGamePad::GetLStickXY()
 	return leftStickAxisXY;
 }
 
-v2float	InputGamePad::GetRStickXY()
+v2float	InputGamePad::GetRStickAxis()
 {
 	// Get the X and Y axis of the left stick
 	short X = m_gamepadState.Gamepad.sThumbRX;
@@ -159,6 +297,16 @@ v2float	InputGamePad::GetRStickXY()
 
 	// Return the Right stick X and Y Axes
 	return rightStickAxisXY;
+}
+
+bool InputGamePad::GetStickDirectionPressed(int _Direction)
+{
+	return StickStates[_Direction];
+}
+
+bool InputGamePad::GetStickDirectionDown(int _Direction)
+{
+	return Gamepad_StickDown[_Direction];
 }
 
 // Trigger Functions
