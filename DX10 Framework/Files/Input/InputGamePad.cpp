@@ -275,7 +275,6 @@ v2float	InputGamePad::GetLStickAxis()
 
 	v2float leftStickAxisXY;
 	// convert to a float between 0.0f and 1.0f
-	// TO DO JC: instead of sizeof if not working 32768.0f
 	leftStickAxisXY.x = (static_cast<float>(X) / 32768.0f);
 	leftStickAxisXY.y = (static_cast<float>(Y) / 32768.0f);
 
@@ -291,7 +290,6 @@ v2float	InputGamePad::GetRStickAxis()
 
 	v2float rightStickAxisXY;
 	// convert to a float value between 0.0f and 1.0f
-	// TO DO JC: instead of sizeof if not working 32768.0f
 	rightStickAxisXY.x = (static_cast<float>(X) / sizeof(short));
 	rightStickAxisXY.y = (static_cast<float>(Y) / sizeof(short));
 
@@ -408,8 +406,6 @@ void InputGamePad::StopVibrate()
 
 XINPUT_STATE InputGamePad::GetState()
 {
-	// TO DO JC: Move to process/Update 
-
 	// Temporary XINPUT_STATE to return
 	XINPUT_STATE tempGamepadState;
 

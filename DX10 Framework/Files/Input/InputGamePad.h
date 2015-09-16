@@ -17,7 +17,6 @@
 #define __CINPUT_GAMEPAD_H__
 
 // Library Link
-
 //#pragma comment(lib, "Xinput.lib")
 #pragma comment(lib, "XInput9_1_0.lib")
 
@@ -141,27 +140,27 @@ struct XStickDirectionIDs
 {
 	XStickDirectionIDs()
 	{
-		LJoyStick_Up = 0;
-		LJoyStick_Down = 1;
-		LJoyStick_Left = 2;
-		LJoyStick_Right = 3;
+		LStick_Up = 0;
+		LStick_Down = 1;
+		LStick_Left = 2;
+		LStick_Right = 3;
 		
-		RJoyStick_Up = 4;
-		RJoyStick_Down = 5;
-		RJoyStick_Left = 6;
-		RJoyStick_Right = 7;
+		RStick_Up = 4;
+		RStick_Down = 5;
+		RStick_Left = 6;
+		RStick_Right = 7;
  	}
 
 	// Joystick 
-	int LJoyStick_Up ;
-	int LJoyStick_Down ;
-	int LJoyStick_Left ;
-	int LJoyStick_Right ;
+	int LStick_Up ;
+	int LStick_Down ;
+	int LStick_Left ;
+	int LStick_Right ;
 
-	int RJoyStick_Up ;
-	int RJoyStick_Down ;
-	int RJoyStick_Left ;
-	int RJoyStick_Right ;
+	int RStick_Up ;
+	int RStick_Down ;
+	int RStick_Left ;
+	int RStick_Right ;
 };
 
 class InputGamePad
@@ -204,8 +203,7 @@ public:
 	* @return: void:
 	********************/
 	void PostProcess(); 
-
-
+	
 	// Thumbstick Functions 
 	
 	/***********************
@@ -236,9 +234,21 @@ public:
 	********************/
 	v2float	GetRStickAxis();
 
-	// TO DO JC: 
-	bool GetStickDirectionPressed(int _Direction);
-	bool GetStickDirectionDown(int _Direction);
+	/***********************
+	* GetStickDirectionPressed: Get whether a stick has been pressed in a certian direction based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction: The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction is pressed (True if the Stick Direction is pressed)
+	********************/
+	bool GetStickDirectionPressed(int _direction);
+
+	/***********************
+	* GetButtonDown: Get whether a stick has been pressed in a certian direction was pressed (gone down) in this frame based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction:  The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction was pressed (gone down) in this frame (True if the Stick Direction is down)
+	********************/
+	bool GetStickDirectionDown(int _direction);
 
 	// Trigger Functions 
 
@@ -261,7 +271,7 @@ public:
 	/***********************
 	* GetButtonPressed: Get whether the button is pressed based on the passed in button ID 
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button is pressed (True if the button is pressed)
 	********************/
 	bool GetButtonPressed(int _button);
@@ -269,7 +279,7 @@ public:
 	/***********************
 	* GetButtonDown: Get whether the button was pressed (gone down) in this frame based on the passed in button ID
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button was pressed (gone down) in this frame (True if the button is down)
 	********************/
 	bool GetButtonDown(int _button); 
@@ -293,15 +303,7 @@ public:
 	void StopVibrate();
 
 	// Utility Functions 
-
-	/***********************
-	* GetState: Return the Current Gamepad State
-	* @author: Jc Fowles
-	* @return: XINPUT_STATE: The Current Gamepad State
-	********************/
-	// TO DO: Abstract the state
-	XINPUT_STATE GetState();
-
+	
 	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
 	* @author: Jc Fowles
@@ -316,10 +318,16 @@ public:
 	********************/
 	bool Connected();   
 
-
-
 protected:
 private:
+
+	/***********************
+	* GetState: Return the Current Gamepad State
+	* @author: Jc Fowles
+	* @return: XINPUT_STATE: The Current Gamepad State
+	********************/
+	XINPUT_STATE GetState();
+
 	  // Member Variables
 public:
 protected:
