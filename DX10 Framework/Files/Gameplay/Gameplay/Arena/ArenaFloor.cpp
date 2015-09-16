@@ -74,6 +74,9 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 		m_arenaTiles.push_back(pRowOfTiles);
 	}
 
+	// Initialise a thread pool for Rendering the Tiles
+
+
 	return true;
 }
 

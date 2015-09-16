@@ -173,7 +173,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_showMenu = true;
+	m_showMenu = false;
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
@@ -382,7 +382,11 @@ void Application::Render()
 		}
 		else
 		{
+			m_pTimer->Tick();
 			m_pGame->Render();
+			m_pTimer->Tick();
+			float dt = m_pTimer->GetDeltaTime();
+			printf("%f \n", dt);
 		}
 
 		// Tell the Renderer the data input is over and present the outcome

@@ -17,6 +17,9 @@
 #ifndef __ARENAFLOOR_H__
 #define __ARENAFLOOR_H__
 
+// Library Includes
+#include <thread>
+
 // Local Includes
 #include "../../../Utility/Utilities.h"
 #include "../../../DX10/DX10/DX10_Renderer.h"
@@ -53,6 +56,8 @@ private:
 	std::vector<std::vector<ArenaTile*>*> m_arenaTiles;	
 
 	float m_timeElapsed;
+
+	std::vector<std::thread> m_threadPool;
 };
 #endif	// __ARENAFLOOR_H__
 
