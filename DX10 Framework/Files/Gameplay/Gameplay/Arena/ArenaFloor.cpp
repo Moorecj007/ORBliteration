@@ -18,6 +18,7 @@
 ArenaFloor::ArenaFloor()
 {
 	m_pDX10_Renderer = 0;
+	m_timeElapsed = 0;
 }
 
 ArenaFloor::~ArenaFloor()
@@ -46,9 +47,6 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	TVertexNormalUV vertNormalUV;
 	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
 
-	UINT texID;
-	VALIDATE(m_pDX10_Renderer->CreateTexture("WoodCrate01.dds", &texID));
-
 	// Create the 2D vector of Arena Tiles
 	for (UINT row = 0; row < rowCount; row++)
 	{
@@ -58,12 +56,12 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 		{
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
-			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, texID));
+			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, "WoodCrate01.dds"));
 
 			// Set the Position based upon the position in the 2D grid
 			v3float tilePos;
-			tilePos.x = ((float)row - ((float)rowCount / 2.0f)) * _tileScale.x;
-			tilePos.y = ((float)col - ((float)colCount / 2.0f)) * _tileScale.y;
+			tilePos.x = ((float)row - ((float)rowCount / 2.0f)) * _tileScale.x + (_tileScale.x / 2.0f);
+			tilePos.y = ((float)col - ((float)colCount / 2.0f)) * _tileScale.y + (_tileScale.y / 2.0f);
 			tilePos.z = 0.0f;
 			pTile->SetPosition(tilePos);
 
@@ -76,11 +74,23 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 		m_arenaTiles.push_back(pRowOfTiles);
 	}
 
+	// Initialise a thread pool for Rendering the Tiles
+
+
 	return true;
 }
 
 void ArenaFloor::Process(float _dt)
 {
+	m_timeElapsed += _dt;
+	if (m_timeElapsed >= 0.5f)	// TO DO make variable
+	{
+		//DestroyOuterLayer();
+
+		m_timeElapsed -= 0.5f;
+	}
+
+
 	// Process all the Tiles in the 2D vector
 	// Cycle through all rows
 	for (UINT row = 0; row < m_arenaTiles.size(); row++)
@@ -103,6 +113,36 @@ void ArenaFloor::Render()
 		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
 		{
 			(*m_arenaTiles[row])[col]->Render();
+		}
+	}
+}
+
+void ArenaFloor::DestroyOuterLayer()
+{
+	if (m_arenaTiles.size() != 0)
+	{
+		ReleasePtr(m_arenaTiles[0]);
+		m_arenaTiles.erase(m_arenaTiles.begin());
+
+		if (m_arenaTiles.size() != 0)
+		{
+			ReleasePtr(m_arenaTiles[m_arenaTiles.size() - 1]);
+			m_arenaTiles.erase(m_arenaTiles.begin() + m_arenaTiles.size() - 1);
+		}
+
+		for (int row = (m_arenaTiles.size() - 1); row >= 0; row--)
+		{
+			if (m_arenaTiles[row]->size() != 0)
+			{
+				ReleasePtr((*m_arenaTiles[row])[0]);
+				m_arenaTiles[row]->erase(m_arenaTiles[row]->begin());
+
+				if (m_arenaTiles[row]->size() != 0)
+				{
+					ReleasePtr((*m_arenaTiles[row])[m_arenaTiles[row]->size() - 1]);
+					m_arenaTiles[row]->erase(m_arenaTiles[row]->begin() + m_arenaTiles[row]->size() - 1);
+				}
+			}
 		}
 	}
 }

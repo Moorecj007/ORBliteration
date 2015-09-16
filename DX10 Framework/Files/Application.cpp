@@ -18,8 +18,16 @@
 // Static Variables
 Application* Application::s_pApp = 0;
 
+// Global Variables
+FILE* g_file;
+
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _cmdShow)
 {
+	if (AllocConsole())
+	{
+		freopen_s(&g_file, "conout$", "w", stdout);
+	}
+
 	// Set the client width and height
 	int clientWidth = 1000;
 	int clientHeight = 1000;
@@ -165,6 +173,8 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
+	m_showMenu = false;
+
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
 	m_clientHeight = _clientHeight;
@@ -179,9 +189,11 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
-	// TO DO CAL - remove
-	m_pGame = new Game();
-	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+	if (m_showMenu == false)
+	{
+		m_pGame = new Game();
+		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+	}
 
 	m_online = true;
 
@@ -208,14 +220,13 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
 
-	m_pShader_Sprite = new DX10_Shader_Sprite();
-	VALIDATE(m_pShader_Sprite->Initialize(m_pDX10_Renderer, &m_hWnd));
+	// Initialise Menu
+	m_mainMenu = new Menu();
+	VALIDATE(m_mainMenu->Initialize(m_pDX10_Renderer, &m_hWnd));
 
-	m_pSprite = new DXSprite();
-	VALIDATE(m_pSprite->Initialize(&m_hWnd, m_pDX10_Renderer, m_pShader_Sprite, "Button/button_exit.png", 280, 345));
-
-	m_pButton = new GUI_Button();
-	VALIDATE(m_pButton->Initialize(m_pDX10_Renderer, m_pSprite, 0.0f, 0.0f, 280.0f, 345.0f / 3.0f));
+	m_mainMenu->AddSprite("Button/button_exit.png", 280, 345, 1, 3);
+	m_mainMenu->AddButton(0, 0.5f);
+	m_mainMenu->AddButton();
 
 	return true;
 }
@@ -245,17 +256,13 @@ void Application::ShutDown()
 		// Gamepad input memory release
 		ReleasePtr(m_pGamepadPlayerOne);
 
-		// Gamepad input memory release
-		ReleasePtr(m_pGamepadPlayerOne);
-
-		// Sprite Stuff
-		ReleasePtr(m_pShader_Sprite);
-		ReleasePtr(m_pSprite);
-		ReleasePtr(m_pButton);
-
-		// TO DO CAL - remove
+		// Menu memory release
+		ReleasePtr(m_mainMenu);
+		
+		// Gameplay objects memory release
 		ReleasePtr(m_pGame);
 
+		// Release the renderers resources
 		m_pDX10_Renderer->ShutDown();
 		ReleasePtr(m_pDX10_Renderer);
 	}	
@@ -278,8 +285,9 @@ void Application::ExecuteOneFrame()
 			m_online = false;
 			return;
 		}
-		Render();
 
+		Render();
+		
 		m_deltaTick = 0;
 		m_fps++;
 	}	
@@ -299,34 +307,57 @@ bool Application::Process(float _dt)
 	// Handle Controller Input
 	m_pGamepadPlayerOne->PreProcess();
 
-	// TO DO SHit HERE
-	//if (!m_pGamepadPlayerOne->LStick_InDeadZone())
-	//{
-	//	v2float LeftAxis = m_pGamepadPlayerOne->GetLStickXY();
-	//	if (LeftAxis.y == 1.0f)
-	//	{
-	//		// 
-	//	}
-	//
-	//	if (m_pGamepadPlayerOne->GetButtonPressed(m_XButtons.DPad_Down))
-	//	{
-	//
-	//	}
-	//}
+	if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepadPlayerOne->GetStickDirectionDown(m_XStickDirections.LStick_Down))
+	{
+		/*if (m_menuItem < m_buttons.size() - 1)
+		{
+			if (m_menuItem >= 0)
+			{
+				m_buttons[m_menuItem]->SetState(BUTTON_STATE_DEFAULT);
+			}
+
+			m_menuItem++;
+			if (m_menuItem >= 0)
+			{
+				m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
+			}
+		}*/
+	}
+	else if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Up) || m_pGamepadPlayerOne->GetStickDirectionDown(m_XStickDirections.LStick_Up))
+	{
+		/*if (m_menuItem > 0)
+		{
+			if (m_menuItem >= 0)
+			{
+				m_buttons[m_menuItem]->SetState(BUTTON_STATE_DEFAULT);
+			}
+
+			m_menuItem--;
+			if (m_menuItem >= 0)
+			{
+				m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
+			}
+		}*/
+	}
 
 	m_pGamepadPlayerOne->PostProcess();
-
 
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
 		m_pCamera->Process();
 
-		ProcessShaders();	
-		m_pButton->Process(_dt);
+		ProcessShaders();
 
-		// TO DO CAL - Remove
-		m_pGame->Process(_dt);
+		if (m_showMenu == true)
+		{
+			m_mainMenu->Process(_dt);
+		}
+		else
+		{
+			m_pGame->Process(_dt);
+		}
+		
 	}
 
 	return true;
@@ -334,10 +365,7 @@ bool Application::Process(float _dt)
 
 void Application::ProcessShaders()
 {
-	if (m_pShader_Sprite != 0)
-	{
-		m_pShader_Sprite->Update(0.0f);
-	}
+	
 }
 
 void Application::Render()
@@ -348,22 +376,21 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		
-
-
-		// Turn the z buffer off
-		m_pDX10_Renderer->TurnZBufferOff();
-
-		m_pButton->Draw();
-
-		// Turn the z buffer on
-		m_pDX10_Renderer->TurnZBufferOn();
-
-		// TO DO CAL - Remove
-		m_pGame->Render();
+		if (m_showMenu == true)
+		{
+			m_mainMenu->Draw();
+		}
+		else
+		{
+			m_pTimer->Tick();
+			m_pGame->Render();
+			m_pTimer->Tick();
+			float dt = m_pTimer->GetDeltaTime();
+			printf("%f \n", dt);
+		}
 
 		// Tell the Renderer the data input is over and present the outcome
-		m_pDX10_Renderer->EndRender();
+		m_pDX10_Renderer->EndRender();	
 	}
 }
 

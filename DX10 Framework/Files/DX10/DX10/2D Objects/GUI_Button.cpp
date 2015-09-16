@@ -39,28 +39,22 @@ bool GUI_Button::Initialize(DX10_Renderer* _pDX10_Renderer, DXSprite* _pSprite, 
 	m_position.x = _x;
 	m_position.y = _y;
 
+	m_width = _width;
+	m_height = _height;
+
 	m_bounds.m_x = _x;
 	m_bounds.m_y = _y;
 	m_bounds.m_w = _width;
 	m_bounds.m_h = _height;
 
 	// Intialize the bounds
-	m_bounds.m_w = m_position.x + (m_width / m_pSprite->GetSliceWidth()) - m_boundsOffset;
-	m_bounds.m_h = m_position.y + (m_height / m_pSprite->GetSliceHeight()) - m_boundsOffset;
-
-	//m_bounds.right = static_cast<long>(_x + (_width / _pBitmap->GetSliceWidth()));
-	//m_bounds.bottom = static_cast<long>(_y + (_height / _pBitmap->GetSliceHeight()));
-
-	m_width = _width;
-	m_height = _height;
-
-	/*if (!m_pBitmap->Initialize(_pD3DDevice, _pHWnd, _filename, _width, _height, _sliceWidth, _sliceHeight)) // 100 * 129, 300 * 387 //88 * 97 , 264 * 291
-	return false; // 280 * 345*/
+	m_bounds.m_w = m_position.x + m_width - m_boundsOffset;
+	m_bounds.m_h = m_position.y + m_height - m_boundsOffset;
 
 	return true;
 }
 
-void GUI_Button::GetPosition(D3DXVECTOR2& _out)	// TOIMPROVE - Maybe add the centre as the origin
+void GUI_Button::GetPosition(v2float& _out)	// TOIMPROVE - Maybe add the centre as the origin
 {
 	_out.x = m_position.x;
 	_out.y = m_position.y;
@@ -69,6 +63,21 @@ void GUI_Button::GetPosition(D3DXVECTOR2& _out)	// TOIMPROVE - Maybe add the cen
 BUTTON_STATE GUI_Button::GetState()
 {
 	return m_state;
+}
+
+DXSprite* GUI_Button::GetSprite()
+{
+	return m_pSprite;
+}
+
+float GUI_Button::GetWidth()
+{
+	return m_width;
+}
+
+float GUI_Button::GetHeight()
+{
+	return m_height;
 }
 
 void GUI_Button::SetPosition(float _x, float _y)
@@ -80,21 +89,14 @@ void GUI_Button::SetPosition(float _x, float _y)
 	m_bounds.m_y = m_position.y + m_boundsOffset;
 
 	// Intialize the bounds
-	m_bounds.m_w = m_position.x + (m_width / m_pSprite->GetSliceWidth()) - m_boundsOffset;
-	m_bounds.m_h = m_position.y + (m_height / m_pSprite->GetSliceHeight()) - m_boundsOffset;
+	m_bounds.m_w = m_position.x + m_width - m_boundsOffset;
+	m_bounds.m_h = m_position.y + m_height - m_boundsOffset;
 }
 
 void GUI_Button::SetState(BUTTON_STATE _state)
 {
 	m_state = _state;
 }
-
-/*void GUI_Button::SetBitmap(DXBitmap* _pBitmap)
-{
-	
-
-	m_pBitmap = _pBitmap;
-}*/
 
 void GUI_Button::SetBoundsOffset(float _offset)
 {
@@ -111,10 +113,10 @@ void GUI_Button::Draw()
 	case BUTTON_STATE::BUTTON_STATE_HOVER:
 		m_pSprite->SetImageIndex(1);
 		break;
-	case BUTTON_STATE::BUTTON_SELECTED:
+	case BUTTON_STATE::BUTTON_STATE_SELECTED:
 		m_pSprite->SetImageIndex(2);
 		break;
-	case BUTTON_STATE::BUTTON_DEACTIVATED:
+	case BUTTON_STATE::BUTTON_STATE_DEACTIVATED:
 		break;
 	}
 
@@ -125,7 +127,7 @@ void GUI_Button::Draw()
 
 void GUI_Button::Process(float _deltaTime)
 {
-	if (m_state == BUTTON_STATE::BUTTON_DEACTIVATED)
+	if (m_state == BUTTON_STATE::BUTTON_STATE_DEACTIVATED)
 		return;
 
 	/*DIMOUSESTATE mouseCurrState = m_pInput->GetMouseState();
@@ -146,4 +148,10 @@ void GUI_Button::Process(float _deltaTime)
 	}
 	else
 		m_state = eState::ES_DEFAULT;*/
+}
+
+bool GUI_Button::IsInBounds(v2float _point)
+{
+	return (_point.x >= m_bounds.m_x && _point.x <= m_bounds.m_w &&
+		_point.y >= m_bounds.m_y && _point.y <= m_bounds.m_h);
 }

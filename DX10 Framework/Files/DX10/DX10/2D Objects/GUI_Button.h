@@ -25,8 +25,8 @@ enum BUTTON_STATE
 {
 	BUTTON_STATE_DEFAULT,
 	BUTTON_STATE_HOVER,
-	BUTTON_SELECTED,
-	BUTTON_DEACTIVATED
+	BUTTON_STATE_SELECTED,
+	BUTTON_STATE_DEACTIVATED
 };
 
 class GUI_Button
@@ -62,15 +62,39 @@ class GUI_Button
 		@parameter:	_out		- The position of the object
 		@return:	void
 		********************/
-		virtual void GetPosition(D3DXVECTOR2& _out);
+		virtual void GetPosition(v2float& _out);
 
 		/*******************
 		-> Gets the objects current state
 		@author:	Juran Griffith.
 		@parameter:	None.
-		@return:	eState		- The current state the object is in.
+		@return:	BUTTON_STATE	- The current state the object is in.
 		********************/
 		virtual BUTTON_STATE GetState();
+
+		/*******************
+		-> Gets the objects current sprite
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	DXSprite	- A pointer to this objects sprite.
+		********************/
+		virtual DXSprite* GetSprite();
+
+		/*******************
+		-> Gets the width of the object
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	float		- The width of the image.
+		********************/
+		float GetWidth();
+
+		/*******************
+		-> Gets the height of the object
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	float		- The height of the image.
+		********************/
+		float GetHeight();
 
 		/*******************
 		-> Sets the objects new position
@@ -98,7 +122,7 @@ class GUI_Button
 		virtual void SetBoundsOffset(float _offset);
 
 		/*******************
-		-> Draws the objects
+		-> Draws the object
 		@author:	Juran Griffith.
 		@parameter:	None.
 		@return:	void
@@ -106,12 +130,20 @@ class GUI_Button
 		virtual void Draw();
 
 		/*******************
-		-> Updates the object
+		-> Process the object
 		@author:	Juran Griffith.
 		@parameter:	_deltaTime	- The application change in time.
 		@return:	void
 		********************/
 		virtual void Process(float _deltaTime);
+
+		/*******************
+		-> This checks if a position is within the object bounds
+		@author:	Juran Griffith.
+		@parameter:	_point	- The point to check if its within the objects bounds. Good for mouse input.
+		@return:	void
+		********************/
+		virtual bool IsInBounds(v2float _point);
 	protected:
 	private:
 	

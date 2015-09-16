@@ -40,12 +40,12 @@ public:
 	~ArenaTile();
 
 	// TO DO
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, UINT _texID);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _pTexName);
 	void Process(float _dt);
 	void Render();
 
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
-	UINT m_texID;
+	ID3D10ShaderResourceView* m_pTex;
 };
 #endif	// __ARENATILE_H__

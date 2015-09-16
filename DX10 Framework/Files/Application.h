@@ -37,7 +37,8 @@
 #include "DX10\DX10.h"
 #include "DX10\DX10\2D Objects\GUI_Button.h"
 #include "Input\InputGamePad.h"
-#include "Gameplay\Gameplay.h"	// TO DO CAL - remove
+#include "Menus\Menu.h"
+#include "Gameplay\Gameplay.h"
 
 class Application
 {
@@ -201,18 +202,17 @@ private:
 	// Camera
 	DX10_Camera_Debug* m_pCamera;
 
-	// Sprite
-	DXSprite* m_pSprite;
-	GUI_Button* m_pButton;
-	DX10_Shader_Sprite* m_pShader_Sprite;
-
 	// Game Pad Input
 	XButtonIDs m_XButtons;
+	XStickDirectionIDs m_XStickDirections;
 	InputGamePad* m_pGamepadPlayerOne;
 
-	// Game TO DO CAL - remove
-	Game* m_pGame;
+	// Menu Objects
+	Menu*	m_mainMenu;
+	bool m_showMenu;
 
+	// Game play Objects
+	Game* m_pGame;
 };
 
 #endif // __APPLICATION_H__
