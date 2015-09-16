@@ -38,6 +38,7 @@
 #include "DX10\DX10\2D Objects\GUI_Button.h"
 #include "Input\InputGamePad.h"
 #include "Menus\Menu.h"
+#include "Gameplay\Gameplay.h"
 
 class Application
 {
@@ -208,6 +209,10 @@ private:
 
 	// Menu Objects
 	Menu*	m_mainMenu;
+	bool m_showMenu;
+
+	// Game play Objects
+	Game* m_pGame;
 };
 
 #endif // __APPLICATION_H__

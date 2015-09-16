@@ -23,7 +23,7 @@ ArenaTile::~ArenaTile()
 {
 }
 
-bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, UINT _texID)
+bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _pTexName)
 {
 	if (_pDX10_Renderer == 0 || _pMesh == 0 || _pShader == 0)
 	{
@@ -34,7 +34,8 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _p
 	m_pRenderer = _pDX10_Renderer;
 	m_pMesh = _pMesh;
 	m_pShader_LitTex = _pShader;
-	m_texID = _texID;
+	
+	VALIDATE(m_pRenderer->CreateTexture(_pTexName, m_pTex));
 	
 	return true;
 }
@@ -50,7 +51,7 @@ void ArenaTile::Render()
 	TLitTex _litTex;
 	_litTex.pMesh = m_pMesh;
 	_litTex.pMatWorld = &m_matWorld;
-	_litTex.textureID = m_texID;
+	_litTex.pTex = m_pTex;
 
 	// Set the Shader to Render the Tile
 	m_pShader_LitTex->Render(_litTex, TECH_LITTEX_STANDARD);

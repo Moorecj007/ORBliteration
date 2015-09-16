@@ -124,6 +124,7 @@
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaFloor.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaTile.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Game.cpp" />
+    <ClCompile Include="Files\Gameplay\Gameplay\Orbs\Orb.cpp" />
     <ClCompile Include="Files\Input\InputGamePad.cpp" />
     <ClCompile Include="Files\Menus\Menu.cpp" />
     <ClCompile Include="Files\Physics\2D Physics\Physics_World_2D.cpp" />
@@ -132,8 +133,8 @@
     <ClCompile Include="Files\Physics\2D Physics\Physics_Rope_2D.cpp" />
     <ClCompile Include="Files\Physics\2D Physics\Physics_Pulley_2D.cpp" />
     <ClCompile Include="Files\Utility\DirectInput.cpp" />
+    <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp" />
     <ClCompile Include="Files\Utility\Timer.cpp" />
-    <ClCompile Include="Orb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Files\Application.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Files\Gameplay\Gameplay\Arena\ArenaFloor.h" />
     <ClInclude Include="Files\Gameplay\Gameplay\Arena\ArenaTile.h" />
     <ClInclude Include="Files\Gameplay\Gameplay\Game.h" />
+    <ClInclude Include="Files\Gameplay\Gameplay\Orbs\Orb.h" />
     <ClInclude Include="Files\Input\InputGamePad.h" />
     <ClInclude Include="Files\Menus\Menu.h" />
     <ClInclude Include="Files\Physics\2D Physics\Physics_World_2D.h" />
@@ -167,10 +169,10 @@
     <ClInclude Include="Files\Physics\2D Physics\Physics_Utilities.h" />
     <ClInclude Include="Files\Physics\Physics_2D.h" />
     <ClInclude Include="Files\Utility\DirectInput.h" />
+    <ClInclude Include="Files\Utility\Mutex_Semaphore.h" />
     <ClInclude Include="Files\Utility\Timer.h" />
     <ClInclude Include="Files\Utility\Utilities.h" />
     <ClInclude Include="Files\Utility\Utility_Math.h" />
-    <ClInclude Include="Orb.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\FX\LightStructures.fx" />

@@ -173,6 +173,8 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
+	m_showMenu = false;
+
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
 	m_clientHeight = _clientHeight;
@@ -186,6 +188,12 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	VALIDATE(m_pGamepadPlayerOne->Initialise(1));
 
 	VALIDATE(Initialise_DX10(_hInstance));
+
+	if (m_showMenu == false)
+	{
+		m_pGame = new Game();
+		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+	}
 
 	m_online = true;
 
@@ -212,7 +220,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
 
-	// Intialise Menu
+	// Initialise Menu
 	m_mainMenu = new Menu();
 	VALIDATE(m_mainMenu->Initialize(m_pDX10_Renderer, &m_hWnd));
 
@@ -250,6 +258,9 @@ void Application::ShutDown()
 
 		// Menu memory release
 		ReleasePtr(m_mainMenu);
+		
+		// Gameplay objects memory release
+		ReleasePtr(m_pGame);
 
 		// Release the renderers resources
 		m_pDX10_Renderer->ShutDown();
@@ -296,17 +307,6 @@ bool Application::Process(float _dt)
 	// Handle Controller Input
 	m_pGamepadPlayerOne->PreProcess();
 
-	// TO DO SHit HERE
-	//if (!m_pGamepadPlayerOne->LStick_InDeadZone())
-	//{
-	//	v2float LeftAxis = m_pGamepadPlayerOne->GetLStickXY();
-	//	if (LeftAxis.y == 1.0f)
-	//	{
-	//		// 
-	//	}
-	//
-	//}
-
 	if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepadPlayerOne->GetStickDirectionDown(m_XStickDirections.LStick_Down))
 	{
 		/*if (m_menuItem < m_buttons.size() - 1)
@@ -348,7 +348,16 @@ bool Application::Process(float _dt)
 		m_pCamera->Process();
 
 		ProcessShaders();
-		m_mainMenu->Process(_dt);
+
+		if (m_showMenu == true)
+		{
+			m_mainMenu->Process(_dt);
+		}
+		else
+		{
+			m_pGame->Process(_dt);
+		}
+		
 	}
 
 	return true;
@@ -367,7 +376,18 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		m_mainMenu->Draw();
+		if (m_showMenu == true)
+		{
+			m_mainMenu->Draw();
+		}
+		else
+		{
+			m_pTimer->Tick();
+			m_pGame->Render();
+			m_pTimer->Tick();
+			float dt = m_pTimer->GetDeltaTime();
+			printf("%f \n", dt);
+		}
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();	
