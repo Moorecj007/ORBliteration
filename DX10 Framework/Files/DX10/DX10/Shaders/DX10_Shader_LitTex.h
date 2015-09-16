@@ -99,10 +99,10 @@ public:
 	********************/
 	void Render(TLitTex _litTex, eTech_LitTex _tech)
 	{
-		SetCurrentIDs(_tech);
-
 		// Reset draw states in case they're different
 		m_pDX10_Renderer->RestoreDefaultDrawStates();
+
+		SetCurrentIDs(_tech);
 
 		// Set the Renderer Input layout and primitive topology to be the correct ones for this shader
 		m_pDX10_Renderer->SetInputLayout(m_currentVertexLayoutID);
@@ -126,10 +126,10 @@ public:
 				m_pMatWorld->SetMatrix((float*)&matWorld);
 				m_pMatTex->SetMatrix((float*)&matTex);
 				m_pMapDiffuse->SetResource(m_pDX10_Renderer->GetTexture(_litTex.textureID));
-				m_pMapSpecular->SetResource(m_pDX10_Renderer->GetTexture(m_specularID));
+				m_pMapSpecular->SetResource(m_pDX10_Renderer->GetTexture(m_specularID));			
 
 				pTech->GetPassByIndex(p)->Apply(0);
-				_litTex.pMesh->Render();
+				_litTex.pMesh->Render();	
 			}
 		}
 	}

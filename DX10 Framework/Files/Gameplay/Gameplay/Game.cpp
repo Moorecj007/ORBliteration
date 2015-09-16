@@ -41,7 +41,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	v3float tileScale = { 10, 10, 1 };
+	v3float tileScale = { 4, 4, 0.1f };
 	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 21, 21, tileScale));
 	
 	return true;

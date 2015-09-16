@@ -43,11 +43,16 @@ public:
 	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT rowCount, UINT colCount, v3float _tileScale);
 	void Process(float _dt);
 	void Render();
+	void DestroyOuterLayer();
+
+
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Mesh_Rect_Prism* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*> m_arenaTiles;	
+
+	float m_timeElapsed;
 };
 #endif	// __ARENAFLOOR_H__
 
