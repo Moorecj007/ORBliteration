@@ -89,6 +89,20 @@ struct XButtonIDs
 
 		Start = 12;
 		Back = 13;
+
+		/*LJoyStick_Up = 14;
+		LJoyStick_Down = 15;
+		LJoyStick_left = 16;
+		LJoyStick_Right = 17;
+
+		RJoyStick_Up = 18;
+		RJoyStick_Down = 19;
+		RJoyStick_left = 20;
+		RJoyStick_Right = 21;
+
+		Trigger_L = 22;
+		Trigger_R = 23;*/
+
 	};
 
 	// Action Buttons
@@ -116,6 +130,38 @@ struct XButtonIDs
 
 	// 'BACK' button
 	int Back;  
+
+};
+
+/***********************
+* XButtonIDs: Struct to hold the XInput Button IDs
+* @author: Jc Fowles
+********************/
+struct XStickDirectionIDs
+{
+	XStickDirectionIDs()
+	{
+		LJoyStick_Up = 0;
+		LJoyStick_Down = 1;
+		LJoyStick_Left = 2;
+		LJoyStick_Right = 3;
+		
+		RJoyStick_Up = 4;
+		RJoyStick_Down = 5;
+		RJoyStick_Left = 6;
+		RJoyStick_Right = 7;
+ 	}
+
+	// Joystick 
+	int LJoyStick_Up ;
+	int LJoyStick_Down ;
+	int LJoyStick_Left ;
+	int LJoyStick_Right ;
+
+	int RJoyStick_Up ;
+	int RJoyStick_Down ;
+	int RJoyStick_Left ;
+	int RJoyStick_Right ;
 };
 
 class InputGamePad
@@ -177,18 +223,22 @@ public:
 	bool RStick_InDeadZone();
 
 	/***********************
-	* GetLStickXY: Get the Value of the X and Y axes of the Left stick
+	* GetLStickAxis: Get the Value of the X and Y axes of the Left stick
 	* @author: Jc Fowles
 	* @return: v2float: The Value of the X and Y axes of the Left stick
 	********************/
-	v2float	GetLStickXY();
+	v2float	GetLStickAxis();
 
 	/***********************
-	* GetRStickXY: Get the Value of the X and Y axes of the Right stick
+	* GetRStickAxis: Get the Value of the X and Y axes of the Right stick
 	* @author: Jc Fowles
 	* @return: v2float: The Value of the X and Y axes of the Right stick
 	********************/
-	v2float	GetRStickXY();
+	v2float	GetRStickAxis();
+
+	// TO DO JC: 
+	bool GetStickDirectionPressed(int _Direction);
+	bool GetStickDirectionDown(int _Direction);
 
 	// Trigger Functions 
 
@@ -291,6 +341,15 @@ private:
   	// Buttons pressed on current frame
 	bool Gamepad_ButtonsDown[ButtonCount];
 
+	// Total gamepad buttons
+	static const int StickCount = 8;
+
+	// Previous frame Stick states
+	bool Prev_StickStates[StickCount];
+	// Current frame Stick states
+	bool StickStates[ButtonCount];
+	// Stick pressed on current frame
+	bool Gamepad_StickDown[ButtonCount];
 
 };
 
