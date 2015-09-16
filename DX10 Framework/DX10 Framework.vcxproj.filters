@@ -204,6 +204,9 @@
     <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.h">
       <Filter>Header Files\DX10\Cameras</Filter>
     </ClInclude>
+    <ClInclude Include="Orb.h">
+      <Filter>Header Files\Gameplay\Orbs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Files\Application.cpp">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.cpp">
       <Filter>Source Files\DX10\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Orb.cpp">
+      <Filter>Source Files\Gameplay\Orbs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

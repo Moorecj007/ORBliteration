@@ -17,7 +17,6 @@
 #define __CINPUT_GAMEPAD_H__
 
 // Library Link
-
 //#pragma comment(lib, "Xinput.lib")
 #pragma comment(lib, "XInput9_1_0.lib")
 
@@ -89,6 +88,20 @@ struct XButtonIDs
 
 		Start = 12;
 		Back = 13;
+
+		/*LJoyStick_Up = 14;
+		LJoyStick_Down = 15;
+		LJoyStick_left = 16;
+		LJoyStick_Right = 17;
+
+		RJoyStick_Up = 18;
+		RJoyStick_Down = 19;
+		RJoyStick_left = 20;
+		RJoyStick_Right = 21;
+
+		Trigger_L = 22;
+		Trigger_R = 23;*/
+
 	};
 
 	// Action Buttons
@@ -116,6 +129,38 @@ struct XButtonIDs
 
 	// 'BACK' button
 	int Back;  
+
+};
+
+/***********************
+* XButtonIDs: Struct to hold the XInput Button IDs
+* @author: Jc Fowles
+********************/
+struct XStickDirectionIDs
+{
+	XStickDirectionIDs()
+	{
+		LStick_Up = 0;
+		LStick_Down = 1;
+		LStick_Left = 2;
+		LStick_Right = 3;
+		
+		RStick_Up = 4;
+		RStick_Down = 5;
+		RStick_Left = 6;
+		RStick_Right = 7;
+ 	}
+
+	// Joystick 
+	int LStick_Up ;
+	int LStick_Down ;
+	int LStick_Left ;
+	int LStick_Right ;
+
+	int RStick_Up ;
+	int RStick_Down ;
+	int RStick_Left ;
+	int RStick_Right ;
 };
 
 class InputGamePad
@@ -158,8 +203,7 @@ public:
 	* @return: void:
 	********************/
 	void PostProcess(); 
-
-
+	
 	// Thumbstick Functions 
 	
 	/***********************
@@ -177,18 +221,34 @@ public:
 	bool RStick_InDeadZone();
 
 	/***********************
-	* GetLStickXY: Get the Value of the X and Y axes of the Left stick
+	* GetLStickAxis: Get the Value of the X and Y axes of the Left stick
 	* @author: Jc Fowles
 	* @return: v2float: The Value of the X and Y axes of the Left stick
 	********************/
-	v2float	GetLStickXY();
+	v2float	GetLStickAxis();
 
 	/***********************
-	* GetRStickXY: Get the Value of the X and Y axes of the Right stick
+	* GetRStickAxis: Get the Value of the X and Y axes of the Right stick
 	* @author: Jc Fowles
 	* @return: v2float: The Value of the X and Y axes of the Right stick
 	********************/
-	v2float	GetRStickXY();
+	v2float	GetRStickAxis();
+
+	/***********************
+	* GetStickDirectionPressed: Get whether a stick has been pressed in a certian direction based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction: The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction is pressed (True if the Stick Direction is pressed)
+	********************/
+	bool GetStickDirectionPressed(int _direction);
+
+	/***********************
+	* GetButtonDown: Get whether a stick has been pressed in a certian direction was pressed (gone down) in this frame based on the passed in Stick Direction ID
+	* @author: Jc Fowles
+	* @parameter: _direction:  The Stick Direction ID of which stick in what direction you are checking
+	* @return: bool: Whether the Stick Direction was pressed (gone down) in this frame (True if the Stick Direction is down)
+	********************/
+	bool GetStickDirectionDown(int _direction);
 
 	// Trigger Functions 
 
@@ -211,7 +271,7 @@ public:
 	/***********************
 	* GetButtonPressed: Get whether the button is pressed based on the passed in button ID 
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button is pressed (True if the button is pressed)
 	********************/
 	bool GetButtonPressed(int _button);
@@ -219,7 +279,7 @@ public:
 	/***********************
 	* GetButtonDown: Get whether the button was pressed (gone down) in this frame based on the passed in button ID
 	* @author: Jc Fowles
-	* @parameter: _button; The Button ID of the button you are checking
+	* @parameter: _button: The Button ID of the button you are checking
 	* @return: bool: Whether the button was pressed (gone down) in this frame (True if the button is down)
 	********************/
 	bool GetButtonDown(int _button); 
@@ -243,15 +303,7 @@ public:
 	void StopVibrate();
 
 	// Utility Functions 
-
-	/***********************
-	* GetState: Return the Current Gamepad State
-	* @author: Jc Fowles
-	* @return: XINPUT_STATE: The Current Gamepad State
-	********************/
-	// TO DO: Abstract the state
-	XINPUT_STATE GetState();
-
+	
 	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
 	* @author: Jc Fowles
@@ -266,10 +318,16 @@ public:
 	********************/
 	bool Connected();   
 
-
-
 protected:
 private:
+
+	/***********************
+	* GetState: Return the Current Gamepad State
+	* @author: Jc Fowles
+	* @return: XINPUT_STATE: The Current Gamepad State
+	********************/
+	XINPUT_STATE GetState();
+
 	  // Member Variables
 public:
 protected:
@@ -291,6 +349,15 @@ private:
   	// Buttons pressed on current frame
 	bool Gamepad_ButtonsDown[ButtonCount];
 
+	// Total gamepad buttons
+	static const int StickCount = 8;
+
+	// Previous frame Stick states
+	bool Prev_StickStates[StickCount];
+	// Current frame Stick states
+	bool StickStates[ButtonCount];
+	// Stick pressed on current frame
+	bool Gamepad_StickDown[ButtonCount];
 
 };
 
