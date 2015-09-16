@@ -37,6 +37,7 @@
 #include "DX10\DX10.h"
 #include "DX10\DX10\2D Objects\GUI_Button.h"
 #include "Input\InputGamePad.h"
+#include "Gameplay\Gameplay.h"	// TO DO CAL - remove
 
 class Application
 {
@@ -208,6 +209,9 @@ private:
 	// Game Pad Input
 	XButtonIDs m_XButtons;
 	InputGamePad* m_pGamepadPlayerOne;
+
+	// Game TO DO CAL - remove
+	Game* m_pGame;
 
 };
 

@@ -179,6 +179,10 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
+	// TO DO CAL - remove
+	m_pGame = new Game();
+	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+
 	m_online = true;
 
 	// Initialise all time keeping variables to default (zero) state
@@ -199,10 +203,10 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise the Objects
 	m_pCamera = new DX10_Camera_Debug();
+	VALIDATE(m_pCamera->Initialise(m_pDX10_Renderer));
 	m_pCamera->SetPostionVec({ 0, 0, -100.0f });
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
-	VALIDATE(m_pCamera->Initialise(m_pDX10_Renderer));
 
 	m_pShader_Sprite = new DX10_Shader_Sprite();
 	VALIDATE(m_pShader_Sprite->Initialize(m_pDX10_Renderer, &m_hWnd));
@@ -238,10 +242,16 @@ void Application::ShutDown()
 		// DX10 pointers to release
 		ReleasePtr(m_pCamera);
 
+		// Gamepad input memory release
+		ReleasePtr(m_pGamepadPlayerOne);
+
 		// Sprite Stuff
 		ReleasePtr(m_pShader_Sprite);
 		ReleasePtr(m_pSprite);
 		ReleasePtr(m_pButton);
+
+		// TO DO CAL - remove
+		ReleasePtr(m_pGame);
 
 		m_pDX10_Renderer->ShutDown();
 		ReleasePtr(m_pDX10_Renderer);
@@ -311,6 +321,9 @@ bool Application::Process(float _dt)
 
 		ProcessShaders();	
 		m_pButton->Process(_dt);
+
+		// TO DO CAL - Remove
+		m_pGame->Process(_dt);
 	}
 
 	return true;
@@ -342,6 +355,9 @@ void Application::Render()
 
 		// Turn the z buffer on
 		m_pDX10_Renderer->TurnZBufferOn();
+
+		// TO DO CAL - Remove
+		m_pGame->Render();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();
