@@ -52,17 +52,38 @@ public:
 	* @parameter: _pShader: The Shader for the Orb
 	* @parameter: _textureID: ID of the single texture for the Orb to display
 	* @parameter: _density: The Density of the Orb to calculate its mass
-	* @parameter: _maxSpeed: The mass speed the Orb is allowed to travel at
+	* @parameter: _speed: The speed at which the Orb accelerates 
+	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, UINT _textureID, float _density, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, UINT _textureID, float _density, float _Speed, float _maxSpeed);
 
 
 	// TO DO JC:
 	void Process(float _dt);
 
-	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
+	//void Accelerate();
+	void Decelerate()
+	{
+		v3float deceleration;
+		deceleration = (m_velocity * m_DecelerationSpeed) * -1.0f;
+		if ((deceleration.x > -0.0001f) && (deceleration.x < 0.0001f))
+		{
+			deceleration.x = 0.0f;
+		}
+		if ((deceleration.y > -0.0001f) && (deceleration.y < 0.0001f))
+		{
+			deceleration.y = 0.0f;
+		}
 
+		m_acceleration = deceleration;
+	};
+
+	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
+	v3float GetAcceleration(){ return m_acceleration; };
+
+	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
+	v3float GetVelocity(){ return m_velocity; };
 protected:
 private:
 	// Member Variables
@@ -72,6 +93,8 @@ private:
 
 	v3float m_acceleration;
 	v3float m_velocity;
+	float m_AccelerationSpeed;
+	float m_DecelerationSpeed;
 	float m_maxSpeed;
 	float m_density;
 	bool m_isAlive;
