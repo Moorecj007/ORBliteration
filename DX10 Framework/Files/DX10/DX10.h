@@ -46,6 +46,7 @@
 
 // Cameras
 #include "DX10\Cameras\DX10_Camera_FirstPerson.h"
+#include "DX10\Cameras\DX10_Camera_Debug.h"
 
 // Shaders
 #include "DX10\Shaders\DX10_Shader_LitTex.h"

@@ -173,6 +173,10 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_pKeyDown = new bool[255];
 	memset(m_pKeyDown, false, 255);
 
+	// Create the Player One Pad controller
+	m_pGamepadPlayerOne = new InputGamePad();
+	VALIDATE(m_pGamepadPlayerOne->Initialise(1));
+
 	VALIDATE(Initialise_DX10(_hInstance));
 
 	m_online = true;
@@ -189,42 +193,25 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 bool Application::Initialise_DX10(HINSTANCE _hInstance)
 {
-	UINT texID = 0;
-
 	// Initialise the Renderer
 	m_pDX10_Renderer = new DX10_Renderer();
 	VALIDATE(m_pDX10_Renderer->Initialise(m_clientWidth, m_clientHeight, m_hWnd));
 
 	// Initialise the Objects
-	m_pCamera = new DX10_Camera_FirstPerson();
-	m_pCamera->Initialise(m_pDX10_Renderer, _hInstance, m_hWnd);
+	m_pCamera = new DX10_Camera_Debug();
+	m_pCamera->SetPostionVec({ 0, 0, -100.0f });
+	m_pCamera->SetTargetVec({ 0, 0, 0 });
+	m_pCamera->SetUpVec({ 0, 1, 0 });
+	VALIDATE(m_pCamera->Initialise(m_pDX10_Renderer));
 
-	m_pShader_LitTex = new DX10_Shader_LitTex();
-	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
+	m_pShader_Sprite = new DX10_Shader_Sprite();
+	VALIDATE(m_pShader_Sprite->Initialize(m_pDX10_Renderer, &m_hWnd));
 
-	m_pTerrainMesh = new DX10_Mesh_Rect_Prism();
-	TVertexNormalUV vertNormalUV;
-	VALIDATE(m_pTerrainMesh->Initialise(m_pDX10_Renderer, vertNormalUV, { 100, 100, 1 }));
+	m_pSprite = new DXSprite();
+	VALIDATE(m_pSprite->Initialize(&m_hWnd, m_pDX10_Renderer, m_pShader_Sprite, "Button/button_exit.png", 280, 345));
 
-	m_pAvatarMesh = new DX10_Mesh_Rect_Prism();
-	VALIDATE(m_pAvatarMesh->Initialise(m_pDX10_Renderer, vertNormalUV, { 1, 1, 1 }));
-
-	
-
-
-
-	m_pDX10_Renderer->CreateTexture("Flare.dds", &texID);
-	std::vector<UINT>* pTexVec = new std::vector < UINT > ;
-	pTexVec->push_back(texID);
-	m_pTerrain = new DX10_Obj_LitTex();
-	VALIDATE(m_pTerrain->Initialise(m_pDX10_Renderer, m_pTerrainMesh, m_pShader_LitTex, pTexVec));
-	m_pTerrain->SetPosition({ 0, 0, 100 });
-
-	m_pDX10_Renderer->CreateTexture("WoodCrate02.dds", &texID);
-	pTexVec = new std::vector < UINT > ;
-	pTexVec->push_back(texID);
-	m_pAvatar = new DX10_Obj_LitTex();
-	VALIDATE(m_pAvatar->Initialise(m_pDX10_Renderer, m_pAvatarMesh, m_pShader_LitTex, pTexVec));
+	m_pButton = new GUI_Button();
+	VALIDATE(m_pButton->Initialize(m_pDX10_Renderer, m_pSprite, 0.0f, 0.0f, 280.0f, 345.0f / 3.0f));
 
 	return true;
 }
@@ -249,12 +236,12 @@ void Application::ShutDown()
 	if (m_pDX10_Renderer != 0)
 	{ 
 		// DX10 pointers to release
-		ReleasePtr(m_pShader_LitTex);
 		ReleasePtr(m_pCamera);
-		ReleasePtr(m_pTerrainMesh);
-		ReleasePtr(m_pAvatarMesh);
-		ReleasePtr(m_pTerrain);
-		ReleasePtr(m_pAvatar);
+
+		// Sprite Stuff
+		ReleasePtr(m_pShader_Sprite);
+		ReleasePtr(m_pSprite);
+		ReleasePtr(m_pButton);
 
 		m_pDX10_Renderer->ShutDown();
 		ReleasePtr(m_pDX10_Renderer);
@@ -280,7 +267,7 @@ void Application::ExecuteOneFrame()
 		}
 		Render();
 
-		m_deltaTick -= (1.0f / 60.0f);
+		m_deltaTick = 0;
 		m_fps++;
 	}	
 
@@ -296,14 +283,34 @@ bool Application::Process(float _dt)
 {
 	VALIDATE(HandleInput());
 
+	// Handle Controller Input
+	m_pGamepadPlayerOne->PreProcess();
+
+	// TO DO SHit HERE
+	//if (!m_pGamepadPlayerOne->LStick_InDeadZone())
+	//{
+	//	v2float LeftAxis = m_pGamepadPlayerOne->GetLStickXY();
+	//	if (LeftAxis.y == 1.0f)
+	//	{
+	//		// 
+	//	}
+	//
+	//	if (m_pGamepadPlayerOne->GetButtonPressed(m_XButtons.DPad_Down))
+	//	{
+	//
+	//	}
+	//}
+
+	m_pGamepadPlayerOne->PostProcess();
+
+
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
-		ProcessShaders();
+		m_pCamera->Process();
 
-		m_pCamera->Process(_dt);
-		m_pTerrain->Process(_dt);
-		m_pAvatar->Process(_dt);
+		ProcessShaders();	
+		m_pButton->Process(_dt);
 	}
 
 	return true;
@@ -311,10 +318,9 @@ bool Application::Process(float _dt)
 
 void Application::ProcessShaders()
 {
-	// Setup the LitTex Shader if one exists
-	if (m_pShader_LitTex != 0)
+	if (m_pShader_Sprite != 0)
 	{
-		m_pShader_LitTex->SetUpPerFrame();
+		m_pShader_Sprite->Update(0.0f);
 	}
 }
 
@@ -326,8 +332,16 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		m_pTerrain->Render();
-		m_pAvatar->Render();
+		
+
+
+		// Turn the z buffer off
+		m_pDX10_Renderer->TurnZBufferOff();
+
+		m_pButton->Draw();
+
+		// Turn the z buffer on
+		m_pDX10_Renderer->TurnZBufferOn();
 
 		// Tell the Renderer the data input is over and present the outcome
 		m_pDX10_Renderer->EndRender();
@@ -349,62 +363,71 @@ bool Application::HandleInput()
 		m_online = false;	// Changing this to false will cause the main application loop to end -> quitting the application
 	}
 
-	if (m_pDX10_Renderer != 0)
+	// Template Inputs
+	if (m_pKeyDown[VK_F1])
 	{
-		if (m_pKeyDown[VK_F1])
-		{
-			m_pDX10_Renderer->ToggleFullscreen();
-			m_pKeyDown[VK_F1] = false;
-		}
-		if (m_pKeyDown[VK_F2])
-		{
-			m_pDX10_Renderer->ToggleFillMode();
-			m_pKeyDown[VK_F2] = false;
-		}
+		m_pDX10_Renderer->ToggleFullscreen();
 
-		// Camera Inputs
-		if (m_pKeyDown[0x57]) // W Key
-		{
-			m_pCamera->MoveForwards(1.0f);
-		}
-		if (m_pKeyDown[0x53]) // S Key
-		{
-			m_pCamera->MoveForwards(-1.0f);
-		}
-		if (m_pKeyDown[0x41])	// A Key
-		{
-			m_pCamera->Strafe(-1.0f);
-		}
-		if (m_pKeyDown[0x44])	// D Key
-		{
-			m_pCamera->Strafe(1.0f);
-		}
-		if (m_pKeyDown[0x45])	// E Key
-		{
-			m_pCamera->Fly(1.0f);
-		}
-		if (m_pKeyDown[0x51])	// Q Key
-		{
-			m_pCamera->Fly(-1.0f);
-		}
-
-		if (m_pKeyDown[VK_LEFT])	// Left Arrow Key
-		{
-			m_pCamera->RotateYaw(-1.0f);
-		}
-		if (m_pKeyDown[VK_RIGHT])	// Right Arrow Key
-		{
-			m_pCamera->RotateYaw(1.0f);
-		}
-		if (m_pKeyDown[VK_UP])	// Up Arrow Key
-		{
-			m_pCamera->RotatePitch(-1.0f);
-		}
-		if (m_pKeyDown[VK_DOWN])	// Down Arrow Key
-		{
-			m_pCamera->RotatePitch(1.0f);
-		}
+		SetKeyDown(VK_F1, false);
 	}
+
+	if (m_pKeyDown[VK_F2])
+	{
+		m_pDX10_Renderer->ToggleFillMode();
+
+		SetKeyDown(VK_F2, false);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD4]) && !(m_pKeyDown[VK_NUMPAD6]))
+	{
+		m_pCamera->Strafe(-1 * m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD6]) && !(m_pKeyDown[VK_NUMPAD4]))
+	{
+		m_pCamera->Strafe(m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD8]) && !(m_pKeyDown[VK_NUMPAD2]))
+	{
+		m_pCamera->Move(m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD2]) && !(m_pKeyDown[VK_NUMPAD8]))
+	{
+		m_pCamera->Move(-1 * m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD1]) && !(m_pKeyDown[VK_NUMPAD0]))
+	{
+		m_pCamera->Fly(m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_NUMPAD0]) && !(m_pKeyDown[VK_NUMPAD1]))
+	{
+		m_pCamera->Fly(-1 * m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_UP]) && !(m_pKeyDown[VK_DOWN]))
+	{
+		m_pCamera->Pitch(-1 * m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_DOWN]) && !(m_pKeyDown[VK_UP]))
+	{
+		m_pCamera->Pitch(m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_LEFT]) && !(m_pKeyDown[VK_RIGHT]))
+	{
+		m_pCamera->Yaw(-1 * m_deltaTick);
+	}
+
+	if ((m_pKeyDown[VK_RIGHT]) && !(m_pKeyDown[VK_LEFT]))
+	{
+		m_pCamera->Yaw(m_deltaTick);
+	}
+
 	return true;
 }
 

@@ -45,8 +45,8 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 positionH    : SV_POSITION;
-    float3 position     : POSITION;
-    float3 normal		: NORMAL;
+	float3 position     : POSITION;
+	float3 normal		: NORMAL;
     float2 texCoord     : TEXCOORD;
 };
  

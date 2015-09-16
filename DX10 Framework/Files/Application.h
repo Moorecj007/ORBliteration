@@ -35,6 +35,8 @@
 #include "Utility\Utilities.h"
 #include "Utility\Timer.h"
 #include "DX10\DX10.h"
+#include "DX10\DX10\2D Objects\GUI_Button.h"
+#include "Input\InputGamePad.h"
 
 class Application
 {
@@ -196,18 +198,17 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 
 	// Camera
-	DX10_Camera_FirstPerson* m_pCamera;
+	DX10_Camera_Debug* m_pCamera;
 
-	// Objects
-	DX10_Obj_LitTex* m_pTerrain;
-	DX10_Obj_LitTex* m_pAvatar;
+	// Sprite
+	DXSprite* m_pSprite;
+	GUI_Button* m_pButton;
+	DX10_Shader_Sprite* m_pShader_Sprite;
 
-	// Meshes
-	DX10_Mesh_Generic* m_pTerrainMesh;
-	DX10_Mesh_Generic* m_pAvatarMesh;
-	
-	// Shaders
-	DX10_Shader_LitTex* m_pShader_LitTex;
+	// Game Pad Input
+	XButtonIDs m_XButtons;
+	InputGamePad* m_pGamepadPlayerOne;
+
 };
 
 #endif // __APPLICATION_H__

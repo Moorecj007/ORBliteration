@@ -208,5 +208,5 @@ bool DX10_Mesh_Finite_Plane::Initialise(DX10_Renderer* _pRenderer, TVertexColor 
 
 void DX10_Mesh_Finite_Plane::Render()
 {
-	m_pRenderer->RenderMesh(m_bufferID);
+	m_pRenderer->RenderBuffer(m_bufferID);
 }

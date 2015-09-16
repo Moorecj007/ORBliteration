@@ -19,18 +19,17 @@
 
 DXSprite::DXSprite():
 	m_previousPosX(-1),
-	m_previousPosY(-1)
+	m_previousPosY(-1),
+	m_pDX10_Renderer(0),
+	m_texID(0)
 {
-	m_pDX10_Renderer = 0;
-	m_texID = 0;
 }
 
 DXSprite::~DXSprite()
 {
-
 }
 
-bool DXSprite::Initialize(DX10_Renderer* _pDX10_Renderer, FXTexture* _pShader, std::string _filename, float _bitmapWidth, float _bitmapHeight, int _sliceWidth, int _sliceHeight)
+bool DXSprite::Initialize(HWND* _pHWnd, DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, std::string _filename, float _bitmapWidth, float _bitmapHeight, int _sliceWidth, int _sliceHeight)
 {
 	// Save the pointer to the device
 	m_pDX10_Renderer = _pDX10_Renderer;
@@ -61,7 +60,7 @@ bool DXSprite::Initialize(DX10_Renderer* _pDX10_Renderer, FXTexture* _pShader, s
 
 	// Save the screen size.
 	RECT rect;
-	if (GetClientRect(*m_pHWnd, &rect))
+	if (GetClientRect(*_pHWnd, &rect))
 	{
 		m_screenWidth = rect.right - rect.left;
 		m_screenHeight = rect.bottom - rect.top;
@@ -86,14 +85,10 @@ bool DXSprite::Initialize(DX10_Renderer* _pDX10_Renderer, FXTexture* _pShader, s
 	return true;
 }
 
-void DXSprite::Process(float _positionX, float _positionY)
+void DXSprite::SetPosition(float _positionX, float _positionY)
 {
-	// Re-build the dynamic vertex buffer for rendering to possibly a different location on the screen.
-	if (!UpdateBuffers(_positionX, _positionY))
-		return;
-
-	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	Render();
+	// Re-build the dynamic vertex buffer for rendering to a different location on the screen.
+	UpdateBuffers(_positionX, _positionY);
 }
 
 int DXSprite::GetIndexCount()
@@ -176,13 +171,13 @@ bool DXSprite::InitializeBuffers()
 
 bool DXSprite::UpdateBuffers(float _positionX, float _positionY)
 {
-	float left, right, top, bottom;
-	TVertexUV* vertices;
-	void* verticesPtr;
-
 	// If the position has not changed then don't update the vertex buffer
 	if ((_positionX == m_previousPosX) && (_positionY == m_previousPosY) && (m_indexPrev == m_index))
 		return true;
+
+	float left, right, top, bottom;
+	TVertexUV* vertices;
+	void* verticesPtr;
 
 	// Update the position
 	m_previousPosX = _positionX;

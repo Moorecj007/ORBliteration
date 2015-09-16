@@ -93,6 +93,8 @@ void DX10_Renderer::ShutDown()
 		ReleasePtr(iterBuffers->second);
 		iterBuffers++;
 	}
+	ReleaseCOM(m_pDepthStencilStateNormal);
+	ReleaseCOM(m_pDepthStencilStateZDisabled);
 	ReleaseCOM(m_pDepthStencilView);
 	ReleaseCOM(m_pDepthStencilBuffer);
 	ReleaseCOM(m_pRenderTargetView);
@@ -121,8 +123,8 @@ bool DX10_Renderer::InitialiseDeviceAndSwapChain()
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 	// multi sampling per pixel ( 4 sample only) and High quality
-	swapChainDesc.SampleDesc.Count = 4;
-	swapChainDesc.SampleDesc.Quality = 4;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
 
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 1;
@@ -188,26 +190,105 @@ bool DX10_Renderer::onResize()
 	// Release the memory from the temporary Back Buffer
 	ReleaseCOM(pBackBuffer);
 
-	// Create the depth/stencil buffer and view.
-	D3D10_TEXTURE2D_DESC depthStencilDesc;
+	// Create the depth buffer.
+	D3D10_TEXTURE2D_DESC depthBufferDesc;
 
-	depthStencilDesc.Width = m_clientWidth;
-	depthStencilDesc.Height = m_clientHeight;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count = 4; // multi sampling must match
-	depthStencilDesc.SampleDesc.Quality = 4; // swap chain values.
-	depthStencilDesc.Usage = D3D10_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D10_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0;
-	depthStencilDesc.MiscFlags = 0;
+	depthBufferDesc.Width = m_clientWidth;
+	depthBufferDesc.Height = m_clientHeight;
+	depthBufferDesc.MipLevels = 1;
+	depthBufferDesc.ArraySize = 1;
+	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthBufferDesc.SampleDesc.Count = 1; // multi sampling must match
+	depthBufferDesc.SampleDesc.Quality = 0; // swap chain values.
+	depthBufferDesc.Usage = D3D10_USAGE_DEFAULT;
+	depthBufferDesc.BindFlags = D3D10_BIND_DEPTH_STENCIL;
+	depthBufferDesc.CPUAccessFlags = 0;
+	depthBufferDesc.MiscFlags = 0;
 
-	VALIDATEHR(m_pDX10Device->CreateTexture2D(&depthStencilDesc, NULL, &m_pDepthStencilBuffer));
-	VALIDATEHR(m_pDX10Device->CreateDepthStencilView(m_pDepthStencilBuffer, NULL, &m_pDepthStencilView));
+	VALIDATEHR(m_pDX10Device->CreateTexture2D(&depthBufferDesc, NULL, &m_pDepthStencilBuffer));
+
+	//--------------------------------------------------------------------------------------
+	// Normal Depth Stencil
+	//--------------------------------------------------------------------------------------
+	D3D10_DEPTH_STENCIL_DESC depthStencilDesc;
+
+	// Initialize the description of the stencil state.
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
+	// Set up the description of the stencil state.
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D10_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D10_COMPARISON_LESS;
+
+	depthStencilDesc.StencilEnable = true;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.FrontFace.StencilFailOp = D3D10_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D10_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D10_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilFunc = D3D10_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing.
+	depthStencilDesc.BackFace.StencilFailOp = D3D10_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D10_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilPassOp = D3D10_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilFunc = D3D10_COMPARISON_ALWAYS;
+
+	// Create the depth stencil state.
+	VALIDATEHR(m_pDX10Device->CreateDepthStencilState(&depthStencilDesc, &m_pDepthStencilStateNormal));
+
+	// Set the depth stencil state on the D3D device.
+	m_pDX10Device->OMSetDepthStencilState(m_pDepthStencilStateNormal, 1);
+
+	D3D10_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+
+	// Initialize the depth stencil view.
+	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+
+	// Set up the depth stencil view description.
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+	// Create the depth stencil view.
+	VALIDATEHR(m_pDX10Device->CreateDepthStencilView(m_pDepthStencilBuffer, &depthStencilViewDesc, &m_pDepthStencilView));
+
+	// Bind the render target view and depth stencil buffer to the output render pipeline.
+	m_pDX10Device->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
+
+	//--------------------------------------------------------------------------------------
+	// Disabled Depth Stencil
+	//--------------------------------------------------------------------------------------
+	D3D10_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
+
+	// Clear the second depth stencil state before setting the parameters.
+	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
+
+	// Now create a second depth stencil state which turns off the Z buffer for 2D rendering.
+	depthDisabledStencilDesc.DepthEnable = false;
+	depthDisabledStencilDesc.DepthWriteMask = D3D10_DEPTH_WRITE_MASK_ALL;
+	depthDisabledStencilDesc.DepthFunc = D3D10_COMPARISON_LESS;
+	depthDisabledStencilDesc.StencilEnable = true;
+	depthDisabledStencilDesc.StencilReadMask = 0xFF;
+	depthDisabledStencilDesc.StencilWriteMask = 0xFF;
+	depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D10_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D10_STENCIL_OP_INCR;
+	depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D10_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilFunc = D3D10_COMPARISON_ALWAYS;
+	depthDisabledStencilDesc.BackFace.StencilFailOp = D3D10_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D10_STENCIL_OP_DECR;
+	depthDisabledStencilDesc.BackFace.StencilPassOp = D3D10_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilFunc = D3D10_COMPARISON_ALWAYS;
+
+	// Create the state using the device.
+	VALIDATEHR(m_pDX10Device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_pDepthStencilStateZDisabled));
+
+	//VALIDATEHR(m_pDX10Device->CreateDepthStencilView(m_pDepthStencilBuffer, NULL, &m_pDepthStencilView));
 	
 	// Bind the Render Target View to the output-merger stage of the pipeline
-	m_pDX10Device->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
+	//m_pDX10Device->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 	
 	// Set the View Port for the Device
 	D3D10_VIEWPORT viewPort;
@@ -224,7 +305,8 @@ bool DX10_Renderer::onResize()
 	// Calculate the new Projection Matrix
 	CalcProjMatrix();
 
-	
+	// Create an orthographic projection matrix for 2D rendering.
+	D3DXMatrixOrthoLH(&m_matOrtho, static_cast<float>(m_clientWidth), static_cast<float>(m_clientHeight), 0.1f, 100.0f);
 
 	return true;
 }
@@ -259,6 +341,16 @@ void DX10_Renderer::ToggleFillMode()
 	ReleaseCOM(m_pRasterizerState);
 	m_pDX10Device->CreateRasterizerState(&m_rasterizerDesc, &m_pRasterizerState);
 	m_pDX10Device->RSSetState(m_pRasterizerState);
+}
+
+void DX10_Renderer::TurnZBufferOn()
+{
+	m_pDX10Device->OMSetDepthStencilState(m_pDepthStencilStateNormal, 1);
+}
+
+void DX10_Renderer::TurnZBufferOff()
+{
+	m_pDX10Device->OMSetDepthStencilState(m_pDepthStencilStateZDisabled, 1);
 }
 
 bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _technique, UINT* _pFXID, UINT* _pTechID)
@@ -441,7 +533,7 @@ bool DX10_Renderer::CreateTexture(std::string _texFileName, UINT* _pTexID)
 	return true;
 }
 
-bool DX10_Renderer::RenderMesh(UINT _bufferID)
+bool DX10_Renderer::RenderBuffer(UINT _bufferID)
 {
 	// Retrieve the Buffer
 	std::map<UINT, DX10_Buffer*>::iterator iterBuffer = m_buffers.find(_bufferID);
@@ -450,13 +542,6 @@ bool DX10_Renderer::RenderMesh(UINT _bufferID)
 		return false;
 	}
 	iterBuffer->second->Render();
-	return true;
-}
-
-bool DX10_Renderer::RenderSprite(UINT _bufferID)
-{
-	
-
 	return true;
 }
 

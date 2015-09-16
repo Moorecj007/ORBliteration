@@ -96,6 +96,22 @@ public:
 	********************/
 	void ToggleFillMode();
 
+	/*******************
+	* TurnZBufferOn: Turns the z buffer on to render 3D objects properly
+	* @author:	Juran Griffith.
+	* @parameter:	None.
+	* @return:	void.
+	********************/
+	void TurnZBufferOn();
+
+	/*******************
+	* TurnZBufferOff: Turns the z buffer off to render 2D objects properly
+	* @author:	Juran Griffith.
+	* @parameter:	None.
+	* @return:	void.
+	********************/
+	void TurnZBufferOff();
+
 	/***********************
 	* BuildFX: Build a FX file and Technique and store on the Renderer
 	* @author: Callan Moore
@@ -174,20 +190,12 @@ public:
 	bool CreateTexture(std::string _texFileName, UINT* _pTexID);
 
 	/***********************
-	* RenderObject: Renders an Object to the screen
+	* RenderBuffer: Renders an Buffer to the screen
 	* @author: Callan Moore
 	* @parameter: _bufferID: The ID of the buffer stored on the Renderer
 	* @return: bool: Successful or not
 	********************/
-	bool RenderMesh(UINT _bufferID);
-
-	/***********************
-	* RenderObject: Renders an Object to the screen
-	* @author: Callan Moore
-	* @parameter: _bufferID: The ID of the buffer stored on the Renderer
-	* @return: bool: Successful or not
-	********************/
-	bool RenderSprite(UINT _bufferID);
+	bool RenderBuffer(UINT _bufferID);
 
 	/***********************
 	* StartRender: Clears the Back buffer ready for new frame
@@ -318,6 +326,7 @@ private:
 	// Matrices for Rendering
 	D3DXMATRIX m_matView;
 	D3DXMATRIX m_matProj;
+	D3DXMATRIX m_matOrtho;
 	D3DXVECTOR3 m_eyePos;
 
 	// DX10 Variables
@@ -325,6 +334,8 @@ private:
 	IDXGISwapChain*  m_pDX10SwapChain;
 	ID3D10RenderTargetView* m_pRenderTargetView;
 	ID3D10DepthStencilView* m_pDepthStencilView;
+	ID3D10DepthStencilState* m_pDepthStencilStateNormal;
+	ID3D10DepthStencilState* m_pDepthStencilStateZDisabled;
 	ID3D10Texture2D* m_pDepthStencilBuffer;
 	D3D10_RASTERIZER_DESC m_rasterizerDesc;
 	ID3D10RasterizerState* m_pRasterizerState;

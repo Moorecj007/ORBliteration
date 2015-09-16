@@ -373,5 +373,5 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexNormalUV
 
 void DX10_Mesh_Rect_Prism::Render()
 {
-	m_pRenderer->RenderMesh(m_bufferID);
+	m_pRenderer->RenderBuffer(m_bufferID);
 }
