@@ -303,7 +303,6 @@ public:
 	void StopVibrate();
 
 	// Utility Functions 
-	
 	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
 	* @author: Jc Fowles
@@ -320,7 +319,6 @@ public:
 
 protected:
 private:
-
 	/***********************
 	* GetState: Return the Current Gamepad State
 	* @author: Jc Fowles
