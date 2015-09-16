@@ -17,8 +17,92 @@
 
 ArenaFloor::ArenaFloor()
 {
+	m_pDX10_Renderer = 0;
 }
 
 ArenaFloor::~ArenaFloor()
 {
+	while (m_arenaTiles.empty() == false)
+	{
+		while (m_arenaTiles.back()->empty() == false)
+		{
+			ReleasePtr(m_arenaTiles.back()->back());
+			m_arenaTiles.back()->pop_back();
+		}
+
+		ReleasePtr(m_arenaTiles.back());
+		m_arenaTiles.pop_back();
+	}
+
+	ReleasePtr(m_pTileMesh);
+}
+
+bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT rowCount, UINT colCount, v3float _tileScale)
+{
+	m_pDX10_Renderer = _pDX10_Renderer;
+
+	// Create the Mesh for the Arena Tiles
+	m_pTileMesh = new DX10_Mesh_Rect_Prism();
+	TVertexNormalUV vertNormalUV;
+	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
+
+	UINT texID;
+	VALIDATE(m_pDX10_Renderer->CreateTexture("WoodCrate01.dds", &texID));
+
+	// Create the 2D vector of Arena Tiles
+	for (UINT row = 0; row < rowCount; row++)
+	{
+		std::vector<ArenaTile*>* pRowOfTiles = new std::vector<ArenaTile*>;
+
+		for (UINT col = 0; col < colCount; col++)
+		{
+			// Create a new Tile
+			ArenaTile* pTile = new ArenaTile();
+			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, texID));
+
+			// Set the Position based upon the position in the 2D grid
+			v3float tilePos;
+			tilePos.x = ((float)row - ((float)rowCount / 2.0f)) * _tileScale.x;
+			tilePos.y = ((float)col - ((float)colCount / 2.0f)) * _tileScale.y;
+			tilePos.z = 0.0f;
+			pTile->SetPosition(tilePos);
+
+			// Calculate the World matrix at Initialization only
+			pTile->CalcWorldMatrix();
+
+			// Add the new Tile to the Row
+			pRowOfTiles->push_back(pTile);
+		}
+		m_arenaTiles.push_back(pRowOfTiles);
+	}
+
+	return true;
+}
+
+void ArenaFloor::Process(float _dt)
+{
+	// Process all the Tiles in the 2D vector
+	// Cycle through all rows
+	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	{
+		// Cycle through all columns (elements in the rows)
+		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		{
+			(*m_arenaTiles[row])[col]->Process(_dt);
+		}
+	}
+}
+
+void ArenaFloor::Render()
+{
+	// Process all the Tiles in the 2D vector
+	// Cycle through all rows
+	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	{
+		// Cycle through all columns (elements in the rows)
+		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		{
+			(*m_arenaTiles[row])[col]->Render();
+		}
+	}
 }
