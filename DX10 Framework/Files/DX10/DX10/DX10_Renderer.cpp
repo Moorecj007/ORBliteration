@@ -516,7 +516,7 @@ bool DX10_Renderer::CreateTexture(std::string _texFileName, UINT* _pTexID)
 		texID = ++m_nextTextureID;
 
 		ID3D10ShaderResourceView* pTexture;
-		std::string filePath = "Resources/Textures/";
+		std::string filePath = TEXTUREFILEPATH;
 		filePath.append(_texFileName);
 
 		VALIDATEHR(D3DX10CreateShaderResourceViewFromFileA(m_pDX10Device,

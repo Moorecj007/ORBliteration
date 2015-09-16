@@ -37,6 +37,7 @@
 #include "DX10\DX10.h"
 #include "DX10\DX10\2D Objects\GUI_Button.h"
 #include "Input\InputGamePad.h"
+#include "Menus\Menu.h"
 
 class Application
 {
@@ -200,15 +201,13 @@ private:
 	// Camera
 	DX10_Camera_Debug* m_pCamera;
 
-	// Sprite
-	UINT m_menuItem;
-	DXSprite* m_pSprite;
-	std::vector<GUI_Button*> m_buttons;
-	DX10_Shader_Sprite* m_pShader_Sprite;
-
 	// Game Pad Input
 	XButtonIDs m_XButtons;
+	XStickDirectionIDs m_XStickDirections;
 	InputGamePad* m_pGamepadPlayerOne;
+
+	// Menu Objects
+	Menu*	m_mainMenu;
 
 };
 

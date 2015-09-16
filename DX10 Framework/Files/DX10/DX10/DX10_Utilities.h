@@ -54,6 +54,9 @@
 	#endif
 #endif 
 
+// Filepaths
+const std::string TEXTUREFILEPATH = "Resources/Textures/";
+
 // Constants
 const D3DXCOLOR WHITE(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR BLACK(0.0f, 0.0f, 0.0f, 1.0f);

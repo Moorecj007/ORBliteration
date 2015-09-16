@@ -103,6 +103,12 @@
     <Filter Include="Source Files\Inputs">
       <UniqueIdentifier>{29bcc5ca-a10a-42d0-a94a-56f08a8142b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Menus">
+      <UniqueIdentifier>{3b06da23-8fee-4653-8115-8b765f15452c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Menus">
+      <UniqueIdentifier>{1dced5e0-6e38-411e-b515-4b7d7926cd3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Files\Application.h">
@@ -204,6 +210,9 @@
     <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.h">
       <Filter>Header Files\DX10\Cameras</Filter>
     </ClInclude>
+    <ClInclude Include="Files\Menus\Menu.h">
+      <Filter>Header Files\Menus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Files\Application.cpp">
@@ -265,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.cpp">
       <Filter>Source Files\DX10\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Files\Menus\Menu.cpp">
+      <Filter>Source Files\Menus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

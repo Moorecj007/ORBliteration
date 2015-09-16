@@ -141,27 +141,27 @@ struct XStickDirectionIDs
 {
 	XStickDirectionIDs()
 	{
-		LJoyStick_Up = 0;
-		LJoyStick_Down = 1;
-		LJoyStick_Left = 2;
-		LJoyStick_Right = 3;
+		LStick_Up = 0;
+		LStick_Down = 1;
+		LStick_Left = 2;
+		LStick_Right = 3;
 		
-		RJoyStick_Up = 4;
-		RJoyStick_Down = 5;
-		RJoyStick_Left = 6;
-		RJoyStick_Right = 7;
+		RStick_Up = 4;
+		RStick_Down = 5;
+		RStick_Left = 6;
+		RStick_Right = 7;
  	}
 
 	// Joystick 
-	int LJoyStick_Up ;
-	int LJoyStick_Down ;
-	int LJoyStick_Left ;
-	int LJoyStick_Right ;
+	int LStick_Up ;
+	int LStick_Down ;
+	int LStick_Left ;
+	int LStick_Right ;
 
-	int RJoyStick_Up ;
-	int RJoyStick_Down ;
-	int RJoyStick_Left ;
-	int RJoyStick_Right ;
+	int RStick_Up ;
+	int RStick_Down ;
+	int RStick_Left ;
+	int RStick_Right ;
 };
 
 class InputGamePad
@@ -295,14 +295,6 @@ public:
 	// Utility Functions 
 
 	/***********************
-	* GetState: Return the Current Gamepad State
-	* @author: Jc Fowles
-	* @return: XINPUT_STATE: The Current Gamepad State
-	********************/
-	// TO DO: Abstract the state
-	XINPUT_STATE GetState();
-
-	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
 	* @author: Jc Fowles
 	* @return: int: The Gamepad Index
@@ -316,10 +308,15 @@ public:
 	********************/
 	bool Connected();   
 
-
-
 protected:
 private:
+	/***********************
+	* GetState: Return the Current Gamepad State
+	* @author: Jc Fowles
+	* @return: XINPUT_STATE: The Current Gamepad State
+	********************/
+	// TO DO: Abstract the state
+	XINPUT_STATE GetState();
 	  // Member Variables
 public:
 protected:

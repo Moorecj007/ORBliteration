@@ -17,6 +17,8 @@
 #define __DX_SPRITE_H__
 
 // Library Includes
+//#include <iostream>     // std::cout
+#include <fstream>      // std::ifstream
 
 // Local Includes
 #include "../DX10_Utilities.h"
@@ -50,13 +52,13 @@ class DXSprite
 		@parameter: _pDX10_Renderer		- The renderer for this application
 		@parameter: _pShader			- The shader object to use for rendering the sprite.
 		@parameter: _filename			- The filename of the texture (include the filepath here too if needed).
-		@parameter: _bitmapWidth		- The bitmap width.
-		@parameter: _bitmapHeight		- The bitmap height.
+		@parameter: _imageWidth			- The image width.
+		@parameter: _imageHeight		- The image height.
 		@parameter: _sliceWidth			- How many slices along the width of the image to do to split the image up into sections. (For sprite sheets etc...)
 		@parameter: _sliceHeight		- How many slices along the height of the image to do to split the image up into sections. (For sprite sheets etc...)
 		@return:	bool		- Returns true if the intialization succeeds otherwise the error on why it failed.
 		********************/
-		bool Initialize(HWND* _pHWnd, DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, std::string _filename, float _bitmapWidth, float _bitmapHeight, int _sliceWidth = 1, int _sliceHeight = 1);
+		bool Initialize(HWND* _pHWnd, DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, std::string _filename, UINT _imageWidth, UINT _imageHeight, UINT _sliceWidth = 1, UINT _sliceHeight = 1);
 
 		/*******************
 		-> Prepares the object for drawing.
@@ -76,7 +78,7 @@ class DXSprite
 		int GetIndexCount();
 
 		/*******************
-		-> Gets the number of slices in the bitmap for rendering different parts of the bitmap.
+		-> Gets the number of slices in the image for rendering different parts of the image.
 		@author:	Juran Griffith.
 		@parameter:	None.
 		@return:	int		- The number of indexes for the 2D image
@@ -84,12 +86,28 @@ class DXSprite
 		int GetSliceWidth();
 
 		/*******************
-		-> Gets the number of slices in the bitmap for rendering different parts of the bitmap.
+		-> Gets the number of slices in the image for rendering different parts of the image.
 		@author:	Juran Griffith.
 		@parameter:	None.
-		@return:	int		- The number of indexes for the 2D image
+		@return:	int		- The number of indices for the 2D image
 		********************/
 		int GetSliceHeight();
+
+		/*******************
+		-> Gets the width of the image
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	UINT		- The width of the image.
+		********************/
+		UINT GetWidth();
+
+		/*******************
+		-> Gets the height of the image
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	UINT		- The height of the image.
+		********************/
+		UINT GetHeight();
 
 		/*******************
 		-> Gets the texture for this object so that it can be used for rendering by shaders.
@@ -100,7 +118,7 @@ class DXSprite
 		ID3D10ShaderResourceView* GetTexture();
 
 		/*******************
-		-> Sets the uv to point to different section of the bitmap based on the amount of splicing done.
+		-> Sets the uv to point to different section of the image based on the amount of splicing done.
 		@author:	Juran Griffith.
 		@parameter: _index	- The image index to render.
 		@return:	void.
@@ -108,10 +126,10 @@ class DXSprite
 		void SetImageIndex(int _index);
 
 		/*******************
-		-> Sets the size of the bitmap
+		-> Sets the size of the image
 		@author:	Juran Griffith.
-		@parameter:	_width	- The width of the bitmap.
-		@parameter:	_height	- The height of the bitmap.
+		@parameter:	_width	- The width of the image.
+		@parameter:	_height	- The height of the image.
 		@return:	void.
 		********************/
 		void SetSize(float _width, float _height);
@@ -134,7 +152,7 @@ class DXSprite
 		bool InitializeBuffers();
 
 		/*******************
-		-> Update the contents of the dynamic vertex buffer to re-position the 2D bitmap image on the screen if need be
+		-> Update the contents of the dynamic vertex buffer to re-position the 2D image image on the screen if need be
 		@author:	Juran Griffith.
 		@parameter:	_positionX	- The x screen position to draw the object.
 		@parameter:	_positionY	- The y screen position to draw the object.
@@ -142,39 +160,47 @@ class DXSprite
 		********************/
 		bool UpdateBuffers(float _positionX, float _positionY);
 
+		/*******************
+		-> Gets the PNG width and height of the image and updates this sprites width and height variables.
+		@author:	Juran Griffith.
+		@parameter:	None.
+		@return:	bool	- True if the file can be read and the variables are updated.
+		********************/
+		bool GetPngSize();
+
 	// Variables
 	public:
 	protected:
 	private:
-		UINT			m_vertexCount;
-		UINT			m_indexCount;
+		UINT					m_vertexCount;
+		UINT					m_indexCount;
 
-		std::string		m_strFilename;
+		std::string				m_strFilename;
 
-		float			m_previousPosX;
-		float			m_previousPosY;
+		float					m_previousPosX;
+		float					m_previousPosY;
 
-		int				m_screenWidth;
-		int				m_screenHeight;
-		float			m_bitmapWidth;
-		float			m_bitmapHeight;
+		int						m_screenWidth;
+		int						m_screenHeight;
+		UINT					m_imageWidth;
+		UINT					m_imageHeight;
 
 		// Sprite sheet variables
-		std::vector<POINT> m_imageIndexList;
-		int				m_index;
-		int				m_indexPrev;
-		int				m_sliceWidth;
-		int				m_sliceHeight;
-		float			m_offsetScreenWidth;
-		float			m_offsetScreenHeight;
-		float			m_offsetBitmapWidth;
-		float			m_offsetBitmapHeight;
-		float			m_offsetU;
-		float			m_offsetV;
+		std::vector<POINT>		m_imageIndexList;
+		int						m_index;
+		int						m_indexPrev;
+		int						m_sliceWidth;
+		int						m_sliceHeight;
+		float					m_offsetScreenWidth;
+		float					m_offsetScreenHeight;
+		float					m_offsetImageWidth;
+		float					m_offsetImageHeight;
+		float					m_offsetU;
+		float					m_offsetV;
 
-		DX10_Renderer*  m_pDX10_Renderer;
-		UINT			m_texID;
-		UINT			m_buffID;
+		DX10_Renderer*			m_pDX10_Renderer;
+		UINT					m_texID;
+		UINT					m_buffID;
 		DX10_Shader_Sprite*		m_pShader;
 };
 

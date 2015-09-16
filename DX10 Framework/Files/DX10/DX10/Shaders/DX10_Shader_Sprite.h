@@ -71,9 +71,9 @@ class DX10_Shader_Sprite
 		/*******************
 		-> Intializes the object
 		@author:	Juran Griffith.
-		@parameter: _pD3DDevice	- The graphics device.
-		@parameter: _pHWnd		- The handler to the window.
-		@return:	bool		- Returns true if the initialization succeeds otherwise the error on why it failed.
+		@parameter: _pDX10_Renderer	- The graphics device.
+		@parameter: _pHWnd			- The handler to the window.
+		@return:	bool			- Returns true if the initialization succeeds otherwise the error on why it failed.
 		********************/
 		bool Initialize(DX10_Renderer*_pDX10_Renderer, HWND* _pHWnd)
 		{
