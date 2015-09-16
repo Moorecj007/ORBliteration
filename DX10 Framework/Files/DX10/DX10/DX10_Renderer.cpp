@@ -37,8 +37,6 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	m_clearColor = YELLOW;
 
 	//Initialise the ID Keys for the Maps
-	m_nextEffectID = 0;
-	m_nextTechniqueID = 0;
 	m_nextInputLayoutID = 0;
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
@@ -63,8 +61,8 @@ void DX10_Renderer::ShutDown()
 	}
 
 	// Delete the Graphics memory stored as DX10 Textures
-	std::map<UINT, ID3D10ShaderResourceView*>::iterator iterTexture = m_texturesByID.begin();
-	while (iterTexture != m_texturesByID.end())
+	std::map<std::string, ID3D10ShaderResourceView*>::iterator iterTexture = m_textures.begin();
+	while (iterTexture != m_textures.end())
 	{
 		ReleaseCOM(iterTexture->second);
 		iterTexture++;
@@ -79,8 +77,8 @@ void DX10_Renderer::ShutDown()
 	}
 
 	// Delete the Graphics memory stored as DX10 Effects
-	std::map<UINT, ID3D10Effect*>::iterator iterFX = m_effectsByID.begin();
-	while (iterFX != m_effectsByID.end())
+	std::map<std::string, ID3D10Effect*>::iterator iterFX = m_fxFiles.begin();
+	while (iterFX != m_fxFiles.end())
 	{
 		ReleaseCOM(iterFX->second);
 		iterFX++;
@@ -353,22 +351,20 @@ void DX10_Renderer::TurnZBufferOff()
 	m_pDX10Device->OMSetDepthStencilState(m_pDepthStencilStateZDisabled, 1);
 }
 
-bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _technique, UINT* _pFXID, UINT* _pTechID)
+bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _techniqueName, ID3D10Effect* _pFX, ID3D10EffectTechnique* _pTech)
 {	
 	ID3D10Effect* pFX = 0;
-	UINT fxID;
-	UINT techID;
+	ID3D10EffectTechnique* pTech = 0;
 
 	// Checking if the Effects file is already loaded
-	std::map<std::string, UINT>::iterator fxCheck;
-	fxCheck = m_effectIDs.find(_fxFileName);
+	std::map<std::string, ID3D10Effect*>::iterator fxCheck;
+	fxCheck = m_fxFiles.find(_fxFileName);
 
 	// Check if the FX file has already been created
-	if (fxCheck != m_effectIDs.end())
+	if (fxCheck != m_fxFiles.end())
 	{
-		// FX file already exists, save the ID
-		fxID = fxCheck->second;
-		pFX = m_effectsByID.find(fxID)->second;
+		// FX file already exists, save the Pointer
+		pFX = fxCheck->second;
 	}
 	else
 	{
@@ -391,37 +387,34 @@ bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _technique, UIN
 		ReleaseCOM(compilationErrors);
 		
 		// Create the pairs to be inserted into the appropriate FX Maps
-		fxID = ++m_nextEffectID;
-		std::pair<std::string, UINT> fxPair(_fxFileName, fxID);
-		std::pair<UINT, ID3D10Effect*> fxPairByID(fxID, pFX);
+		std::pair<std::string, ID3D10Effect*> fxPair(_fxFileName, pFX);
 
 		// Insert the pairs into their respective Maps
-		VALIDATE(m_effectIDs.insert(fxPair).second);
-		VALIDATE(m_effectsByID.insert(fxPairByID).second);
+		VALIDATE(m_fxFiles.insert(fxPair).second);
 	}
 
 	// Adding the Technique to the Map
 
 	// Retrieve the Technique IDs map using the FX ID to get a Map of all techniques for that particular FX file
-	std::map<UINT, std::map<std::string, UINT>>::iterator fxIDCheck;
-	fxIDCheck = m_techniqueIDs.find(fxID);
+	std::map<std::string, std::map<std::string, ID3D10EffectTechnique*>>::iterator fxNameCheck;
+	fxNameCheck = m_techniques.find(_fxFileName);
 
 	// Check if the FX file already has techniques stored for it
-	if (fxIDCheck != m_techniqueIDs.end())
+	if (fxNameCheck != m_techniques.end())
 	{
 		// Search the Inner Map (of Techs by FX ID) to check if the Technique has already been created
-		std::map<std::string, UINT>::iterator techIDCheck;
-		techIDCheck = fxIDCheck->second.find(_technique);
+		std::map<std::string, ID3D10EffectTechnique*>::iterator techNameCheck;
+		techNameCheck = fxNameCheck->second.find(_techniqueName);
 
-		if (techIDCheck != fxIDCheck->second.end())
+		if (techNameCheck != fxNameCheck->second.end())
 		{
 			// Technique already exists, save the ID
-			techID = fxCheck->second;
+			pTech = techNameCheck->second;
 		}
 		else
 		{
 			// Technique has not been created so Retrieve the Tech from the FX file
-			ID3D10EffectTechnique* pTech = pFX->GetTechniqueByName(_technique.c_str());
+			pTech = pFX->GetTechniqueByName(_techniqueName.c_str());
 
 			if (pTech == NULL)
 			{
@@ -430,106 +423,78 @@ bool DX10_Renderer::BuildFX(std::string _fxFileName, std::string _technique, UIN
 			}
 
 			// Create pairs to store in the Technique Maps
-			techID = ++m_nextTechniqueID;
-			std::pair<std::string, UINT> techPair(_technique, techID);
-			std::pair<UINT, ID3D10EffectTechnique*> techPairByID(techID, pTech);
+			std::pair<std::string, ID3D10EffectTechnique*> techPair(_techniqueName, pTech);
 
 			// Insert the pairs into their respective Maps
-			VALIDATE((&fxIDCheck->second)->insert(techPair).second);
-			VALIDATE(m_techniquesByID.insert(techPairByID).second);
+			VALIDATE((&fxNameCheck->second)->insert(techPair).second);
 		}
 	}
 	else
 	{
 		// Technique has not been created so Retrieve the Tech from the FX file
-		ID3D10EffectTechnique* pTech = pFX->GetTechniqueByName(_technique.c_str());
+		pTech = pFX->GetTechniqueByName(_techniqueName.c_str());
 
 		// Create pairs to store in the Technique Maps
-		techID = ++m_nextTechniqueID;
-		std::map<std::string, UINT> innerTechMap;
-		std::pair<std::string, UINT> innerTechPair(_technique, techID);
+		std::map<std::string, ID3D10EffectTechnique*> innerTechMap;
+		std::pair<std::string, ID3D10EffectTechnique*> innerTechPair(_techniqueName, pTech);
 		VALIDATE(innerTechMap.insert(innerTechPair).second);
 
-		std::pair<UINT, std::map<std::string, UINT>> outerTechMap(fxID, innerTechMap);
-		VALIDATE(m_techniqueIDs.insert(outerTechMap).second);
-
-		std::pair<UINT, ID3D10EffectTechnique*> techByIDPair(techID, pTech);
-		VALIDATE(m_techniquesByID.insert(techByIDPair).second);
+		std::pair<std::string, std::map<std::string, ID3D10EffectTechnique*>> outerTechMap(_fxFileName, innerTechMap);
+		VALIDATE(m_techniques.insert(outerTechMap).second);
 	}
 
 	// Save the FX and Technique IDs in the memory passed by the Object.
-	*_pFXID = fxID;
-	*_pTechID = techID;
+	_pFX = pFX;
+	_pTech = pTech;
 	return true;
 }
 
-ID3D10EffectVariable* DX10_Renderer::GetFXVariable(UINT _fxID, std::string _techVar)
+bool DX10_Renderer::CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, ID3D10EffectTechnique* _pTech, ID3D10InputLayout* _pVertexLayout, UINT _passNum)
 {
-	// Retrieve the FX pointer
-	ID3D10Effect* pFX = m_effectsByID.find(_fxID)->second;
-
-	// Retrieve the pointer to the variable and return it to the calling object
-	return pFX->GetVariableByName(_techVar.c_str());
-}
-
-bool DX10_Renderer::CreateVertexLayout(D3D10_INPUT_ELEMENT_DESC* _vertexDesc, UINT _elementNum, UINT _techID, UINT* _vertexLayoutID, UINT _passNum)
-{
-	// Find the Technique using the ID
-	ID3D10EffectTechnique* pTech = m_techniquesByID.find(_techID)->second;
-	ID3D10InputLayout* pVertexLayout;
-
 	// Create the input layout
 	D3D10_PASS_DESC passDesc;
-	pTech->GetPassByIndex(_passNum)->GetDesc(&passDesc);
+	_pTech->GetPassByIndex(_passNum)->GetDesc(&passDesc);
 
 	VALIDATEHR(m_pDX10Device->CreateInputLayout(_vertexDesc, _elementNum, passDesc.pIAInputSignature,
-		passDesc.IAInputSignatureSize, &pVertexLayout));
+		passDesc.IAInputSignatureSize, &_pVertexLayout));
 
 	// Add the Vertex Layout to the Map
 	UINT inputLayerID = ++m_nextInputLayoutID;
-	std::pair<UINT, ID3D10InputLayout*> inputLayerPair(inputLayerID, pVertexLayout);
+	std::pair<UINT, ID3D10InputLayout*> inputLayerPair(inputLayerID, _pVertexLayout);
 	VALIDATE(m_inputLayouts.insert(inputLayerPair).second);
 
-	// Store the ID in for the calling object
-	*_vertexLayoutID = inputLayerID;
 	return true;
 }
 
-bool DX10_Renderer::CreateTexture(std::string _texFileName, UINT* _pTexID)
+bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResourceView* _pTex)
 {
-	ID3D10Effect* pTexture = 0;
-	UINT texID;
+	ID3D10ShaderResourceView* pTexture = 0;
 
 	// Look for the texture by name to see if it is already loaded
-	std::map<std::string, UINT>::iterator texCheck;
-	texCheck = m_textureIDs.find(_texFileName);
+	std::map<std::string, ID3D10ShaderResourceView*>::iterator texCheck;
+	texCheck = m_textures.find(_texFileName);
 
 	// Check if the Texture exists
-	if (texCheck != m_textureIDs.end())
+	if (texCheck != m_textures.end())
 	{
 		// Texture is already loaded. Save its ID
-		texID = texCheck->second;
+		pTexture = texCheck->second;
 	}
 	else
 	{
 		// Texture is new, create and save.
-		texID = ++m_nextTextureID;
-
-		ID3D10ShaderResourceView* pTexture;
 		std::string filePath = TEXTUREFILEPATH;
 		filePath.append(_texFileName);
 
 		VALIDATEHR(D3DX10CreateShaderResourceViewFromFileA(m_pDX10Device,
 			filePath.c_str(), 0, 0, &pTexture, 0));
 
-		std::pair<std::string, UINT> texNameID(_texFileName, texID);
-		std::pair<UINT, ID3D10ShaderResourceView*> texIDResource(texID, pTexture);
+		std::pair<std::string, ID3D10ShaderResourceView*> texPair(_texFileName, pTexture);
 
-		VALIDATE(m_textureIDs.insert(texNameID).second);
-		VALIDATE(m_texturesByID.insert(texIDResource).second);
+		VALIDATE(m_textures.insert(texPair).second);
 	}
 
-	*_pTexID = texID;
+	_pTex = pTexture;
 	return true;
 }
 
@@ -568,17 +533,9 @@ void DX10_Renderer::SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _primitiveType)
 	m_pDX10Device->IASetPrimitiveTopology(_primitiveType);
 }
 
-bool DX10_Renderer::SetInputLayout(UINT _vertexLayoutID)
+bool DX10_Renderer::SetInputLayout(ID3D10InputLayout* _pVertexLayout)
 {
-	// Retrieve the Vertex Layout
-	std::map<UINT, ID3D10InputLayout*>::iterator iterVLayout = m_inputLayouts.find(_vertexLayoutID);
-	if (iterVLayout == m_inputLayouts.end())
-	{
-		return false;
-	}
-	ID3D10InputLayout* pVertexLayout = iterVLayout->second;
-
-	m_pDX10Device->IASetInputLayout(pVertexLayout);
+	m_pDX10Device->IASetInputLayout(_pVertexLayout);
 	return true;
 }
 
@@ -587,41 +544,19 @@ void DX10_Renderer::SetViewMatrix(D3DXMATRIX _view)
 	m_matView = _view;
 }
 
-ID3D10Buffer* DX10_Renderer::GetVertexBuffer(UINT _buffID)
-{
-	// Retrieve the Technique
-	std::map<UINT, DX10_Buffer*>::iterator iterBuff = m_buffers.find(_buffID);
-	if (iterBuff == m_buffers.end())
-	{
-		return NULL;
-	}
-	return iterBuff->second->GetVertexBuffer();
-}
-
-ID3D10EffectTechnique* DX10_Renderer::GetTechnique(UINT _techID)
-{
-	// Retrieve the Technique
-	std::map<UINT, ID3D10EffectTechnique*>::iterator iterTech = m_techniquesByID.find(_techID);
-	if (iterTech == m_techniquesByID.end())
-	{
-		return NULL;
-	}
-	return iterTech->second;
-}
-
-ID3D10ShaderResourceView* DX10_Renderer::GetTexture(UINT _texID)
-{
-	// Retrieve the Texture
-	std::map<UINT, ID3D10ShaderResourceView*>::iterator iterTex = m_texturesByID.find(_texID);
-	if (iterTex == m_texturesByID.end())
-	{
-		return NULL;
-	}
-	return iterTex->second;
-}
-
 void DX10_Renderer::CalcProjMatrix()
 {
 	float aspect = float(m_clientWidth) / m_clientHeight;
 	D3DXMatrixPerspectiveFovLH(&m_matProj, 0.25f*PI, aspect, 1.0f, 1000.0f);
+}
+
+ID3D10Buffer* DX10_Renderer::GetVertexBuffer(UINT _buffID)
+{
+	// Retrieve the Buffer
+	std::map<UINT, DX10_Buffer*>::iterator iterBuffer = m_buffers.find(_buffID);
+	if (iterBuffer == m_buffers.end())
+	{
+		return NULL;
+	}
+	return iterBuffer->second->GetVertexBuffer();
 }

@@ -47,9 +47,6 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	TVertexNormalUV vertNormalUV;
 	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
 
-	UINT texID;
-	VALIDATE(m_pDX10_Renderer->CreateTexture("WoodCrate01.dds", &texID));
-
 	// Create the 2D vector of Arena Tiles
 	for (UINT row = 0; row < rowCount; row++)
 	{
@@ -59,7 +56,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 		{
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
-			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, texID));
+			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, "WoodCrate01.dds"));
 
 			// Set the Position based upon the position in the 2D grid
 			v3float tilePos;
