@@ -29,10 +29,10 @@ Orb::~Orb()
 {
 }
 
-bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, UINT _textureID, float _density, float _speed, float _maxSpeed)
+bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _speed, float _maxSpeed)
 {	
 	// Initialise the object this is derived from
-	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _textureID));
+	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _texName));
 
 	// Check the passed in parameters
 	if ((_density < 0.0f) || (_maxSpeed < 0.0f))
@@ -47,7 +47,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_
 	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;
 	   
-	// Succesful Initialization
+	// Successful Initialization
 	return true;
 }
   
