@@ -125,9 +125,9 @@ UINT DXSprite::GetHeight()
 	//return 0;
 }
 
-void DXSprite::SetImageIndex(int _index)
+void DXSprite::SetImageIndex(UINT _index)
 {
-	if (!m_imageIndexList.empty() && static_cast<UINT>(_index) < m_imageIndexList.size())
+	if (!m_imageIndexList.empty() && _index < m_imageIndexList.size())
 	{
 		m_index = _index;
 	}

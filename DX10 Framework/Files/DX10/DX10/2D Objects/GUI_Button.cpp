@@ -21,6 +21,8 @@ GUI_Button::GUI_Button()
 {
 	m_horizontal = false;
 	m_boundsOffset = 0;
+	m_col = 0;
+	m_row = 0; 
 }
 
 GUI_Button::~GUI_Button()
@@ -79,10 +81,9 @@ float GUI_Button::GetHeight()
 	return m_height;
 }
 
-void GUI_Button::SetPosition(float _x, float _y)
+void GUI_Button::SetPosition(v2float _position)
 {
-	m_position.x = _x;
-	m_position.y = _y;
+	m_position = _position;
 
 	m_bounds.m_x = m_position.x + m_boundsOffset;
 	m_bounds.m_y = m_position.y + m_boundsOffset;
@@ -102,21 +103,31 @@ void GUI_Button::SetBoundsOffset(float _offset)
 	m_boundsOffset = _offset;
 }
 
+void GUI_Button::SetColumnIndex(UINT _index)
+{
+	m_col = _index;
+}
+
+void GUI_Button::SetRowIndex(UINT _index)
+{
+	m_row = _index;
+}
+
 void GUI_Button::Draw()
 {
 	switch (m_state)
 	{
 	case BUTTON_STATE::BUTTON_STATE_DEFAULT:
-		m_pSprite->SetImageIndex(0);
+		m_pSprite->SetImageIndex(m_col + 0);
 		break;
 	case BUTTON_STATE::BUTTON_STATE_HOVER:
-		m_pSprite->SetImageIndex(1);
+		m_pSprite->SetImageIndex(m_col + 1 * m_pSprite->GetSliceWidth());
 		break;
 	case BUTTON_STATE::BUTTON_STATE_SELECTED:
-		m_pSprite->SetImageIndex(2);
+		m_pSprite->SetImageIndex(m_col + 2 * m_pSprite->GetSliceWidth());
 		break;
 	case BUTTON_STATE::BUTTON_STATE_DEACTIVATED:
-		m_pSprite->SetImageIndex(3);
+		m_pSprite->SetImageIndex(m_col + 3 * m_pSprite->GetSliceWidth());
 		break;
 	}
 
@@ -125,12 +136,12 @@ void GUI_Button::Draw()
 	m_pSprite->Render();
 }
 
-void GUI_Button::Process(float _deltaTime)
+/*void GUI_Button::Process(float _deltaTime)
 {
 	if (m_state == BUTTON_STATE::BUTTON_STATE_DEACTIVATED)
 		return;
 
-	/*DIMOUSESTATE mouseCurrState = m_pInput->GetMouseState();
+	DIMOUSESTATE mouseCurrState = m_pInput->GetMouseState();
 
 	D3DXVECTOR2 mousePosition;
 	m_pInput->GetMousePosition(mousePosition);
@@ -147,8 +158,8 @@ void GUI_Button::Process(float _deltaTime)
 			m_state = eState::ES_HOVER;
 	}
 	else
-		m_state = eState::ES_DEFAULT;*/
-}
+		m_state = eState::ES_DEFAULT;
+}*/
 
 bool GUI_Button::IsInBounds(v2float _point)
 {
