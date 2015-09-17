@@ -28,9 +28,12 @@
 ********************/
 enum eBaseTileImages
 {
-	BTI_STANDARD,
-	BTI_SLIPPERY,
-	BTI_ROUGH
+	BTI_STANDARD,	
+	BTI_SLIPPERY,	
+	BTI_ROUGH,
+	BTI_STANDARD_DYING,
+	BTI_SLIPPERY_DYING,
+	BTI_ROUGH_DYING
 };
 
 /***********************
@@ -117,14 +120,22 @@ public:
 	* @return: void
 	********************/
 	void SetActive(bool _active){ m_active = _active; };
+
+	// TO DO CAL
+	void SetDeathTimer(float _deathTime) { m_deathTimer = 0; m_deathIncrement = _deathTime / 10; };
+
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
-	ID3D10ShaderResourceView* m_pBaseTex;
+	ID3D10ShaderResourceView* m_pBaseTex[11];
 	ID3D10ShaderResourceView* m_pOverlayTex[4];
 
 	eBaseTileImages m_baseImage;
+	int m_currentBaseImage;
 	eOverlayTileImages m_currentOverlay;
 
 	bool m_active;
+	float m_deathTimer;
+	float m_deathIncrement;
+	int m_deathFrameCount;
 };
 #endif	// __ARENATILE_H__

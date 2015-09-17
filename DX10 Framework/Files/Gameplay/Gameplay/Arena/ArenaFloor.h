@@ -83,11 +83,14 @@ public:
 private:
 
 	/***********************
-	* DestroyOuterLayer: Destroy the Outer layer of the Arena
+	* StartDeathOuterLayer: Destroy the Outer layer of the Arena
 	* @author: Callan Moore
 	* @return: void
 	********************/
-	void DestroyOuterLayer();
+	void StartDeathOuterLayer();
+
+	// TO DO
+	void StartTileDeath(UINT _row, UINT _col);
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
