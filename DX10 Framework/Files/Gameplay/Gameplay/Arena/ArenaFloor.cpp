@@ -60,7 +60,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
 
-			eBaseTileImages eBaseImage = (eBaseTileImages)(rand() % 3);
+			eBaseTileImages eBaseImage = BTI_STANDARD; // (eBaseTileImages)(rand() % 3);
 
 			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
@@ -88,6 +88,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
 
 	m_destroyedLayers = 0;
+	StartDeathOuterLayer();
 
 	return true;
 }
@@ -97,7 +98,7 @@ void ArenaFloor::Process(float _dt)
 	m_timeElapsed += _dt;
 	if (m_timeElapsed >= m_destroyOutsideTime)
 	{
-		//DestroyOuterLayer();
+		StartDeathOuterLayer();
 
 		m_timeElapsed = 0.0f;
 	}
@@ -127,31 +128,40 @@ void ArenaFloor::Render()
 	}
 }
 
-void ArenaFloor::DestroyOuterLayer()
+void ArenaFloor::StartDeathOuterLayer()
 {
 	if (m_destroyedLayers <= m_layerCount)
 	{	
 		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
 			int row = m_destroyedLayers;
-			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+			StartTileDeath(row, col);		
 		}
 
 		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
 			int row = (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1;
-			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+			StartTileDeath(row, col);
 		}
 
 		for (UINT row = m_destroyedLayers; row < m_pArenaTiles->size() - m_destroyedLayers; row++)
 		{
 			int col = m_destroyedLayers;
-			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+			StartTileDeath(row, col);
+
 			col = (*m_pArenaTiles)[row]->size() - 1 - m_destroyedLayers;
-			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+			StartTileDeath(row, col);
 		}
 	}
 
 	// Increase the Count of destroyed layers
 	m_destroyedLayers++;	
+}
+
+void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
+{
+	float modifier = (float)(rand() % 80 - 40);
+	modifier = modifier / 100.0f + 1.0f;
+
+	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
 }

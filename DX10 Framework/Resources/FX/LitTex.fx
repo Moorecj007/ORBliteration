@@ -117,15 +117,15 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 	float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
 	float4 spec = g_mapSpec.Sample(g_triLinearSam, _inputPS.texCoord);
 
-	float4 totalDiffuse = diffuse1;
-	//if (diffuse2.a == 0)
-	//{
-	//	totalDiffuse = diffuse1;
-	//}
-	//else
-	//{
-	//	totalDiffuse = diffuse2;
-	//}
+	float4 totalDiffuse;
+	if (diffuse2.a > 0)
+	{
+		totalDiffuse = diffuse2;
+	}
+	else
+	{
+		totalDiffuse = diffuse1;
+	}
 
 	// Map [0,1] --> [0,256]
 	spec.a *= 256.0f;
@@ -137,7 +137,7 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 	SurfaceInfo surface = { _inputPS.position, normal, totalDiffuse, spec };
 	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
 
-	return float4(litColor, totalDiffuse.a);
+	return float4(litColor, 1);
 }
 
 technique10 BlendTex2Tech
