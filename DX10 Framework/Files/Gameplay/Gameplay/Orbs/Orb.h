@@ -94,6 +94,9 @@ private:
 	bool m_isAlive;
 
 
+	bool m_phase;
+	bool m_boost;
+
 
 	
 };

@@ -42,7 +42,7 @@ Game::~Game()
 
 }
 
-bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
+bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 {
 	if (_pDX10_Renderer == 0)
 	{
@@ -50,6 +50,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		return false;
 	}
 
+	m_numPlayers = _numPlayers;
 	m_pDX10_Renderer = _pDX10_Renderer;
 														
 	// Create the Shader for the Game Objects
@@ -66,7 +67,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 	// TO DO JC: This will be based on the number of players selected for a given match
 	// Create the Contollers and the player orbs
-	for (int i = 0; i < m_maxPlayers; i++)
+	for (int i = 0; i < m_numPlayers; i++)
 	{
 		m_pContollers.push_back(new InputGamePad());
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
@@ -95,23 +96,16 @@ bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
 		float distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
 		// Calculate the combined Radius of the two orbs
 		float combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
-
 		
-
-		// Check if the orbs are colliding
+			// Check if the orbs are colliding
 		if (distance <= combinedRadius)
 		{
-						 
-			
-
 			return true;
-
 		}
 		else
 		{
 			return false;
 		}
-
 	}
 	else
 	{
@@ -124,8 +118,8 @@ void Game::HandleCollisions(Orb* _OrbA, Orb* _OrbB)
 	v3float orbVelocity_A = _OrbA->GetVelocity();
 	v3float orbVelocity_B = _OrbB->GetVelocity();
 
-	_OrbA->SetVelocity(orbVelocity_B * _OrbB->GetBounce());
-	_OrbB->SetVelocity(orbVelocity_A * _OrbA->GetBounce());
+	_OrbA->SetVelocity((orbVelocity_B * _OrbB->GetBounce()));
+	_OrbB->SetVelocity((orbVelocity_A * _OrbA->GetBounce()));
 }
 
 void Game::Process(float _dt)
@@ -135,15 +129,6 @@ void Game::Process(float _dt)
 
 	m_pShader_LitTex->SetUpPerFrame();
 	m_pArenaFloor->Process(_dt);
-	 	
-	/*for (UINT row = 0; row < m_pArenaTiles->size(); row++)
-	{
-		for (UINT col = 0; col < m_pArenaTiles->size(); col++)
-		{
-			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_BLANK);
-		}
-	}*/
-	
 
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
@@ -151,7 +136,6 @@ void Game::Process(float _dt)
 		{
 			// Get and set the surface friction
 			
-
 			// Check Collisions
 			for (UINT j = 0; j < m_pOrbs.size(); j++)
 			{

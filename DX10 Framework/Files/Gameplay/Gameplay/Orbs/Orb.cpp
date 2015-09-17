@@ -14,8 +14,7 @@
 
 // This Include
 #include "Orb.h"
-
-
+ 
 Orb::Orb()
 {
 	m_acceleration = {0.0f,0.0f,0.0f};
@@ -70,4 +69,3 @@ void Orb::Process(float _dt)
 
 	DX10_Obj_LitTex::Process(_dt);
 }
-

@@ -46,7 +46,7 @@ public:
 	* @parameter: _pDX10_Renderer: The renderer for this Game
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers);
 	
 	/***********************
 	* Process: Process the Game
@@ -76,7 +76,7 @@ private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
 	// Contollers
-	static const int m_maxPlayers = 4;
+	int m_numPlayers;
 	XButtonIDs m_XButtons;
 	XStickDirectionIDs m_XStickDirections;
 	std::vector<InputGamePad*> m_pContollers;
