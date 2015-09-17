@@ -65,6 +65,8 @@ public:
    	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
 	
+	void SetAlive(bool _alive){ m_isAlive = _alive; };
+	bool GetAlive(){ return m_isAlive; };
 		
 protected:
 private:

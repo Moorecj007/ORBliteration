@@ -100,35 +100,76 @@ void Game::Process(float _dt)
 	{
 		for (UINT col = 0; col < m_pArenaTiles->size(); col++)
 		{
-
+			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_BLANK);
 		}
 	}
 	
 
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
-		// Get and set the surface friction
-		m_pOrbs[i]->SetSurfaceFriction(0.5f);
+		if (m_pOrbs[i]->GetAlive())
+		{
+			// Get and set the surface friction
+			
 
-		v3float OrbPos = m_pOrbs[i]->GetPosition();
-		v3float tilePos;
-		UINT row = (OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2);
-		UINT col = (OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2);;
+			v3float OrbPos = m_pOrbs[i]->GetPosition();
+			v3float tilePos;
+			OrbPos += m_tileScale / 2;
+			int row = (OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2);
+			int col = (OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2);
 
-		//m_pArenaTiles[row][col]->
-	
+			if (row < 0)
+			{
+				row = 0;
+				m_pOrbs[i]->SetAlive(false);
+			}
+			else if (row > m_pArenaTiles->size() - 1)
+			{
+				row = m_pArenaTiles->size() - 1;
+				m_pOrbs[i]->SetAlive(false);
+			}
+			if (col < 0)
+			{
+				col = 0;
+				m_pOrbs[i]->SetAlive(false);
+			}
+			else if (col > m_pArenaTiles->size() - 1)
+			{
+				col = m_pArenaTiles->size() - 1;
+				m_pOrbs[i]->SetAlive(false);
+			}
 
-		//(m_areaSize - 1) / 2
+			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_POWER_CONFUSION);
 
-		//tilePos.x = ((float)row - ((float)m_areaSize / 2.0f)) * m_tileScale.x + (m_tileScale.x / 2.0f);
-		
-		//row = ((tilePos.x - (m_tileScale.x / 2.0f)) / m_tileScale.x) + ((float)m_areaSize / 2.0f);
-		//col = ((tilePos.y - (m_tileScale.y / 2.0f)) / m_tileScale.y) + ((float)m_areaSize / 2.0f);
+			switch ((*(*m_pArenaTiles)[row])[col]->GetBaseImageEnum())
+			{
+			case BTI_SLIPPERY:
+			{
+				m_pOrbs[i]->SetSurfaceFriction(0.0f);
+			}
+				break;
+			case BTI_ROUGH:
+			{
+				m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
+			}
+				break;
+			case BTI_STANDARD:
+			{
+				m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+			}
+				default: break;
+			}
 
-		
+			
+
+			if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+			{
+				m_pOrbs[i]->SetAlive(false);
+			}
 
 
-		m_pOrbs[i]->Process(_dt);
+			m_pOrbs[i]->Process(_dt);
+		}
 	}
 }
 
@@ -138,7 +179,10 @@ void Game::Render()
 
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
-		m_pOrbs[i]->Render();
+		if (m_pOrbs[i]->GetAlive())
+		{
+			m_pOrbs[i]->Render();
+		}
 	}
 }
 
@@ -147,19 +191,22 @@ void Game::HandleInput()
 	// Handle the Controller Inputs
 	for (UINT i = 0; i < m_pContollers.size(); i++)
 	{
-		if (m_pContollers[i]->Connected())
+		if (m_pOrbs[i]->GetAlive())
 		{
-			m_pContollers[i]->PreProcess();
-			
-			v2float LeftAxis;
-
-			if (!m_pContollers[i]->LStick_InDeadZone())
+			if (m_pContollers[i]->Connected())
 			{
-				LeftAxis = m_pContollers[i]->GetLStickAxis();
-				m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
-			}
+				m_pContollers[i]->PreProcess();
 
-			m_pContollers[i]->PostProcess();
+				v2float LeftAxis;
+
+				if (!m_pContollers[i]->LStick_InDeadZone())
+				{
+					LeftAxis = m_pContollers[i]->GetLStickAxis();
+					m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
+				}
+
+				m_pContollers[i]->PostProcess();
+			}
 		}
 	}
 }
