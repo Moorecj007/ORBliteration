@@ -136,10 +136,20 @@ class Menu
 		@parameter: _option			- The menu state option this button refers to
 		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
 		@parameter: _scale			- How big to make the object.
-		@parameter: _position		- Where to place the item. (make sure to set the menu layout to custom to use this)
 		@return:	bool			- True if added otherwise false.
 		********************/
 		bool AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale = 1.0f, v2float _position = v2float(0.0f, 0.0f));
+
+		/***********************
+		-> Adds a new button to the menu. By default it is placed after the last button added.
+		@author:	Juran Griffith.
+		@parameter: _button			- The button struct to attach this toggle to.
+		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
+		@parameter: _toggled		- Sets the toggled buttons intial state.
+		@parameter: _scale			- How big to make the object.
+		@return:	bool			- True if added otherwise false.
+		********************/
+		bool AddToggleButton(TButton* _button, UINT _spriteIndex, bool _toggled = true, float _scale = 1.0f);
 
 		/***********************
 		-> Adds a title to the menu.
@@ -158,6 +168,14 @@ class Menu
 		@return:	BUTTON_STATE	- The current buttons state.
 		********************/
 		BUTTON_STATE GetButtonState(UINT _index);
+
+		/***********************
+		-> Gets the button at the current index.
+		@author:	Juran Griffith.
+		@parameter: _index		- The button index.
+		@return:	TButton		- The pointer to the button struct in this menu
+		********************/
+		TButton* GetButton(UINT _index);
 
 		/***********************
 		-> Gets the current menu item the menu is hovering over(for mouse) or at(xbox)
@@ -206,6 +224,8 @@ class Menu
 		UINT						m_menuItem;
 		std::vector<DXSprite*>		m_sprites;
 		std::vector<TButton*>		m_buttons;
+		std::vector<GUI_Button*>	m_toggleButtons;
+
 		DX10_Shader_Sprite*			m_pShader_Sprite;
 		v2float						m_position;
 		GUI_Button*					m_title;

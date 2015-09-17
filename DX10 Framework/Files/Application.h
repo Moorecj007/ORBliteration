@@ -242,6 +242,9 @@ private:
 
 	// App State
 	APP_STATE m_state;
+	bool m_isFullscreen;
+	bool m_isSound;
+	bool m_isRumble;
 };
 
 #endif // __APPLICATION_H__

@@ -39,6 +39,12 @@ Menu::~Menu()
 		m_sprites.pop_back();
 	}
 
+	while (!m_toggleButtons.empty())
+	{
+		ReleasePtr(m_toggleButtons.back());
+		m_toggleButtons.pop_back();
+	}
+
 	while (!m_buttons.empty())
 	{
 		ReleasePtr(m_buttons.back());
@@ -95,6 +101,11 @@ void Menu::Process(float _deltaTime)
 		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
 		{
 			(*button)->m_pButton->Process(_deltaTime);
+		}
+
+		for (auto button = m_toggleButtons.begin(); button != m_toggleButtons.end(); button++)
+		{
+			(*button)->Process(_deltaTime);
 		}
 
 		// Handle Controller Input
@@ -167,6 +178,11 @@ void Menu::Draw()
 			(*button)->m_pButton->Draw();
 		}
 
+		for (auto button = m_toggleButtons.begin(); button != m_toggleButtons.end(); button++)
+		{
+			(*button)->Draw();
+		}
+
 		// Turn the z buffer on
 		m_pDX10_Renderer->TurnZBufferOn();
 	}
@@ -188,7 +204,7 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, v2floa
 	if (_spriteIndex < m_sprites.size())
 	{
 		float offsety = 0.0f;
-		if (m_buttons.size() > 0) // TO IMPROVE Juran - More options on how to place the buttons
+		if (m_buttons.size() > 0)
 		{
 			offsety = m_buttons[m_buttons.size() - 1]->m_pButton->GetHeight();
 		}
@@ -210,7 +226,7 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, v2floa
 			}
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
-			m_screenHeight = m_screenHeight * 0.5f /*- (m_sprites[_spriteIndex]->GetHeight() * 0.5f)*/;
+			m_screenHeight = m_screenHeight * 0.5f;
 
 			VALIDATE(temp->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
 				m_position.x + m_screenWidth,
@@ -241,6 +257,21 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, v2floa
 	return true;
 }
 
+bool Menu::AddToggleButton(TButton* _button, UINT _spriteIndex, bool _toggled, float _scale)
+{
+	if (_spriteIndex < m_sprites.size())
+	{
+		m_toggleButtons.push_back(new GUI_Button());
+
+		VALIDATE(m_toggleButtons.back()->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+			_button->m_pButton->GetPosition().x + _button->m_pButton->GetWidth() + m_space,
+			_button->m_pButton->GetPosition().y,
+			m_sprites[_spriteIndex]->GetWidth() * _scale,
+			m_sprites[_spriteIndex]->GetHeight() * _scale));
+	}
+	return true;
+}
+
 bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 {
 	if (!m_title)
@@ -261,12 +292,11 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 			}
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
-			m_screenHeight = m_screenHeight * 0.25f /*- (m_sprites[_spriteIndex]->GetHeight() * 0.5f)*/;
+			m_screenHeight = m_screenHeight * 0.25f;
 
 			if (m_position.x + m_screenWidth + m_sprites[_spriteIndex]->GetWidth() * _scale > static_cast<float>(rect.right - rect.left))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left) * 0.125f * 0.125f;
-				//m_screenWidth = 0.0f;
 			}
 
 			VALIDATE(m_title->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
@@ -294,7 +324,9 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 BUTTON_STATE Menu::GetButtonState(UINT _index)
 {
 	if (_index < m_buttons.size())
+	{
 		return m_buttons[_index]->m_pButton->GetState();
+	}
 	return BUTTON_STATE_DEACTIVATED;
 }
 
@@ -306,6 +338,15 @@ UINT Menu::GetCurrentMenuItem()
 MENU_STATE Menu::GetMenuState()
 {
 	return m_state;
+}
+
+TButton* Menu::GetButton(UINT _index)
+{
+	if (_index < m_buttons.size())
+	{
+		return m_buttons[_index];
+	}
+	return NULL;
 }
 
 void Menu::SetPosition(v2float _position)

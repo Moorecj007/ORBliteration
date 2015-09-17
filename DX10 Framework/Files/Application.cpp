@@ -174,6 +174,9 @@ Application* Application::GetInstance()
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
 	m_state = APP_STATE_MAIN_MENU;	// TO DO - Change to title screen 
+	m_isFullscreen = false;
+	m_isSound = false;
+	m_isRumble = false;
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
@@ -248,9 +251,15 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
 	m_menus.back()->AddSprite("Button/toggle_button.png", 95, 61, 1, 2);
-	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 0, 1.0f);
-	m_menus.back()->AddButton(MENU_STATE_SOUND, 0, 1.0f);
-	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 0, 1.0f);
+	m_menus.back()->AddSprite("Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_sound_fill.png", 481, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.25f);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen);
+	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.25f);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(1), 0, m_isSound);
+	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 3, 0.25f);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(2), 0, m_isRumble);
 
 	// Intialise Pause Menu
 	m_menus.push_back(new Menu());
@@ -553,13 +562,16 @@ void Application::UpdateState(MENU_STATE _state)
 
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
-		
+		m_state = APP_STATE_OPTION_MENU;
+		m_menus[2]->Reset();
 		break;
 	case MENU_STATE_SOUND:
-		
+		m_state = APP_STATE_OPTION_MENU;
+		m_menus[2]->Reset();
 		break;
 	case MENU_STATE_RUMBLE:
-		
+		m_state = APP_STATE_OPTION_MENU;
+		m_menus[2]->Reset();
 		break;
 
 		// Match menu states
