@@ -125,6 +125,7 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 	else
 	{
 		totalDiffuse = diffuse1;
+
 	}
 
 	// Map [0,1] --> [0,256]
