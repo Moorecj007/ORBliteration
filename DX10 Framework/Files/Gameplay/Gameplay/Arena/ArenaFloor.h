@@ -76,6 +76,9 @@ public:
 	* @return: std::vector<std::vector<ArenaTile*>*>*: The vector of all Arena Tiles
 	********************/
 	std::vector<std::vector<ArenaTile*>*>* GetArenaTiles() { return m_pArenaTiles; };
+
+	// TO DO JC
+	v2float GetTile(v3float _orbPos);
 	
 private:
 
@@ -91,9 +94,12 @@ private:
 	DX10_Mesh_Rect_Prism* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;	
 
+
 	float m_timeElapsed;
 	float m_matchLength;
 	float m_destroyOutsideTime;
+	int m_layerCount;
+	int m_destroyedLayers;
 };
 #endif	// __ARENAFLOOR_H__
 

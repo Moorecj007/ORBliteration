@@ -94,7 +94,29 @@ public:
 	* @return: eBaseTileImages: Enum for the displayed image
 	********************/
 	eBaseTileImages GetBaseImageEnum() { return m_baseImage; };
+	
+	/***********************
+	* GetActive: Retrieve the active state of the tile
+	* @author: Callan Moore
+	* @return: bool: The active state
+	********************/
+	bool GetActive() { return m_active; };
 
+	/***********************
+	* SetOverlayImage: Set the Overlay image to a new one
+	* @author: Callan Moore
+	* @parameter: _overlay: The new enum to determine the Overlay image
+	* @return: void
+	********************/
+	void SetOverlayImage(eOverlayTileImages _overlay) { m_currentOverlay = _overlay; };
+
+	/***********************
+	* SetActive: Set the Active state of the tile
+	* @author: Callan Moore
+	* @parameter: _active: The new active state
+	* @return: void
+	********************/
+	void SetActive(bool _active){ m_active = _active; };
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
 	ID3D10ShaderResourceView* m_pBaseTex;
@@ -102,5 +124,7 @@ private:
 
 	eBaseTileImages m_baseImage;
 	eOverlayTileImages m_currentOverlay;
+
+	bool m_active;
 };
 #endif	// __ARENATILE_H__
