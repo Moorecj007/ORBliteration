@@ -59,10 +59,10 @@ class GUI_Button
 		/*******************
 		-> Gets the objects position on the screen.
 		@author:	Juran Griffith.
-		@parameter:	_out		- The position of the object
-		@return:	void
+		@parameter:	None
+		@return:	v2float		- The position of the object
 		********************/
-		virtual void GetPosition(v2float& _out);
+		virtual v2float GetPosition();
 
 		/*******************
 		-> Gets the objects current state
@@ -154,7 +154,7 @@ class GUI_Button
 		DXSprite*			m_pSprite;
 
 		shape::Rectangle	m_bounds;
-		D3DXVECTOR2			m_position;
+		v2float				m_position;
 		float				m_boundsOffset;
 		BUTTON_STATE		m_state;
 

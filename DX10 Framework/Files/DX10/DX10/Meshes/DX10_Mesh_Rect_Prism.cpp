@@ -205,7 +205,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexColorUV 
 	float vertScaleX = _scale.x / 2;
 	float vertScaleY = _scale.y / 2;
 	float vertScaleZ = _scale.z / 2;
-
+	
 	// Create vertex buffer
 	TVertexColorUV vertices[] =
 	{
@@ -292,6 +292,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexNormalUV
 	float vertScaleX = _scale.x / 2;
 	float vertScaleY = _scale.y / 2;
 	float vertScaleZ = _scale.z / 2;
+	m_scale = _scale;
 
 	// Create vertex buffer
 	TVertexNormalUV vertices[] =
