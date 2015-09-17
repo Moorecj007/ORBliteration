@@ -123,7 +123,7 @@ class DXSprite
 		@parameter: _index	- The image index to render.
 		@return:	void.
 		********************/
-		void SetImageIndex(int _index);
+		void SetImageIndex(UINT _index);
 
 		/*******************
 		-> Sets the size of the image

@@ -80,7 +80,7 @@ void Menu::Process(float _deltaTime)
 		// Draw Title
 		if (m_title)
 		{
-			m_title->Process(_deltaTime);
+			//m_title->Process(_deltaTime);
 			if (m_elaspedTime > 60.0f)
 			{
 				m_title->SetState((BUTTON_STATE)++m_imageIndex);
@@ -98,7 +98,7 @@ void Menu::Process(float _deltaTime)
 		}
 
 		// Process all the buttons
-		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
+		/*for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
 		{
 			(*button)->m_pButton->Process(_deltaTime);
 		}
@@ -106,7 +106,7 @@ void Menu::Process(float _deltaTime)
 		for (auto button = m_toggleButtons.begin(); button != m_toggleButtons.end(); button++)
 		{
 			(*button)->Process(_deltaTime);
-		}
+		}*/
 
 		// Handle Controller Input
 		m_pGamepad->PreProcess();
@@ -199,7 +199,7 @@ bool Menu::AddSprite(std::string _filename, UINT _imageWidth, UINT _imageHeight,
 	return true;
 }
 
-bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, v2float _position)
+bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, UINT _col, UINT _row)
 {
 	if (_spriteIndex < m_sprites.size())
 	{
@@ -238,15 +238,14 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, v2floa
 			break;
 		case MENU_LAYOUT_CUSTOM:
 			VALIDATE(temp->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
-				m_position.x + _position.x,
-				m_position.y + _position.y,
+				m_position.x,
+				m_position.y,
 				m_sprites[_spriteIndex]->GetWidth() * _scale,
 				m_sprites[_spriteIndex]->GetHeight() * _scale));
 			break;
 		}
 		
-
-		m_buttons.back()->SetButton(temp, _option, _spriteIndex, _scale);
+		m_buttons.back()->SetButton(temp, _option, _spriteIndex, _scale, _col, _row);
 
 		if (m_buttons.size() == 1)
 		{
@@ -352,6 +351,19 @@ TButton* Menu::GetButton(UINT _index)
 void Menu::SetPosition(v2float _position)
 {
 	m_position = _position;
+}
+
+void Menu::SetButtonPosition(UINT _index, v2float _position)
+{
+	m_buttons[_index]->m_pButton->SetPosition(_position);
+}
+
+void Menu::ToggleButton(UINT _index)
+{
+	if (m_toggleButtons[_index]->GetState() == BUTTON_STATE_DEFAULT)
+		m_toggleButtons[_index]->SetState(BUTTON_STATE_HOVER);
+	else
+		m_toggleButtons[_index]->SetState(BUTTON_STATE_DEFAULT);
 }
 
 void Menu::Reset()
