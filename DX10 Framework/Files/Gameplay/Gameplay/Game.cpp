@@ -56,10 +56,12 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
 
-	 // Create the Orb Mesh
+
+	// Create the Orb Mesh
+	float OrbRadius = 0.5f;
 	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
 	TVertexNormalUV tempVertNormUV;
-	v3float orbScale = { 1, 1, 1 };
+	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, tempVertNormUV, orbScale));
 
 	// TO DO JC: This will be based on the number of players selected for a given match
@@ -70,7 +72,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 1.0f,1.0f, 100.0f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 2.0f, 1.0f, 100.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 	}
    
@@ -85,6 +87,47 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 	return true;
 }
 
+bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
+{
+	if ((_OrbA != _OrbB))
+	{
+		// Calculate the distance between the two orbs
+		float distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
+		// Calculate the combined Radius of the two orbs
+		float combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
+
+		
+
+		// Check if the orbs are colliding
+		if (distance <= combinedRadius)
+		{
+						 
+			
+
+			return true;
+
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void Game::HandleCollisions(Orb* _OrbA, Orb* _OrbB)
+{
+	v3float orbVelocity_A = _OrbA->GetVelocity();
+	v3float orbVelocity_B = _OrbB->GetVelocity();
+
+	_OrbA->SetVelocity(orbVelocity_B * _OrbB->GetBounce());
+	_OrbB->SetVelocity(orbVelocity_A * _OrbA->GetBounce());
+}
+
 void Game::Process(float _dt)
 {
 
@@ -92,17 +135,14 @@ void Game::Process(float _dt)
 
 	m_pShader_LitTex->SetUpPerFrame();
 	m_pArenaFloor->Process(_dt);
-
-	// Find which Tile you are on
-
-
-	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
+	 	
+	/*for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
 		for (UINT col = 0; col < m_pArenaTiles->size(); col++)
 		{
 			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_BLANK);
 		}
-	}
+	}*/
 	
 
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
@@ -111,6 +151,23 @@ void Game::Process(float _dt)
 		{
 			// Get and set the surface friction
 			
+
+			// Check Collisions
+			for (UINT j = 0; j < m_pOrbs.size(); j++)
+			{
+				if ((i != j))
+				{
+					if (m_pOrbs[j]->GetAlive())
+					{
+						if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
+						{
+							HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+						}
+					}
+				}
+			}
+
+
 
 			v3float OrbPos = m_pOrbs[i]->GetPosition();
 			v3float tilePos;
@@ -139,18 +196,20 @@ void Game::Process(float _dt)
 				m_pOrbs[i]->SetAlive(false);
 			}
 
-			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_POWER_CONFUSION);
+			//(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_POWER_CONFUSION);
 
 			switch ((*(*m_pArenaTiles)[row])[col]->GetBaseImageEnum())
 			{
 			case BTI_SLIPPERY:
 			{
 				m_pOrbs[i]->SetSurfaceFriction(0.0f);
+				//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 			}
 				break;
 			case BTI_ROUGH:
 			{
 				m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
+				//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 			}
 				break;
 			case BTI_STANDARD:
@@ -159,13 +218,14 @@ void Game::Process(float _dt)
 			}
 				default: break;
 			}
-
 			
 
 			if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
 			{
 				m_pOrbs[i]->SetAlive(false);
 			}
+
+
 
 
 			m_pOrbs[i]->Process(_dt);

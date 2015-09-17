@@ -66,6 +66,10 @@ public:
 	// TO DO JC
 	void HandleInput();
 
+	bool IsOrbsColliding(Orb* _OrbA, Orb* _OrbB);
+
+	void HandleCollisions(Orb* _OrbA, Orb* _OrbB);
+
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	ArenaFloor* m_pArenaFloor;

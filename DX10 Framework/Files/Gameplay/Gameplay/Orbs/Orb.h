@@ -22,8 +22,6 @@
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_Generic.h"
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_LitTex.h"
 
-
-
 class Orb :
 	public DX10_Obj_LitTex
 {
@@ -67,21 +65,34 @@ public:
 	
 	void SetAlive(bool _alive){ m_isAlive = _alive; };
 	bool GetAlive(){ return m_isAlive; };
-		
+
+	float GetRadius(){ return m_radius; };
+	// TO DO JC: Set radius
+
+	v3float GetVelocity(){ return m_velocity; };
+	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
+
+	float GetBounce(){ return m_bounce; };
+	void SetBounce(float _bounce){ m_bounce = _bounce; };
+
+
 protected:
 private:
 	// Member Variables
 public:
-	float m_surfaceFriction;
 protected:
 private:
 
 	v3float m_acceleration;
 	v3float m_velocity;
+	float m_surfaceFriction;
 	float m_speed;
 	float m_maxSpeed;
-	float m_density;
+	// TO DO JC: Currently unused
+	float m_bounce;
+	float m_radius;
 	bool m_isAlive;
+
 
 
 	

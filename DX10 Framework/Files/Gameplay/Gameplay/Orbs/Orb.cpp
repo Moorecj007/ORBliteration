@@ -20,18 +20,19 @@ Orb::Orb()
 {
 	m_acceleration = {0.0f,0.0f,0.0f};
 	m_velocity = { 0.0f, 0.0f, 0.0f };
-	m_density = 0.0f;
+	m_bounce = 0.0f;
 	m_maxSpeed = 0.0f;
 	m_isAlive = true;
 }
 
 Orb::~Orb()
 {
+	
 }
 
 bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _speed, float _maxSpeed)
 {	
-	// Initialise the object this is derived from
+ 	// Initialise the object this is derived from
 	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _texName));
 
 	// Check the passed in parameters
@@ -41,7 +42,8 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_
 	}
 
 	// Store the initial state of the variables
-	m_density = _density;
+	m_bounce = _density;
+	m_radius = _pMesh->GetScale().x / 2;
 	m_speed = _speed;
 	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;
