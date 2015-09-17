@@ -81,6 +81,7 @@ private:
 	float m_density;
 	bool m_isAlive;
 
+
 	
 };
 
