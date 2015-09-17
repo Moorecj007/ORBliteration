@@ -112,7 +112,7 @@ public:
 
 protected:
 	DX10_Renderer* m_pRenderer;
-	UINT m_bufferID;
+	DX10_Buffer* m_pBuffer;
 	eVertexType m_vertType;
 	D3D_PRIMITIVE_TOPOLOGY m_primTopology;
 

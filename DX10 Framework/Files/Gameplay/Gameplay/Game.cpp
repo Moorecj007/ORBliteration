@@ -74,12 +74,10 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 	}
 
-
-
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
 	v3float tileScale = { 4, 4, 0.1f };
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 21, 21, tileScale));
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, tileScale, 15.0f));
 	
 	return true;
 }

@@ -213,11 +213,11 @@
     <ClInclude Include="Files\Menus\Menu.h">
       <Filter>Header Files\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Orb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Files\Utility\Mutex_Semaphore.h">
       <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Files\Gameplay\Gameplay\Orbs\Orb.h">
+      <Filter>Header Files\Gameplay\Orbs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -284,11 +284,11 @@
     <ClCompile Include="Files\Menus\Menu.cpp">
       <Filter>Source Files\Menus</Filter>
     </ClCompile>
-    <ClCompile Include="Orb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Files\Gameplay\Gameplay\Orbs\Orb.cpp">
+      <Filter>Source Files\Gameplay\Orbs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,24 +23,26 @@ ArenaFloor::ArenaFloor()
 
 ArenaFloor::~ArenaFloor()
 {
-	while (m_arenaTiles.empty() == false)
+	while (m_pArenaTiles->empty() == false)
 	{
-		while (m_arenaTiles.back()->empty() == false)
+		while (m_pArenaTiles->back()->empty() == false)
 		{
-			ReleasePtr(m_arenaTiles.back()->back());
-			m_arenaTiles.back()->pop_back();
+			ReleasePtr(m_pArenaTiles->back()->back());
+			m_pArenaTiles->back()->pop_back();
 		}
 
-		ReleasePtr(m_arenaTiles.back());
-		m_arenaTiles.pop_back();
+		ReleasePtr(m_pArenaTiles->back());
+		m_pArenaTiles->pop_back();
 	}
+	ReleasePtr(m_pArenaTiles);
 
 	ReleasePtr(m_pTileMesh);
 }
 
-bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT rowCount, UINT colCount, v3float _tileScale)
+bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT _arenaSize, v3float _tileScale, float _matchLength)
 {
 	m_pDX10_Renderer = _pDX10_Renderer;
+	m_matchLength = _matchLength;
 
 	// Create the Mesh for the Arena Tiles
 	m_pTileMesh = new DX10_Mesh_Rect_Prism();
@@ -48,20 +50,24 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
 
 	// Create the 2D vector of Arena Tiles
-	for (UINT row = 0; row < rowCount; row++)
+	m_pArenaTiles = new std::vector<std::vector<ArenaTile*>*>;
+	for (UINT row = 0; row < _arenaSize; row++)
 	{
 		std::vector<ArenaTile*>* pRowOfTiles = new std::vector<ArenaTile*>;
 
-		for (UINT col = 0; col < colCount; col++)
+		for (UINT col = 0; col < _arenaSize; col++)
 		{
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
-			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, "WoodCrate01.dds"));
+
+			eBaseTileImages eBaseImage = (eBaseTileImages)(rand() % 3);
+
+			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
 			// Set the Position based upon the position in the 2D grid
 			v3float tilePos;
-			tilePos.x = ((float)row - ((float)rowCount / 2.0f)) * _tileScale.x + (_tileScale.x / 2.0f);
-			tilePos.y = ((float)col - ((float)colCount / 2.0f)) * _tileScale.y + (_tileScale.y / 2.0f);
+			tilePos.x = ((float)row - ((float)_arenaSize / 2.0f)) * _tileScale.x + (_tileScale.x / 2.0f);
+			tilePos.y = ((float)col - ((float)_arenaSize / 2.0f)) * _tileScale.y + (_tileScale.y / 2.0f);
 			tilePos.z = 0.0f;
 			pTile->SetPosition(tilePos);
 
@@ -71,11 +77,15 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Add the new Tile to the Row
 			pRowOfTiles->push_back(pTile);
 		}
-		m_arenaTiles.push_back(pRowOfTiles);
+		m_pArenaTiles->push_back(pRowOfTiles);
 	}
 
-	// Initialise a thread pool for Rendering the Tiles
-
+	// Calculate the time interval for destroying the outer layer
+	int evenSize;
+	// Ensure the Arena size is even for the next calculation
+	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
+	int layerCount = evenSize / 2;
+	m_destroyOutsideTime = m_matchLength / (float)layerCount;
 
 	return true;
 }
@@ -83,64 +93,89 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 void ArenaFloor::Process(float _dt)
 {
 	m_timeElapsed += _dt;
-	if (m_timeElapsed >= 0.5f)	// TO DO make variable
+	if (m_timeElapsed >= m_destroyOutsideTime)	// TO DO make variable
 	{
-		//DestroyOuterLayer();
+		DestroyOuterLayer();
 
-		m_timeElapsed -= 0.5f;
+		m_timeElapsed = 0.0f;
 	}
-
 
 	// Process all the Tiles in the 2D vector
 	// Cycle through all rows
-	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
 		// Cycle through all columns (elements in the rows)
-		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		for (UINT col = 0; col < (*m_pArenaTiles)[row]->size(); col++)
 		{
-			(*m_arenaTiles[row])[col]->Process(_dt);
+			(*(*m_pArenaTiles)[row])[col]->Process(_dt);
 		}
 	}
 }
 
 void ArenaFloor::Render()
 {
-	// Process all the Tiles in the 2D vector
+	if (m_pArenaTiles->size() == 0)
+	{
+		// Nothing to render, return.
+		return;
+	}
+
 	// Cycle through all rows
-	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
 		// Cycle through all columns (elements in the rows)
-		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		for (UINT col = 0; col < (*m_pArenaTiles)[row]->size(); col++)
 		{
-			(*m_arenaTiles[row])[col]->Render();
+			(*(*m_pArenaTiles)[row])[col]->Render();
 		}
 	}
 }
 
 void ArenaFloor::DestroyOuterLayer()
 {
-	if (m_arenaTiles.size() != 0)
+	if (m_pArenaTiles->size() != 0)
 	{
-		ReleasePtr(m_arenaTiles[0]);
-		m_arenaTiles.erase(m_arenaTiles.begin());
-
-		if (m_arenaTiles.size() != 0)
+		// Delete the Entire first rows individual elements
+		while ((*m_pArenaTiles)[0]->empty() == false)
 		{
-			ReleasePtr(m_arenaTiles[m_arenaTiles.size() - 1]);
-			m_arenaTiles.erase(m_arenaTiles.begin() + m_arenaTiles.size() - 1);
+			ReleasePtr((*(*m_pArenaTiles)[0])[0]);
+			(*m_pArenaTiles)[0]->erase((*m_pArenaTiles)[0]->begin());
+		}
+		// Delete the row
+		ReleasePtr((*m_pArenaTiles)[0]);
+		m_pArenaTiles->erase(m_pArenaTiles->begin());
+
+		// Ensure the last row was not deleted
+		if (m_pArenaTiles->size() != 0)
+		{
+			// Delete the entire last rows individual elements
+			while ((*m_pArenaTiles)[m_pArenaTiles->size() - 1]->empty() == false)
+			{
+				ReleasePtr((*(*m_pArenaTiles)[m_pArenaTiles->size() - 1])[0]);
+				(*m_pArenaTiles)[m_pArenaTiles->size() - 1]->erase((*m_pArenaTiles)[m_pArenaTiles->size() - 1]->begin());
+			}
+
+			// Delete the Last row
+			ReleasePtr((*m_pArenaTiles)[m_pArenaTiles->size() - 1]);
+			m_pArenaTiles->erase(m_pArenaTiles->begin() + m_pArenaTiles->size() - 1);
 		}
 
-		for (int row = (m_arenaTiles.size() - 1); row >= 0; row--)
+		// Delete the first and last elements within each remaining row
+		for (int row = (m_pArenaTiles->size() - 1); row >= 0; row--)
 		{
-			if (m_arenaTiles[row]->size() != 0)
+			// ensure the row has one element in it
+			if ((*m_pArenaTiles)[row]->size() != 0)
 			{
-				ReleasePtr((*m_arenaTiles[row])[0]);
-				m_arenaTiles[row]->erase(m_arenaTiles[row]->begin());
+				// Delete the first element
+				ReleasePtr((*(*m_pArenaTiles)[row])[0]);
+				(*m_pArenaTiles)[row]->erase((*m_pArenaTiles)[row]->begin());
 
-				if (m_arenaTiles[row]->size() != 0)
+				// ensure the row has one element in it
+				if ((*m_pArenaTiles)[row]->size() != 0)
 				{
-					ReleasePtr((*m_arenaTiles[row])[m_arenaTiles[row]->size() - 1]);
-					m_arenaTiles[row]->erase(m_arenaTiles[row]->begin() + m_arenaTiles[row]->size() - 1);
+					// Delete the last element
+					ReleasePtr((*(*m_pArenaTiles)[row])[(*m_pArenaTiles)[row]->size() - 1]);
+					(*m_pArenaTiles)[row]->erase((*m_pArenaTiles)[row]->begin() + (*m_pArenaTiles)[row]->size() - 1);
 				}
 			}
 		}
