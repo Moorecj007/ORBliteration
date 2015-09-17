@@ -61,25 +61,32 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _p
 	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SizeIncrease.dds", m_pOverlayTex[OTI_POWER_SIZEINCREASE]));
 	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SpeedIncrease.dds", m_pOverlayTex[OTI_POWER_SPEEDINCREASE]));
 
-
+	m_currentOverlay = OTI_BLANK;
 	m_baseImage = _baseImage;
+	m_active = true;
 	return true;
 }
 
 void ArenaTile::Process(float _dt)
 {
-	// TO DO CAL - Determine the correct image to be displayed
+	if (m_active)
+	{
+		// TO DO CAL - Determine the correct image to be displayed
+	}	
 }
 
 void ArenaTile::Render()
 {
-	// Put the Object Specific variables into a structure
-	TLitTex _litTex;
-	_litTex.pMesh = m_pMesh;
-	_litTex.pMatWorld = &m_matWorld;
-	_litTex.pTexBase = m_pBaseTex;
-	_litTex.pTex2 = m_pOverlayTex[OTI_BLANK];
+	if (m_active == true)
+	{
+		// Put the Object Specific variables into a structure
+		TLitTex _litTex;
+		_litTex.pMesh = m_pMesh;
+		_litTex.pMatWorld = &m_matWorld;
+		_litTex.pTexBase = m_pBaseTex;
+		_litTex.pTex2 = m_pOverlayTex[m_currentOverlay];
 
-	// Set the Shader to Render the Tile
-	m_pShader_LitTex->Render(_litTex, TECH_LITTEX_BLENDTEX2);
+		// Set the Shader to Render the Tile
+		m_pShader_LitTex->Render(_litTex, TECH_LITTEX_BLENDTEX2);
+	}
 }

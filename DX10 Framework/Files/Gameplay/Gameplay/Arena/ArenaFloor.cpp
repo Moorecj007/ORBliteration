@@ -84,8 +84,10 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	int evenSize;
 	// Ensure the Arena size is even for the next calculation
 	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
-	int layerCount = evenSize / 2;
-	m_destroyOutsideTime = m_matchLength / (float)layerCount;
+	m_layerCount = evenSize / 2;
+	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
+
+	m_destroyedLayers = 0;
 
 	return true;
 }
@@ -93,7 +95,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 void ArenaFloor::Process(float _dt)
 {
 	m_timeElapsed += _dt;
-	if (m_timeElapsed >= m_destroyOutsideTime)	// TO DO make variable
+	if (m_timeElapsed >= m_destroyOutsideTime)
 	{
 		DestroyOuterLayer();
 
@@ -114,12 +116,6 @@ void ArenaFloor::Process(float _dt)
 
 void ArenaFloor::Render()
 {
-	if (m_pArenaTiles->size() == 0)
-	{
-		// Nothing to render, return.
-		return;
-	}
-
 	// Cycle through all rows
 	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
@@ -133,51 +129,29 @@ void ArenaFloor::Render()
 
 void ArenaFloor::DestroyOuterLayer()
 {
-	if (m_pArenaTiles->size() != 0)
-	{
-		// Delete the Entire first rows individual elements
-		while ((*m_pArenaTiles)[0]->empty() == false)
+	if (m_destroyedLayers <= m_layerCount)
+	{	
+		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
-			ReleasePtr((*(*m_pArenaTiles)[0])[0]);
-			(*m_pArenaTiles)[0]->erase((*m_pArenaTiles)[0]->begin());
-		}
-		// Delete the row
-		ReleasePtr((*m_pArenaTiles)[0]);
-		m_pArenaTiles->erase(m_pArenaTiles->begin());
-
-		// Ensure the last row was not deleted
-		if (m_pArenaTiles->size() != 0)
-		{
-			// Delete the entire last rows individual elements
-			while ((*m_pArenaTiles)[m_pArenaTiles->size() - 1]->empty() == false)
-			{
-				ReleasePtr((*(*m_pArenaTiles)[m_pArenaTiles->size() - 1])[0]);
-				(*m_pArenaTiles)[m_pArenaTiles->size() - 1]->erase((*m_pArenaTiles)[m_pArenaTiles->size() - 1]->begin());
-			}
-
-			// Delete the Last row
-			ReleasePtr((*m_pArenaTiles)[m_pArenaTiles->size() - 1]);
-			m_pArenaTiles->erase(m_pArenaTiles->begin() + m_pArenaTiles->size() - 1);
+			int row = m_destroyedLayers;
+			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
 		}
 
-		// Delete the first and last elements within each remaining row
-		for (int row = (m_pArenaTiles->size() - 1); row >= 0; row--)
+		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
-			// ensure the row has one element in it
-			if ((*m_pArenaTiles)[row]->size() != 0)
-			{
-				// Delete the first element
-				ReleasePtr((*(*m_pArenaTiles)[row])[0]);
-				(*m_pArenaTiles)[row]->erase((*m_pArenaTiles)[row]->begin());
+			int row = (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1;
+			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+		}
 
-				// ensure the row has one element in it
-				if ((*m_pArenaTiles)[row]->size() != 0)
-				{
-					// Delete the last element
-					ReleasePtr((*(*m_pArenaTiles)[row])[(*m_pArenaTiles)[row]->size() - 1]);
-					(*m_pArenaTiles)[row]->erase((*m_pArenaTiles)[row]->begin() + (*m_pArenaTiles)[row]->size() - 1);
-				}
-			}
+		for (UINT row = m_destroyedLayers; row < m_pArenaTiles->size() - m_destroyedLayers; row++)
+		{
+			int col = m_destroyedLayers;
+			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
+			col = (*m_pArenaTiles)[row]->size() - 1 - m_destroyedLayers;
+			(*(*m_pArenaTiles)[row])[col]->SetActive(false);
 		}
 	}
+
+	// Increase the Count of destroyed layers
+	m_destroyedLayers++;	
 }
