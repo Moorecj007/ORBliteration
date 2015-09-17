@@ -82,6 +82,8 @@ private:
 
 	DX10_Mesh_Generic* m_pOrbMesh;
 
+
+
 };
 #endif	//__GAME_H__
 
