@@ -54,10 +54,9 @@ bool GUI_Button::Initialize(DX10_Renderer* _pDX10_Renderer, DXSprite* _pSprite, 
 	return true;
 }
 
-void GUI_Button::GetPosition(v2float& _out)	// TOIMPROVE - Maybe add the centre as the origin
+v2float GUI_Button::GetPosition()
 {
-	_out.x = m_position.x;
-	_out.y = m_position.y;
+	return m_position;
 }
 
 BUTTON_STATE GUI_Button::GetState()
@@ -117,6 +116,7 @@ void GUI_Button::Draw()
 		m_pSprite->SetImageIndex(2);
 		break;
 	case BUTTON_STATE::BUTTON_STATE_DEACTIVATED:
+		m_pSprite->SetImageIndex(3);
 		break;
 	}
 

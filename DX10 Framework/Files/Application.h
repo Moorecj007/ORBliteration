@@ -40,6 +40,17 @@
 #include "Menus\Menu.h"
 #include "Gameplay\Gameplay.h"
 
+enum APP_STATE
+{
+	APP_STATE_TITLE,
+	APP_STATE_MAIN_MENU,
+	APP_STATE_MATCH_MENU,
+	APP_STATE_OPTION_MENU,
+	APP_STATE_INSTRUCTIONS_MENU,
+	APP_STATE_PAUSE_MENU,
+	APP_STATE_GAME
+};
+
 class Application
 {
 public:
@@ -176,6 +187,22 @@ private:
 	Application(const Application& _kr);
 	Application& operator= (const Application& _kr);
 
+	/*******************
+	-> Exits the application
+	@author:	Juran Griffith.
+	@parameter:	None.
+	@return:	void
+	********************/
+	void ExitApp();
+
+	/*******************
+	-> Updates the application based on the menu item selected
+	@author:	Juran Griffith.
+	@parameter:	None.
+	@return:	void
+	********************/
+	void UpdateState(MENU_STATE _state);
+
 private:
 	// Singleton Instance
 	static Application* s_pApp;
@@ -203,16 +230,21 @@ private:
 	DX10_Camera_Debug* m_pCamera;
 
 	// Game Pad Input
-	XButtonIDs m_XButtons;
-	XStickDirectionIDs m_XStickDirections;
+	XButtonIDs m_XButtons;	//TO DO Jc - Maybe use enums
+	XStickDirectionIDs m_XStickDirections; //TO DO Jc - Maybe use enums
 	InputGamePad* m_pGamepadPlayerOne;
 
 	// Menu Objects
-	Menu*	m_mainMenu;
-	bool m_showMenu;
+	std::vector<Menu*> m_menus;
 
 	// Game play Objects
 	Game* m_pGame;
+
+	// App State
+	APP_STATE m_state;
+	bool m_isFullscreen;
+	bool m_isSound;
+	bool m_isRumble;
 };
 
 #endif // __APPLICATION_H__
