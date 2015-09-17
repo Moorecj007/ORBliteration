@@ -83,6 +83,10 @@ private:
 	DX10_Mesh_Generic* m_pOrbMesh;
 
 
+	// TO DO JC: Temp remove
+	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
+	v3float m_tileScale;
+	int m_areaSize;
 
 };
 #endif	//__GAME_H__
