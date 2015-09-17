@@ -117,6 +117,7 @@ void GUI_Button::Draw()
 		m_pSprite->SetImageIndex(2);
 		break;
 	case BUTTON_STATE::BUTTON_STATE_DEACTIVATED:
+		m_pSprite->SetImageIndex(3);
 		break;
 	}
 

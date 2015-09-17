@@ -173,7 +173,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_showMenu = false;
+	m_state = APP_STATE_MAIN_MENU;	// TO DO - Change to title screen 
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
@@ -189,11 +189,8 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
-	if (m_showMenu == false)
-	{
-		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
-	}
+	m_pGame = new Game();
+	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
 
 	m_online = true;
 
@@ -220,13 +217,53 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
 
-	// Initialise Menu
-	m_mainMenu = new Menu();
-	VALIDATE(m_mainMenu->Initialize(m_pDX10_Renderer, &m_hWnd));
+	// Initialise Main Menu
+	m_menus.push_back(new Menu());
+	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_mainMenu->AddSprite("Button/button_exit.png", 280, 345, 1, 3);
-	m_mainMenu->AddButton(0, 0.5f);
-	m_mainMenu->AddButton();
+	m_menus.back()->AddSprite("Button/tron_orbliteration.png", 1231, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_start_fill.png", 481, 424, 1, 4); 
+	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddTitle(0, 0.75f);
+	m_menus.back()->AddButton(MENU_STATE_START, 1, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 2, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 3, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_EXIT, 4, 0.5f);
+
+	// Intialise Match Menu
+	m_menus.push_back(new Menu());
+	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+
+	m_menus.back()->AddSprite("Button/tron_button_2_fill.png", 106, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_3_fill.png", 106, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_4_fill.png", 106, 424, 1, 4);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 1, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 2, 0.5f);
+
+	// Intialise Options Menu
+	m_menus.push_back(new Menu());
+	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+
+	m_menus.back()->AddSprite("Button/toggle_button.png", 95, 61, 1, 2);
+	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 0, 1.0f);
+	m_menus.back()->AddButton(MENU_STATE_SOUND, 0, 1.0f);
+	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 0, 1.0f);
+
+	// Intialise Pause Menu
+	m_menus.push_back(new Menu());
+	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+
+	m_menus.back()->AddSprite("Button/tron_button_resume_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddButton(MENU_STATE_RESUME, 0, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_EXIT, 3, 0.5f);
 
 	return true;
 }
@@ -257,7 +294,11 @@ void Application::ShutDown()
 		ReleasePtr(m_pGamepadPlayerOne);
 
 		// Menu memory release
-		ReleasePtr(m_mainMenu);
+		while (!m_menus.empty())
+		{
+			ReleasePtr(m_menus.back());
+			m_menus.pop_back();
+		}
 		
 		// Gameplay objects memory release
 		ReleasePtr(m_pGame);
@@ -304,44 +345,6 @@ bool Application::Process(float _dt)
 {
 	VALIDATE(HandleInput());
 
-	// Handle Controller Input
-	m_pGamepadPlayerOne->PreProcess();
-
-	if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepadPlayerOne->GetStickDirectionDown(m_XStickDirections.LStick_Down))
-	{
-		/*if (m_menuItem < m_buttons.size() - 1)
-		{
-			if (m_menuItem >= 0)
-			{
-				m_buttons[m_menuItem]->SetState(BUTTON_STATE_DEFAULT);
-			}
-
-			m_menuItem++;
-			if (m_menuItem >= 0)
-			{
-				m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
-			}
-		}*/
-	}
-	else if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.DPad_Up) || m_pGamepadPlayerOne->GetStickDirectionDown(m_XStickDirections.LStick_Up))
-	{
-		/*if (m_menuItem > 0)
-		{
-			if (m_menuItem >= 0)
-			{
-				m_buttons[m_menuItem]->SetState(BUTTON_STATE_DEFAULT);
-			}
-
-			m_menuItem--;
-			if (m_menuItem >= 0)
-			{
-				m_buttons[m_menuItem]->SetState(BUTTON_STATE_HOVER);
-			}
-		}*/
-	}
-
-	m_pGamepadPlayerOne->PostProcess();
-
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
@@ -349,15 +352,34 @@ bool Application::Process(float _dt)
 
 		ProcessShaders();
 
-		if (m_showMenu == true)
+		switch (m_state)
 		{
-			m_mainMenu->Process(_dt);
-		}
-		else
-		{
+		case APP_STATE_TITLE:
+			break;
+		case APP_STATE_MAIN_MENU:
+			m_menus[0]->Process(_dt);
+			UpdateState(m_menus[0]->GetMenuState());
+			break;
+		case APP_STATE_MATCH_MENU:
+			m_menus[1]->Process(_dt);
+			UpdateState(m_menus[1]->GetMenuState());
+			break;
+		case APP_STATE_INSTRUCTIONS_MENU:
+			break;
+		case APP_STATE_OPTION_MENU:
+			m_menus[2]->Process(_dt);
+			UpdateState(m_menus[2]->GetMenuState());
+			break;
+		case APP_STATE_PAUSE_MENU:
+			m_menus[3]->Process(_dt);
+			UpdateState(m_menus[3]->GetMenuState());
+			break;
+		case APP_STATE_GAME:
 			m_pGame->Process(_dt);
+			break;
+		default:
+			break;
 		}
-		
 	}
 
 	return true;
@@ -376,17 +398,29 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		if (m_showMenu == true)
+		switch (m_state)
 		{
-			m_mainMenu->Draw();
-		}
-		else
-		{
-			m_pTimer->Tick();
+		case APP_STATE_TITLE:
+			break;
+		case APP_STATE_MAIN_MENU:
+			m_menus[0]->Draw();
+			break;
+		case APP_STATE_MATCH_MENU:
+			m_menus[1]->Draw();
+			break;
+		case APP_STATE_INSTRUCTIONS_MENU:
+			break;
+		case APP_STATE_OPTION_MENU:
+			m_menus[2]->Draw();
+			break;
+		case APP_STATE_PAUSE_MENU:
+			m_menus[3]->Draw();
+			break;
+		case APP_STATE_GAME:
 			m_pGame->Render();
-			m_pTimer->Tick();
-			float dt = m_pTimer->GetDeltaTime();
-			printf("%f \n", dt);
+			break;
+		default:
+			break;
 		}
 
 		// Tell the Renderer the data input is over and present the outcome
@@ -398,15 +432,7 @@ bool Application::HandleInput()
 {
 	if (m_pKeyDown[VK_ESCAPE])
 	{
-		if (m_pDX10_Renderer != 0)
-		{
-			if (m_pDX10_Renderer->GetFullScreenState() == true)
-			{
-				// Toggle the screen mode to windowed before exiting application
-				m_pDX10_Renderer->ToggleFullscreen();
-			}
-		}
-		m_online = false;	// Changing this to false will cause the main application loop to end -> quitting the application
+		ExitApp();
 	}
 
 	// Template Inputs
@@ -477,19 +503,83 @@ bool Application::HandleInput()
 	return true;
 }
 
+void Application::ExitApp()
+{
+	if (m_pDX10_Renderer != 0)
+	{
+		if (m_pDX10_Renderer->GetFullScreenState() == true)
+		{
+			// Toggle the screen mode to windowed before exiting application
+			m_pDX10_Renderer->ToggleFullscreen();
+		}
+	}
+	m_online = false;	// Changing this to false will cause the main application loop to end -> quitting the application
+}
 
+void Application::UpdateState(MENU_STATE _state)
+{
+	switch (_state)
+	{
+		// Main menu
+	case MENU_STATE_START:
+		m_state = APP_STATE_MATCH_MENU;
+		m_menus[1]->Reset();
+		break;
+	case MENU_STATE_INSTRUCTIONS:
+		//m_state = APP_STATE_INSTRUCTIONS_MENU;
+		m_menus[0]->Reset();
+		break;
+	case MENU_STATE_OPTIONS:
+		m_state = APP_STATE_OPTION_MENU;
+		m_menus[2]->Reset();
+		break;
+	case MENU_STATE_EXIT:
+		switch (m_state)
+		{
+		case APP_STATE_MAIN_MENU:
+			ExitApp();
+			break;
+		case APP_STATE_MATCH_MENU:			// Fall through
+		case APP_STATE_INSTRUCTIONS_MENU:	// Fall through
+		case APP_STATE_OPTION_MENU:			// Fall through
+			m_state = APP_STATE_MAIN_MENU;
+			m_menus[0]->Reset();
+			break;
+		case APP_STATE_PAUSE_MENU:
+			m_state = APP_STATE_GAME;
+			break;
+		}
+		break;
 
+		// Options menu
+	case MENU_STATE_FULL_SCREEN:
+		
+		break;
+	case MENU_STATE_SOUND:
+		
+		break;
+	case MENU_STATE_RUMBLE:
+		
+		break;
 
+		// Match menu states
+	case MENU_STATE_PLAYERS_2:
+		m_state = APP_STATE_GAME;
+		break;
+	case MENU_STATE_PLAYERS_3:
+		m_state = APP_STATE_GAME;
+		break;
+	case MENU_STATE_PLAYERS_4:
+		m_state = APP_STATE_GAME;
+		break;
 
+		// Pause menu states (reuses the main menu states)
+	case MENU_STATE_RESUME:
+		m_state = APP_STATE_GAME;
+		break;
 
-
-
-
-
-
-
-
-
-
-
-
+	default:
+		
+		break;
+	}
+}
