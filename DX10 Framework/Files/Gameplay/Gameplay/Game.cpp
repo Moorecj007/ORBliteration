@@ -172,15 +172,15 @@ void Game::Process(float _dt)
 			v3float OrbPos = m_pOrbs[i]->GetPosition();
 			v3float tilePos;
 			OrbPos += m_tileScale / 2;
-			int row = (OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2);
-			int col = (OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2);
+			int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
+			int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
 
 			if (row < 0)
 			{
 				row = 0;
 				m_pOrbs[i]->SetAlive(false);
 			}
-			else if (row > m_pArenaTiles->size() - 1)
+			else if (row > (int)m_pArenaTiles->size() - 1)
 			{
 				row = m_pArenaTiles->size() - 1;
 				m_pOrbs[i]->SetAlive(false);
@@ -190,7 +190,7 @@ void Game::Process(float _dt)
 				col = 0;
 				m_pOrbs[i]->SetAlive(false);
 			}
-			else if (col > m_pArenaTiles->size() - 1)
+			else if (col > (int)m_pArenaTiles->size() - 1)
 			{
 				col = m_pArenaTiles->size() - 1;
 				m_pOrbs[i]->SetAlive(false);
