@@ -57,7 +57,7 @@ public:
 	********************/
 	template<typename TIndices, typename TVertices>
 	bool Initialise(	typename TVertices* _pVertices, typename TIndices* _pIndices,
-						UINT _vertCount, UINT _indexCount, UINT _stride, UINT* _bufferID,
+						UINT _vertCount, UINT _indexCount, UINT _stride,
 						D3D10_USAGE _vertexUsage, D3D10_USAGE _indexUsage)
 	{
 		m_vertexCount = _vertCount;

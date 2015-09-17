@@ -200,7 +200,7 @@ class DXSprite
 
 		DX10_Renderer*			m_pDX10_Renderer;
 		ID3D10ShaderResourceView*	m_pTex;
-		UINT					m_buffID;
+		DX10_Buffer*			m_pBuff;
 		DX10_Shader_Sprite*		m_pShader;
 };
 

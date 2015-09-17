@@ -143,30 +143,29 @@ public:
 	* @parameter: _vertCount: Number of Vertices
 	* @parameter: _indexCount: Number of Indices
 	* @parameter: _stride: Stride size for each Vertex
-	* @parameter: _pBufferID: Storage variable to hold the ID of the created buffer
+	* @parameter: _prBuffer: Storage variable to hold the created buffer
 	* @return: bool: Successful or not
 	********************/
 	template<typename TIndices, typename TVertices>
 	bool CreateBuffer(typename TVertices* _pVertices, typename TIndices* _pIndices,
-		UINT _vertCount, UINT _indexCount, UINT _stride, UINT* _pBufferID,
+		UINT _vertCount, UINT _indexCount, UINT _stride, DX10_Buffer*& _prBuffer,
 		D3D10_USAGE _vertexUsage = D3D10_USAGE_IMMUTABLE, D3D10_USAGE _indexUsage = D3D10_USAGE_IMMUTABLE)
 	{
-		*_pBufferID = ++m_nextBufferID;
-
+		++m_nextBufferID;
 		DX10_Buffer* buff = new DX10_Buffer(m_pDX10Device);
-		if (buff->Initialise(_pVertices, _pIndices, _vertCount, _indexCount, _stride, _pBufferID, _vertexUsage, _indexUsage))
+		if (buff->Initialise(_pVertices, _pIndices, _vertCount, _indexCount, _stride, _vertexUsage, _indexUsage))
 		{
 			std::pair<UINT, DX10_Buffer*> bufferPair(m_nextBufferID, buff);
 			VALIDATE(m_buffers.insert(bufferPair).second);
-
+			 
+			_prBuffer = buff;
 			return true;
 		}
 		else
 		{
 			// Delete the failed buffer memory
-			_pBufferID = 0;
-			delete buff;
-			buff = 0;
+			_prBuffer = 0;
+			ReleasePtr(buff);
 			return false;
 		}
 	}
@@ -183,10 +182,10 @@ public:
 	/***********************
 	* RenderBuffer: Renders an Buffer to the screen
 	* @author: Callan Moore
-	* @parameter: _bufferID: The ID of the buffer stored on the Renderer
-	* @return: bool: Successful or not
+	* @parameter: _buffer: The buffer to Render
+	* @return: void
 	********************/
-	bool RenderBuffer(UINT _bufferID);
+	void RenderBuffer(DX10_Buffer* _buffer);
 
 	/***********************
 	* StartRender: Clears the Back buffer ready for new frame
@@ -247,9 +246,6 @@ public:
 	* @return: void
 	********************/
 	void CalcProjMatrix();
-
-	// TO DO CAL
-	ID3D10Buffer* GetVertexBuffer(UINT _buffID);
 	
 	/***********************
 	* GetViewMatrix: Retrieve the View Matrix

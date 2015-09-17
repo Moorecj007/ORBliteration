@@ -105,7 +105,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexBasic _v
 	UINT indexCount = (sizeof(indices) / sizeof(*indices));
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, m_pBuffer);
 
 	return true;
 }
@@ -192,7 +192,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexColor _v
 	UINT indexCount = (sizeof(indices) / sizeof(*indices));
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, m_pBuffer);
 
 	return true;
 }
@@ -279,7 +279,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexColorUV 
 	UINT indexCount = (sizeof(indices) / sizeof(*indices));
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, m_pBuffer);
 
 	return true;
 }
@@ -366,12 +366,12 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexNormalUV
 	UINT indexCount = (sizeof(indices) / sizeof(*indices));
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, m_pBuffer);
 
 	return true;
 }
 
 void DX10_Mesh_Rect_Prism::Render()
 {
-	m_pRenderer->RenderBuffer(m_bufferID);
+	m_pRenderer->RenderBuffer(m_pBuffer);
 }

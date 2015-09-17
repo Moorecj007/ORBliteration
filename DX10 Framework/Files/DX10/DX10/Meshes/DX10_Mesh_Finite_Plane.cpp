@@ -108,7 +108,7 @@ bool DX10_Mesh_Finite_Plane::Initialise(DX10_Renderer* _pRenderer, TVertexBasic 
 	m_primTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, kVertexCount, kIndexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, kVertexCount, kIndexCount, stride, m_pBuffer);
 
 	return true;
 }
@@ -201,12 +201,12 @@ bool DX10_Mesh_Finite_Plane::Initialise(DX10_Renderer* _pRenderer, TVertexColor 
 	m_primTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
 	// Create the buffer and store the ID
-	m_pRenderer->CreateBuffer(vertices, indices, kVertexCount, kIndexCount, stride, &m_bufferID);
+	m_pRenderer->CreateBuffer(vertices, indices, kVertexCount, kIndexCount, stride, m_pBuffer);
 
 	return true;
 }
 
 void DX10_Mesh_Finite_Plane::Render()
 {
-	m_pRenderer->RenderBuffer(m_bufferID);
+	m_pRenderer->RenderBuffer(m_pBuffer);
 }
