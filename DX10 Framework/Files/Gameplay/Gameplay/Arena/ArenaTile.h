@@ -22,6 +22,29 @@
 #include "../../../DX10/DX10/Meshes/DX10_Mesh_Generic.h"
 #include "../../../DX10/DX10/Shaders/DX10_Shader_LitTex.h"
 
+/***********************
+* eBaseTileImages: The image list of textures that can be applied to the base of a tile
+* @author: Callan Moore
+********************/
+enum eBaseTileImages
+{
+	BTI_STANDARD,
+	BTI_SLIPPERY,
+	BTI_ROUGH
+};
+
+/***********************
+* eOverlayTileImages: The image list of textures that can be overlayed on top of a tile
+* @author: Callan Moore
+********************/
+enum eOverlayTileImages
+{
+	OTI_BLANK,
+	OTI_POWER_CONFUSION,
+	OTI_POWER_SIZEINCREASE,
+	OTI_POWER_SPEEDINCREASE
+};
+
 class ArenaTile :
 	public DX10_Obj_Generic
 {
@@ -39,13 +62,45 @@ public:
 	********************/
 	~ArenaTile();
 
-	// TO DO
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _pTexName);
+	/***********************
+	* Initialise: Initialise the ArenaTilefor use
+	* @author: Callan Moore
+	* @parameter: _pDX10_Renderer: The renderer for this object
+	* @parameter: _pMesh: The mesh to create this tile with
+	* @parameter: _pShader: The shader to use for rendering this tile
+	* @parameter: _baseImage: Enum to indicate which image to display as the tiles base image
+	* @return: bool: Successful or not
+	********************/
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, eBaseTileImages _baseImage);
+	
+	/***********************
+	* Process: Process the Tile
+	* @author: Callan Moore
+	* @parameter: _dt: The current delta tick
+	* @return: void
+	********************/
 	void Process(float _dt);
+	
+	/***********************
+	* Render: Render the Tile
+	* @author: Callan Moore
+	* @return: void
+	********************/
 	void Render();
+	
+	/***********************
+	* GetBaseImage: Retrieve the Base Image indicator for which image is displayed on the tile
+	* @author: Callan Moore
+	* @return: eBaseTileImages: Enum for the displayed image
+	********************/
+	eBaseTileImages GetBaseImageEnum() { return m_baseImage; };
 
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
-	ID3D10ShaderResourceView* m_pTex;
+	ID3D10ShaderResourceView* m_pBaseTex;
+	ID3D10ShaderResourceView* m_pOverlayTex[4];
+
+	eBaseTileImages m_baseImage;
+	eOverlayTileImages m_currentOverlay;
 };
 #endif	// __ARENATILE_H__

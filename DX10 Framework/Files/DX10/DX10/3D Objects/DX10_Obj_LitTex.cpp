@@ -103,7 +103,7 @@ void DX10_Obj_LitTex::Render(eTech_LitTex _tech)
 	TLitTex litTex;
 	litTex.pMesh = m_pMesh;
 	litTex.pMatWorld = &m_matWorld;
-	litTex.pTex = (*m_pTextures)[m_texIndex];
+	litTex.pTexBase = (*m_pTextures)[m_texIndex];
 
 	m_pShader->Render(litTex, _tech);
 }

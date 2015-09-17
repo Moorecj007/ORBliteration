@@ -23,6 +23,9 @@ FILE* g_file;
 
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _cmdShow)
 {
+	// Seed the random based on the time
+	srand((UINT)time(NULL));
+
 	if (AllocConsole())
 	{
 		freopen_s(&g_file, "conout$", "w", stdout);
@@ -285,7 +288,7 @@ void Application::ExecuteOneFrame()
 			m_online = false;
 			return;
 		}
-
+		
 		Render();
 		
 		m_deltaTick = 0;
@@ -295,6 +298,7 @@ void Application::ExecuteOneFrame()
 	// Reset FPS counters
 	if (m_fpsTimer >= 1.0f)
 	{
+		//printf("FPS: %d \n", m_fps);
 		m_fpsTimer -= 1.0f;
 		m_fps = 0;
 	}
