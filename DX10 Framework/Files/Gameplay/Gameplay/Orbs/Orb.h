@@ -62,43 +62,24 @@ public:
 	// TO DO JC:
 	void Process(float _dt);
 
-	//void Accelerate();
-	void Decelerate()
-	{
-		v3float deceleration;
-		deceleration = (m_velocity * m_DecelerationSpeed) * -1.0f;
-		if ((deceleration.x > -0.0001f) && (deceleration.x < 0.0001f))
-		{
-			deceleration.x = 0.0f;
-		}
-		if ((deceleration.y > -0.0001f) && (deceleration.y < 0.0001f))
-		{
-			deceleration.y = 0.0f;
-		}
-
-		m_acceleration = deceleration;
-	};
-
+   	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
-	v3float GetAcceleration(){ return m_acceleration; };
-
-	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
-	v3float GetVelocity(){ return m_velocity; };
+	
+		
 protected:
 private:
 	// Member Variables
 public:
+	float m_surfaceFriction;
 protected:
 private:
 
 	v3float m_acceleration;
 	v3float m_velocity;
-	float m_AccelerationSpeed;
-	float m_DecelerationSpeed;
+	float m_speed;
 	float m_maxSpeed;
 	float m_density;
 	bool m_isAlive;
-
 
 	
 };
