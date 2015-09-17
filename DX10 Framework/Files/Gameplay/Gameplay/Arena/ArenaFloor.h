@@ -69,6 +69,13 @@ public:
 	* @return: void
 	********************/
 	void Render();
+
+	/***********************
+	* GetArenaTiles: Retrieve the Arena Tiles vector
+	* @author: Callan Moore
+	* @return: std::vector<std::vector<ArenaTile*>*>*: The vector of all Arena Tiles
+	********************/
+	std::vector<std::vector<ArenaTile*>*>* GetArenaTiles() { return m_pArenaTiles; };
 	
 private:
 
@@ -78,8 +85,6 @@ private:
 	* @return: void
 	********************/
 	void DestroyOuterLayer();
-
-
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;

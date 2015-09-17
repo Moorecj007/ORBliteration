@@ -73,14 +73,15 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 1.0f,1.0f, 100.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 	}
-
-
-
+   
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	v3float tileScale = { 4, 4, 0.1f };
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, tileScale, 15.0f));
+	m_tileScale = { 4, 4, 0.1f };
+	m_areaSize = 15;
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 15.0f));
 	
+	m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
+
 	return true;
 }
 
@@ -92,12 +93,41 @@ void Game::Process(float _dt)
 	m_pShader_LitTex->SetUpPerFrame();
 	m_pArenaFloor->Process(_dt);
 
+	// Find which Tile you are on
+
+
+	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
+	{
+		for (UINT col = 0; col < m_pArenaTiles->size(); col++)
+		{
+
+		}
+	}
 	
 
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
 		// Get and set the surface friction
 		m_pOrbs[i]->SetSurfaceFriction(0.5f);
+
+		v3float OrbPos = m_pOrbs[i]->GetPosition();
+		v3float tilePos;
+		UINT row = (OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2);
+		UINT col = (OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2);;
+
+		//m_pArenaTiles[row][col]->
+	
+
+		//(m_areaSize - 1) / 2
+
+		//tilePos.x = ((float)row - ((float)m_areaSize / 2.0f)) * m_tileScale.x + (m_tileScale.x / 2.0f);
+		
+		//row = ((tilePos.x - (m_tileScale.x / 2.0f)) / m_tileScale.x) + ((float)m_areaSize / 2.0f);
+		//col = ((tilePos.y - (m_tileScale.y / 2.0f)) / m_tileScale.y) + ((float)m_areaSize / 2.0f);
+
+		
+
+
 		m_pOrbs[i]->Process(_dt);
 	}
 }

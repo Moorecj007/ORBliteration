@@ -95,7 +95,7 @@ void ArenaFloor::Process(float _dt)
 	m_timeElapsed += _dt;
 	if (m_timeElapsed >= m_destroyOutsideTime)	// TO DO make variable
 	{
-		DestroyOuterLayer();
+		//DestroyOuterLayer();
 
 		m_timeElapsed = 0.0f;
 	}
