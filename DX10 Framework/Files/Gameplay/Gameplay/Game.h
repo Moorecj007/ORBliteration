@@ -40,13 +40,35 @@ public:
 	********************/
 	~Game();
 
-	// TO DO CAL
+	/***********************
+	* Initialise: Initialise the Game for use
+	* @author: Callan Moore
+	* @parameter: _pDX10_Renderer: The renderer for this Game
+	* @return: bool: Successful or not
+	********************/
 	bool Initialise(DX10_Renderer* _pDX10_Renderer);
+	
+	/***********************
+	* Process: Process the Game
+	* @author: Callan Moore
+	* @parameter: _dt: The current delta tick
+	* @return: void
+	********************/
 	void Process(float _dt);
+	
+	/***********************
+	* Render: Render the Game
+	* @author: Callan Moore
+	* @return: void
+	********************/
 	void Render();
 
 	// TO DO JC
 	void HandleInput();
+
+	bool IsOrbsColliding(Orb* _OrbA, Orb* _OrbB);
+
+	void HandleCollisions(Orb* _OrbA, Orb* _OrbB);
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
@@ -63,6 +85,12 @@ private:
 	std::vector<Orb*> m_pOrbs;
 
 	DX10_Mesh_Generic* m_pOrbMesh;
+
+
+	// TO DO JC: Temp remove
+	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
+	v3float m_tileScale;
+	int m_areaSize;
 
 };
 #endif	//__GAME_H__

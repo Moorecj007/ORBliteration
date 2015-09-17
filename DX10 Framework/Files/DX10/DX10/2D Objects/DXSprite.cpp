@@ -125,9 +125,9 @@ UINT DXSprite::GetHeight()
 	//return 0;
 }
 
-void DXSprite::SetImageIndex(int _index)
+void DXSprite::SetImageIndex(UINT _index)
 {
-	if (!m_imageIndexList.empty() && static_cast<UINT>(_index) < m_imageIndexList.size())
+	if (!m_imageIndexList.empty() && _index < m_imageIndexList.size())
 	{
 		m_index = _index;
 	}
@@ -147,7 +147,7 @@ void DXSprite::Render()
 	// Set the type of primitive
 	m_pDX10_Renderer->SetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	m_pShader->Render(m_buffID, m_pTex);
+	m_pShader->Render(m_pBuff, m_pTex);
 }
 
 bool DXSprite::InitializeBuffers()
@@ -184,7 +184,7 @@ bool DXSprite::InitializeBuffers()
 		pIndices[i] = i;
 	}
 
-	VALIDATE(m_pDX10_Renderer->CreateBuffer(pVertices, pIndices, m_vertexCount, m_indexCount, (UINT)sizeof(TVertexUV), &m_buffID, D3D10_USAGE_DYNAMIC, D3D10_USAGE_DEFAULT));
+	VALIDATE(m_pDX10_Renderer->CreateBuffer(pVertices, pIndices, m_vertexCount, m_indexCount, (UINT)sizeof(TVertexUV), m_pBuff, D3D10_USAGE_DYNAMIC, D3D10_USAGE_DEFAULT));
 
 	// Clean up
 	delete[] pVertices;
@@ -259,7 +259,7 @@ bool DXSprite::UpdateBuffers(float _positionX, float _positionY)
 	verticesPtr = 0;
 
 	// Lock the vertex buffer.
-	ID3D10Buffer* pVertexBuff = m_pDX10_Renderer->GetVertexBuffer(m_buffID);
+	ID3D10Buffer* pVertexBuff = m_pBuff->GetVertexBuffer();
 	VALIDATEHR(pVertexBuff->Map(D3D10_MAP_WRITE_DISCARD, 0, (void**)&verticesPtr));
 
 	// Copy the data into the vertex buffer.

@@ -23,24 +23,26 @@ ArenaFloor::ArenaFloor()
 
 ArenaFloor::~ArenaFloor()
 {
-	while (m_arenaTiles.empty() == false)
+	while (m_pArenaTiles->empty() == false)
 	{
-		while (m_arenaTiles.back()->empty() == false)
+		while (m_pArenaTiles->back()->empty() == false)
 		{
-			ReleasePtr(m_arenaTiles.back()->back());
-			m_arenaTiles.back()->pop_back();
+			ReleasePtr(m_pArenaTiles->back()->back());
+			m_pArenaTiles->back()->pop_back();
 		}
 
-		ReleasePtr(m_arenaTiles.back());
-		m_arenaTiles.pop_back();
+		ReleasePtr(m_pArenaTiles->back());
+		m_pArenaTiles->pop_back();
 	}
+	ReleasePtr(m_pArenaTiles);
 
 	ReleasePtr(m_pTileMesh);
 }
 
-bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT rowCount, UINT colCount, v3float _tileScale)
+bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* _pShader, UINT _arenaSize, v3float _tileScale, float _matchLength)
 {
 	m_pDX10_Renderer = _pDX10_Renderer;
+	m_matchLength = _matchLength;
 
 	// Create the Mesh for the Arena Tiles
 	m_pTileMesh = new DX10_Mesh_Rect_Prism();
@@ -48,20 +50,24 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
 
 	// Create the 2D vector of Arena Tiles
-	for (UINT row = 0; row < rowCount; row++)
+	m_pArenaTiles = new std::vector<std::vector<ArenaTile*>*>;
+	for (UINT row = 0; row < _arenaSize; row++)
 	{
 		std::vector<ArenaTile*>* pRowOfTiles = new std::vector<ArenaTile*>;
 
-		for (UINT col = 0; col < colCount; col++)
+		for (UINT col = 0; col < _arenaSize; col++)
 		{
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
-			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, "WoodCrate01.dds"));
+
+			eBaseTileImages eBaseImage = BTI_STANDARD; // (eBaseTileImages)(rand() % 3);
+
+			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
 			// Set the Position based upon the position in the 2D grid
 			v3float tilePos;
-			tilePos.x = ((float)row - ((float)rowCount / 2.0f)) * _tileScale.x + (_tileScale.x / 2.0f);
-			tilePos.y = ((float)col - ((float)colCount / 2.0f)) * _tileScale.y + (_tileScale.y / 2.0f);
+			tilePos.x = ((float)row - ((float)_arenaSize / 2.0f)) * _tileScale.x + (_tileScale.x / 2.0f);
+			tilePos.y = ((float)col - ((float)_arenaSize / 2.0f)) * _tileScale.y + (_tileScale.y / 2.0f);
 			tilePos.z = 0.0f;
 			pTile->SetPosition(tilePos);
 
@@ -71,11 +77,18 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Add the new Tile to the Row
 			pRowOfTiles->push_back(pTile);
 		}
-		m_arenaTiles.push_back(pRowOfTiles);
+		m_pArenaTiles->push_back(pRowOfTiles);
 	}
 
-	// Initialise a thread pool for Rendering the Tiles
+	// Calculate the time interval for destroying the outer layer
+	int evenSize;
+	// Ensure the Arena size is even for the next calculation
+	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
+	m_layerCount = evenSize / 2;
+	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
 
+	m_destroyedLayers = 0;
+	StartDeathOuterLayer();
 
 	return true;
 }
@@ -83,66 +96,72 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 void ArenaFloor::Process(float _dt)
 {
 	m_timeElapsed += _dt;
-	if (m_timeElapsed >= 0.5f)	// TO DO make variable
+	if (m_timeElapsed >= m_destroyOutsideTime)
 	{
-		//DestroyOuterLayer();
+		StartDeathOuterLayer();
 
-		m_timeElapsed -= 0.5f;
+		m_timeElapsed = 0.0f;
 	}
-
 
 	// Process all the Tiles in the 2D vector
 	// Cycle through all rows
-	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
 		// Cycle through all columns (elements in the rows)
-		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		for (UINT col = 0; col < (*m_pArenaTiles)[row]->size(); col++)
 		{
-			(*m_arenaTiles[row])[col]->Process(_dt);
+			(*(*m_pArenaTiles)[row])[col]->Process(_dt);
 		}
 	}
 }
 
 void ArenaFloor::Render()
 {
-	// Process all the Tiles in the 2D vector
 	// Cycle through all rows
-	for (UINT row = 0; row < m_arenaTiles.size(); row++)
+	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
 	{
 		// Cycle through all columns (elements in the rows)
-		for (UINT col = 0; col < m_arenaTiles[row]->size(); col++)
+		for (UINT col = 0; col < (*m_pArenaTiles)[row]->size(); col++)
 		{
-			(*m_arenaTiles[row])[col]->Render();
+			(*(*m_pArenaTiles)[row])[col]->Render();
 		}
 	}
 }
 
-void ArenaFloor::DestroyOuterLayer()
+void ArenaFloor::StartDeathOuterLayer()
 {
-	if (m_arenaTiles.size() != 0)
-	{
-		ReleasePtr(m_arenaTiles[0]);
-		m_arenaTiles.erase(m_arenaTiles.begin());
-
-		if (m_arenaTiles.size() != 0)
+	if (m_destroyedLayers <= m_layerCount)
+	{	
+		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
-			ReleasePtr(m_arenaTiles[m_arenaTiles.size() - 1]);
-			m_arenaTiles.erase(m_arenaTiles.begin() + m_arenaTiles.size() - 1);
+			int row = m_destroyedLayers;
+			StartTileDeath(row, col);		
 		}
 
-		for (int row = (m_arenaTiles.size() - 1); row >= 0; row--)
+		for (UINT col = m_destroyedLayers; col < (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1; col++)
 		{
-			if (m_arenaTiles[row]->size() != 0)
-			{
-				ReleasePtr((*m_arenaTiles[row])[0]);
-				m_arenaTiles[row]->erase(m_arenaTiles[row]->begin());
+			int row = (*m_pArenaTiles)[m_destroyedLayers]->size() - m_destroyedLayers - 1;
+			StartTileDeath(row, col);
+		}
 
-				if (m_arenaTiles[row]->size() != 0)
-				{
-					ReleasePtr((*m_arenaTiles[row])[m_arenaTiles[row]->size() - 1]);
-					m_arenaTiles[row]->erase(m_arenaTiles[row]->begin() + m_arenaTiles[row]->size() - 1);
-				}
-			}
+		for (UINT row = m_destroyedLayers; row < m_pArenaTiles->size() - m_destroyedLayers; row++)
+		{
+			int col = m_destroyedLayers;
+			StartTileDeath(row, col);
+
+			col = (*m_pArenaTiles)[row]->size() - 1 - m_destroyedLayers;
+			StartTileDeath(row, col);
 		}
 	}
+
+	// Increase the Count of destroyed layers
+	m_destroyedLayers++;	
+}
+
+void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
+{
+	float modifier = (float)(rand() % 80 - 40);
+	modifier = modifier / 100.0f + 1.0f;
+
+	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
 }

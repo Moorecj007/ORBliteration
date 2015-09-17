@@ -101,7 +101,7 @@ public:
 	* @author: Jc Fowles
 	* @return: float: The Scale of the Mesh
 	********************/
-	float GetScale(){ return m_scale; };
+	v3float GetScale(){ return m_scale; };
 
 	/***********************
 	* SetScale: Sets the Scale of the Mesh
@@ -112,11 +112,11 @@ public:
 
 protected:
 	DX10_Renderer* m_pRenderer;
-	UINT m_bufferID;
+	DX10_Buffer* m_pBuffer;
 	eVertexType m_vertType;
 	D3D_PRIMITIVE_TOPOLOGY m_primTopology;
 
-	float m_scale;
+	v3float m_scale;
 };
 
 #endif	// __DX10_MESH_GENERIC_H__

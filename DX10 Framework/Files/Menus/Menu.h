@@ -57,18 +57,20 @@ struct TButton
 		ReleasePtr(m_pButton);
 	}
 
-	void SetButton(GUI_Button* _pButton, MENU_STATE _option, UINT _index, float _scale)
+	void SetButton(GUI_Button* _pButton, MENU_STATE _option, UINT _index, float _scale, UINT _col, UINT _row)
 	{
 		m_pButton = _pButton;
 		m_option = _option;
 		m_index = _index;
 		m_scale = _scale;
+		m_pButton->SetColumnIndex(_col);
+		m_pButton->SetRowIndex(_row);
 	}
 
+	GUI_Button* m_pButton = 0;
+	MENU_STATE m_option = MENU_STATE_DEFAULT;
 	UINT m_index = 0;
 	float m_scale = 1.0f;
-	MENU_STATE m_option = MENU_STATE_DEFAULT;
-	GUI_Button* m_pButton = 0;
 };
 
 class Menu
@@ -136,9 +138,12 @@ class Menu
 		@parameter: _option			- The menu state option this button refers to
 		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
 		@parameter: _scale			- How big to make the object.
+		@parameter: _position		- The position to put the button.
+		@parameter: _col			- The col image index
+		@parameter: _row			- The row image index
 		@return:	bool			- True if added otherwise false.
 		********************/
-		bool AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale = 1.0f, v2float _position = v2float(0.0f, 0.0f));
+		bool AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale = 1.0f, UINT _col = 0, UINT _row = 0);
 
 		/***********************
 		-> Adds a new button to the menu. By default it is placed after the last button added.
@@ -202,12 +207,29 @@ class Menu
 		void SetPosition(v2float _position);
 
 		/***********************
+		-> Sets the current index buttons position.
+		@author:	Juran Griffith.
+		@parameter: _index		- The button index.
+		@parameter: _position	- The new position for the button.
+		@return:	void
+		********************/
+		void SetButtonPosition(UINT _index, v2float _position);
+
+		/***********************
 		-> Resets the menu states
 		@author:	Juran Griffith.
 		@parameter: None.
 		@return:	void
 		********************/
 		void Reset();
+
+		/***********************
+		-> Toggles the button at the given index
+		@author:	Juran Griffith.
+		@parameter: _index		- The toggle button index.
+		@return:	void
+		********************/
+		void ToggleButton(UINT _index);
 	protected:
 	private:
 

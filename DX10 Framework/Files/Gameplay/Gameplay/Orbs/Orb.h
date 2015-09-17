@@ -22,8 +22,6 @@
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_Generic.h"
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_LitTex.h"
 
-
-
 class Orb :
 	public DX10_Obj_LitTex
 {
@@ -62,28 +60,22 @@ public:
 	// TO DO JC:
 	void Process(float _dt);
 
-	//void Accelerate();
-	void Decelerate()
-	{
-		v3float deceleration;
-		deceleration = (m_velocity * m_DecelerationSpeed) * -1.0f;
-		if ((deceleration.x > -0.0001f) && (deceleration.x < 0.0001f))
-		{
-			deceleration.x = 0.0f;
-		}
-		if ((deceleration.y > -0.0001f) && (deceleration.y < 0.0001f))
-		{
-			deceleration.y = 0.0f;
-		}
-
-		m_acceleration = deceleration;
-	};
-
+   	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
-	v3float GetAcceleration(){ return m_acceleration; };
+	
+	void SetAlive(bool _alive){ m_isAlive = _alive; };
+	bool GetAlive(){ return m_isAlive; };
 
-	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
+	float GetRadius(){ return m_radius; };
+	// TO DO JC: Set radius
+
 	v3float GetVelocity(){ return m_velocity; };
+	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
+
+	float GetBounce(){ return m_bounce; };
+	void SetBounce(float _bounce){ m_bounce = _bounce; };
+
+
 protected:
 private:
 	// Member Variables
@@ -93,11 +85,14 @@ private:
 
 	v3float m_acceleration;
 	v3float m_velocity;
-	float m_AccelerationSpeed;
-	float m_DecelerationSpeed;
+	float m_surfaceFriction;
+	float m_speed;
 	float m_maxSpeed;
-	float m_density;
+	// TO DO JC: Currently unused
+	float m_bounce;
+	float m_radius;
 	bool m_isAlive;
+
 
 
 	

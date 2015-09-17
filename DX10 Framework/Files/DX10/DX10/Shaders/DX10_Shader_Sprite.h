@@ -133,11 +133,11 @@ class DX10_Shader_Sprite
 		/*******************
 		-> Draws the 2D texture
 		@author:	Juran Griffith.
-		@parameter: _buffID	- Buffer ID of the object
+		@parameter: _pBuff	- Buffer of the object
 		@parameter: _pTex	- Texture to be used
 		@return:	void
 		********************/
-		void Render(UINT _buffID, ID3D10ShaderResourceView* _pTex)
+		void Render(DX10_Buffer* _pBuff, ID3D10ShaderResourceView* _pTex)
 		{
 			// Bind the texture.
 			m_pEsrvTexture->SetResource(_pTex);
@@ -152,7 +152,7 @@ class DX10_Shader_Sprite
 				for (UINT p = 0; p < techDesc.Passes; ++p)
 				{
 					m_pTech->GetPassByIndex(p)->Apply(0);
-					m_pDX10_Renderer->RenderBuffer(_buffID);
+					m_pDX10_Renderer->RenderBuffer(_pBuff);
 				}
 			}
 		}

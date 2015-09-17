@@ -24,6 +24,7 @@ cbuffer cbPerObject
 
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D g_mapDiffuse;
+Texture2D g_mapDiffuse2;
 Texture2D g_mapSpec;
 
 bool g_specularEnabled;
@@ -106,5 +107,46 @@ technique10 AnimateWaterTech
 		SetVertexShader(CompileShader(vs_4_0, VS_Standard()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_4_0, PS_Standard()));
+	}
+}
+
+float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
+{
+	// Get materials from texture maps.
+	float4 diffuse1 = g_mapDiffuse.Sample(g_triLinearSam, _inputPS.texCoord);
+	float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
+	float4 spec = g_mapSpec.Sample(g_triLinearSam, _inputPS.texCoord);
+
+	float4 totalDiffuse;
+	if (diffuse2.a > 0)
+	{
+		totalDiffuse = diffuse2;
+	}
+	else
+	{
+		totalDiffuse = diffuse1;
+
+	}
+
+	// Map [0,1] --> [0,256]
+	spec.a *= 256.0f;
+
+	// Interpolating normal can make it not be of unit length so normalize it.
+	float3 normal = normalize(_inputPS.normal);
+
+	// Compute the lit color for this pixel.
+	SurfaceInfo surface = { _inputPS.position, normal, totalDiffuse, spec };
+	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
+
+	return float4(litColor, 1);
+}
+
+technique10 BlendTex2Tech
+{
+	pass P0
+	{
+		SetVertexShader(CompileShader(vs_4_0, VS_Standard()));
+		SetGeometryShader(NULL);
+		SetPixelShader(CompileShader(ps_4_0, PS_BlendTex2()));
 	}
 }

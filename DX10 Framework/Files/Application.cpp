@@ -23,6 +23,9 @@ FILE* g_file;
 
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdLine, int _cmdShow)
 {
+	// Seed the random based on the time
+	srand((UINT)time(NULL));
+
 	if (AllocConsole())
 	{
 		freopen_s(&g_file, "conout$", "w", stdout);
@@ -224,11 +227,11 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_orbliteration.png", 1231, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_start_fill.png", 481, 424, 1, 4); 
-	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration.png", 1231, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4); 
+	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
 	m_menus.back()->AddTitle(0, 0.75f);
 	m_menus.back()->AddButton(MENU_STATE_START, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 2, 0.5f);
@@ -239,21 +242,19 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_button_2_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_3_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_4_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 1, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 2, 0.5f);
+	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f, 2);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 0, 0.5f, 3);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 0, 0.5f, 4);
 
 	// Intialise Options Menu
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/toggle_button.png", 95, 61, 1, 2);
-	m_menus.back()->AddSprite("Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_sound_fill.png", 481, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_sound_fill.png", 481, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
 	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.25f);
 	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen);
 	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.25f);
@@ -265,10 +266,10 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_button_resume_fill.png", 575, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
 	m_menus.back()->AddButton(MENU_STATE_RESUME, 0, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
@@ -335,7 +336,7 @@ void Application::ExecuteOneFrame()
 			m_online = false;
 			return;
 		}
-
+		
 		Render();
 		
 		m_deltaTick = 0;
@@ -345,6 +346,7 @@ void Application::ExecuteOneFrame()
 	// Reset FPS counters
 	if (m_fpsTimer >= 1.0f)
 	{
+		//printf("FPS: %d \n", m_fps);
 		m_fpsTimer -= 1.0f;
 		m_fps = 0;
 	}
@@ -562,16 +564,31 @@ void Application::UpdateState(MENU_STATE _state)
 
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isFullscreen = !m_isFullscreen;
+		m_pDX10_Renderer->ToggleFullscreen();
+		m_menus[2]->ToggleButton(0);
 		m_menus[2]->Reset();
+	}
 		break;
 	case MENU_STATE_SOUND:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isSound = !m_isSound;
+		// Toggle sound
+		m_menus[2]->ToggleButton(1);
 		m_menus[2]->Reset();
+	}
 		break;
 	case MENU_STATE_RUMBLE:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isRumble = !m_isRumble;
+		// Toggle rumble
+		m_menus[2]->ToggleButton(2);
 		m_menus[2]->Reset();
+	}
 		break;
 
 		// Match menu states

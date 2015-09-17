@@ -99,11 +99,10 @@ class GUI_Button
 		/*******************
 		-> Sets the objects new position
 		@author:	Juran Griffith.
-		@parameter:	_x	- The x position on the screen.
-		@parameter:	_y	- The y position on the screen.
+		@parameter: _position		- The new position to set
 		@return:	void
 		********************/
-		virtual void SetPosition(float _x, float _y);
+		virtual void SetPosition(v2float _position);
 
 		/*******************
 		-> Sets the objects new state
@@ -122,6 +121,22 @@ class GUI_Button
 		virtual void SetBoundsOffset(float _offset);
 
 		/*******************
+		-> Set the buttons column index to render a different part of the image along the column
+		@author:	Juran Griffith.
+		@parameter:	_index	- The index to change to
+		@return:	void
+		********************/
+		virtual void SetColumnIndex(UINT _index);
+
+		/*******************
+		-> Set the buttons row index to render a different part of the image along the row
+		@author:	Juran Griffith.
+		@parameter:	_index	- The index to change to
+		@return:	void
+		********************/
+		virtual void SetRowIndex(UINT _index);
+
+		/*******************
 		-> Draws the object
 		@author:	Juran Griffith.
 		@parameter:	None.
@@ -135,7 +150,7 @@ class GUI_Button
 		@parameter:	_deltaTime	- The application change in time.
 		@return:	void
 		********************/
-		virtual void Process(float _deltaTime);
+		//virtual void Process(float _deltaTime);
 
 		/*******************
 		-> This checks if a position is within the object bounds
@@ -162,6 +177,9 @@ class GUI_Button
 		float				m_height;
 
 		bool				m_horizontal;
+
+		UINT				m_col;
+		UINT				m_row;
 	private:
 };
 

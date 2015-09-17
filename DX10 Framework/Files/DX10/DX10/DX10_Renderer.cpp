@@ -505,16 +505,9 @@ bool DX10_Renderer::CreateTexture(std::string _texFileName, ID3D10ShaderResource
 	return true;
 }
 
-bool DX10_Renderer::RenderBuffer(UINT _bufferID)
+void DX10_Renderer::RenderBuffer(DX10_Buffer* _buffer)
 {
-	// Retrieve the Buffer
-	std::map<UINT, DX10_Buffer*>::iterator iterBuffer = m_buffers.find(_bufferID);
-	if (iterBuffer == m_buffers.end())
-	{
-		return false;
-	}
-	iterBuffer->second->Render();
-	return true;
+	_buffer->Render();
 }
 
 void DX10_Renderer::StartRender()
@@ -555,15 +548,4 @@ void DX10_Renderer::CalcProjMatrix()
 {
 	float aspect = float(m_clientWidth) / m_clientHeight;
 	D3DXMatrixPerspectiveFovLH(&m_matProj, 0.25f*PI, aspect, 1.0f, 1000.0f);
-}
-
-ID3D10Buffer* DX10_Renderer::GetVertexBuffer(UINT _buffID)
-{
-	// Retrieve the Buffer
-	std::map<UINT, DX10_Buffer*>::iterator iterBuffer = m_buffers.find(_buffID);
-	if (iterBuffer == m_buffers.end())
-	{
-		return NULL;
-	}
-	return iterBuffer->second->GetVertexBuffer();
 }
