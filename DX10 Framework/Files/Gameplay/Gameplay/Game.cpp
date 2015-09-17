@@ -59,7 +59,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 	 // Create the Orb Mesh
 	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
 	TVertexNormalUV tempVertNormUV;
-	v3float orbScale = { 3, 3, 3 };
+	v3float orbScale = { 1, 1, 1 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, tempVertNormUV, orbScale));
 
 	// TO DO JC: This will be based on the number of players selected for a given match
@@ -70,7 +70,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 1.0f,1.0f, 10.0f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 1.0f,1.0f, 100.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 	}
 
@@ -78,8 +78,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	v3float tileScale = { 4, 4, 0.1f };
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 21, 21, tileScale));
+	v3float tileScale = { 10, 10, 0.1f };
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, 15, tileScale));
 	
 	return true;
 }
@@ -92,8 +92,12 @@ void Game::Process(float _dt)
 	m_pShader_LitTex->SetUpPerFrame();
 	m_pArenaFloor->Process(_dt);
 
+	
+
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
+		// Get and set the surface friction
+		m_pOrbs[i]->SetSurfaceFriction(0.5f);
 		m_pOrbs[i]->Process(_dt);
 	}
 }
@@ -124,18 +128,6 @@ void Game::HandleInput()
 				LeftAxis = m_pContollers[i]->GetLStickAxis();
 				m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
 			}
-			else
-			{
-				//LeftAxis = { 0.0f, 0.0f };
-				//
-				//v3float OrbAccel;// = m_pOrbs[i]->GetAcceleration();
-				//v3float OrbVelocity = m_pOrbs[i]->GetVelocity();
-				//OrbAccel = (OrbVelocity / 2.0f) * -1.0f;
-				//m_pOrbs[i]->SetAcceleration(OrbAccel);
-				m_pOrbs[i]->Decelerate();
-			}
-
-		
 
 			m_pContollers[i]->PostProcess();
 		}

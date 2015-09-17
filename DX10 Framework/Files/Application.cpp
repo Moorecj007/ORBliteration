@@ -382,11 +382,7 @@ void Application::Render()
 		}
 		else
 		{
-			m_pTimer->Tick();
 			m_pGame->Render();
-			m_pTimer->Tick();
-			float dt = m_pTimer->GetDeltaTime();
-			printf("%f \n", dt);
 		}
 
 		// Tell the Renderer the data input is over and present the outcome
