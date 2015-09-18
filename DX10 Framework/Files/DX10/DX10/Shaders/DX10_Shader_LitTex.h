@@ -32,6 +32,7 @@ struct TLitTex
 	D3DXMATRIX* pMatWorld;
 	ID3D10ShaderResourceView* pTexBase;
 	ID3D10ShaderResourceView* pTex2;
+	float reduceAlpha = 0.0f;
 };
 
 enum eTech_LitTex
@@ -125,15 +126,16 @@ public:
 				m_pMatWorld->SetMatrix((float*)&matWorld);
 				m_pMatTex->SetMatrix((float*)&matTex);
 				m_pMapDiffuse->SetResource(_litTex.pTexBase);
-				m_pMapSpecular->SetResource(m_pSpecularTex);	
-
+				m_pMapSpecular->SetResource(m_pSpecularTex);
+				m_pReduceAlpha->SetRawValue(&_litTex.reduceAlpha, 0, sizeof(float));
+				
 				if (_eTech == TECH_LITTEX_BLENDTEX2)
 				{
 					m_pMapDiffuse2->SetResource(_litTex.pTex2);
 				}
 
 				m_pCurrentTech->GetPassByIndex(p)->Apply(0);
-				_litTex.pMesh->Render();	
+				_litTex.pMesh->Render();			
 			}
 		}
 	}
@@ -165,12 +167,13 @@ private:
 		m_pLight = m_pFX->GetVariableByName("g_light");
 		m_pEyePos = m_pFX->GetVariableByName("g_eyePosW");
 
-		m_pMatView = m_pFX->GetVariableByName("g_matView")->AsMatrix();;
-		m_pMatProj = m_pFX->GetVariableByName("g_matProj")->AsMatrix();;
+		m_pMatView = m_pFX->GetVariableByName("g_matView")->AsMatrix();
+		m_pMatProj = m_pFX->GetVariableByName("g_matProj")->AsMatrix();
 
 		// Per Object
-		m_pMatWorld = m_pFX->GetVariableByName("g_matWorld")->AsMatrix();;
-		m_pMatTex = m_pFX->GetVariableByName("g_matTex")->AsMatrix();;
+		m_pMatWorld = m_pFX->GetVariableByName("g_matWorld")->AsMatrix();
+		m_pMatTex = m_pFX->GetVariableByName("g_matTex")->AsMatrix();
+		m_pReduceAlpha = m_pFX->GetVariableByName("g_reduceAlpha")->AsScalar();
 
 		// Globals
 		m_pMapDiffuse = m_pFX->GetVariableByName("g_mapDiffuse")->AsShaderResource();
@@ -183,6 +186,7 @@ private:
 		VALIDATE(m_pMatProj != 0);
 		VALIDATE(m_pMatWorld != 0);
 		VALIDATE(m_pMatTex != 0);
+		VALIDATE(m_pReduceAlpha != 0);
 		VALIDATE(m_pMapDiffuse != 0);
 		VALIDATE(m_pMapDiffuse2 != 0);
 		VALIDATE(m_pMapSpecular != 0);
@@ -272,6 +276,7 @@ private:
 
 	ID3D10EffectMatrixVariable*			m_pMatWorld;
 	ID3D10EffectMatrixVariable*			m_pMatTex;
+	ID3D10EffectVariable*				m_pReduceAlpha;
 
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse;
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse2;
