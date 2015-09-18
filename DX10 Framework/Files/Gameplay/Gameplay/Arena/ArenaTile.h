@@ -122,7 +122,7 @@ public:
 	void SetActive(bool _active){ m_active = _active; };
 
 	// TO DO CAL
-	void SetDeathTimer(float _deathTime) { m_deathTimer = 0; m_deathIncrement = _deathTime / 10; };
+	void SetDeathTimer(float _deathTime) { m_deathTimer = 0; m_deathIncrement = _deathTime / 10;};
 
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
@@ -136,6 +136,7 @@ private:
 	bool m_active;
 	float m_deathTimer;
 	float m_deathIncrement;
+	float m_reduceAlpha;
 	int m_deathFrameCount;
 };
 #endif	// __ARENATILE_H__
