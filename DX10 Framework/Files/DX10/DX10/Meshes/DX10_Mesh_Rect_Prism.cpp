@@ -366,7 +366,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexNormalUV
 	m_primTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	UINT indexCount = (sizeof(indices) / sizeof(*indices));
 
-	// Create the buffer and store the ID
+	// Create the buffer
 	m_pRenderer->CreateBuffer(vertices, indices, vertexCount, indexCount, stride, m_pBuffer);
 
 	return true;
@@ -375,4 +375,28 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, TVertexNormalUV
 void DX10_Mesh_Rect_Prism::Render()
 {
 	m_pRenderer->RenderBuffer(m_pBuffer);
+}
+
+bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, v3float _scale)
+{
+	// Save the renderer on the Rectangular Prism
+	m_pRenderer = _pRenderer;
+
+	m_scale = _scale;
+	m_vertType = VT_NORMAL_UV;
+	m_primTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	TVertexNormalUV* pVertexBuffer = 0;
+	DWORD* pIndexBuffer = 0;
+	int vertexCount;
+	int indexCount;
+	std::string fileName = "Resources/Meshes/Mesh_Sphere.obj";
+	int stride = sizeof(TVertexNormalUV);
+
+	VALIDATE(m_pRenderer->LoadMeshObj(fileName, pVertexBuffer, pIndexBuffer, &vertexCount, &indexCount, m_scale));
+
+	// Create the buffer
+	VALIDATE(m_pRenderer->CreateBuffer(pVertexBuffer, pIndexBuffer, vertexCount, indexCount, stride, m_pBuffer));
+
+	return true;
 }

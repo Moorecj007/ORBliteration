@@ -277,6 +277,12 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_EXIT, 3, 0.5f);
 
+	// TO DO CAL
+	//char* fileName = "Resources/Meshes/Mesh_RectPrism.obj";
+	//TVertexNormalUV* pVertexBuffer = 0;
+	//m_pDX10_Renderer->LoadDataStructures(fileName, pVertexBuffer);
+	//int i = 0;
+
 	return true;
 }
 

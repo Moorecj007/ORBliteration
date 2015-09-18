@@ -89,20 +89,26 @@ private:
 	********************/
 	void StartDeathOuterLayer();
 
-	// TO DO
+	// TO DO CAL
 	void StartTileDeath(UINT _row, UINT _col);
+	void SpawnPowerUp();
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Mesh_Rect_Prism* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;	
 
-
+	// Destruction variables
 	float m_timeElapsed;
 	float m_matchLength;
 	float m_destroyOutsideTime;
 	int m_layerCount;
 	int m_destroyedLayers;
+
+	// Power up time Variables
+	float m_powerSpawnTimer;
+	float m_maxPowerSpawnTimer;
+
 };
 #endif	// __ARENAFLOOR_H__
 

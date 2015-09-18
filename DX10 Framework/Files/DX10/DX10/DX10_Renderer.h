@@ -208,6 +208,10 @@ public:
 	********************/
 	void RestoreDefaultDrawStates();
 
+	// TO DO CAL
+	bool ReadFileCounts(std::string  filename, int& _rVertexCount, int& _rTexCount, int& _rNormalCount, int& _rPolygonCount);
+	bool LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVertexBuffer, DWORD*& _prIndexBuffer, int* _pVertexCount, int* _pIndexCount, v3float _scale);
+
 	/***********************
 	* SetPrimitiveTopology: Sets the primitive topology for a Mesh before drawing
 	* @author: Callan Moore
