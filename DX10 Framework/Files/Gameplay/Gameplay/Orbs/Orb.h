@@ -59,6 +59,7 @@ public:
 
 	// TO DO JC:
 	void Process(float _dt);
+	void Render();
 
    	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
@@ -75,6 +76,10 @@ public:
 	float GetBounce(){ return m_bounce; };
 	void SetBounce(float _bounce){ m_bounce = _bounce; };
 
+	void Boost(bool _boost);
+	void Phase(bool _phase);
+
+	bool GetPhase(){ return m_phase; };
 
 protected:
 private:
@@ -93,6 +98,20 @@ private:
 	float m_radius;
 	bool m_isAlive;
 
+	bool m_boost;
+	bool m_AllowBoost;
+	float m_boostAmount;
+	float m_boostCooldown;
+	float m_boostLimit;
+	float m_boostActiveTime;
+	float m_boostCoolDownTime;
+
+	bool m_phase;
+	bool m_AllowPhase;
+	float m_phaseCooldown;
+	float m_phaseMaxTime;
+	float m_phaseActiveTime;
+	float m_phaseCoolDownTime;
 
 
 	

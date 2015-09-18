@@ -42,7 +42,7 @@ Game::~Game()
 
 }
 
-bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
+bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 {
 	if (_pDX10_Renderer == 0)
 	{
@@ -50,6 +50,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 		return false;
 	}
 
+	m_numPlayers = _numPlayers;
+	m_numAlivePlayers = _numPlayers;
 	m_pDX10_Renderer = _pDX10_Renderer;
 														
 	// Create the Shader for the Game Objects
@@ -58,7 +60,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 
 	// Create the Orb Mesh
-	float OrbRadius = 0.5f;
+	float OrbRadius = 1.0f;
 	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
 	TVertexNormalUV tempVertNormUV;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
@@ -66,14 +68,33 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 	// TO DO JC: This will be based on the number of players selected for a given match
 	// Create the Contollers and the player orbs
-	for (int i = 0; i < m_maxPlayers; i++)
+
+	std::string temp;
+	for (int i = 0; i < m_numPlayers; i++)
 	{
 		m_pContollers.push_back(new InputGamePad());
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 2.0f, 1.0f, 100.0f));
+		switch (i)
+		{
+		case 0:
+			temp = "pBall.png";
+			break;
+		case 1:
+			temp = "gBall.png";
+			break;
+		case 2:
+			temp = "Tron/Tile/tron_tile_green.png";
+			break;
+		case 3:
+			temp = "Tron/Tile/tron_tile_white.png";
+			break;
+		}
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, temp, 2.0f, 1.0f, 100.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
+
+		//VALIDATE(m_pContollers[i]->Connected());
 	}
    
 	// Create and Initialise the Arena Floor
@@ -91,27 +112,47 @@ bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
 {
 	if ((_OrbA != _OrbB))
 	{
-		// Calculate the distance between the two orbs
-		float distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
-		// Calculate the combined Radius of the two orbs
-		float combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
-
-		
-
-		// Check if the orbs are colliding
-		if (distance <= combinedRadius)
+		if (_OrbA->GetPhase() == _OrbB->GetPhase())
 		{
-						 
+			// Calculate the distance between the two orbs
+			float distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
+			// Calculate the combined Radius of the two orbs
+			float combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
+
+			// Check if the orbs are colliding
+			if (distance < combinedRadius)
+			{
+				
+				// Move objects out of collidiong with each other
+				while (distance < combinedRadius)
+				{
+					// Calulate Peirce
+					float peirce = combinedRadius - distance;
+
+					// Calculate the direction of collision
+					v3float Direction = (_OrbA->GetPosition() - _OrbB->GetPosition());
 			
+					_OrbA->SetPosition(_OrbA->GetPosition() + (Direction *  peirce));
+					_OrbB->SetPosition(_OrbB->GetPosition() + (Direction *  -peirce));
+					
+					// Calculate the distance between the two orbs
+					distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
+					// Calculate the combined Radius of the two orbs
+					combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
+				}
+				
 
-			return true;
-
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
 			return false;
 		}
-
 	}
 	else
 	{
@@ -124,124 +165,178 @@ void Game::HandleCollisions(Orb* _OrbA, Orb* _OrbB)
 	v3float orbVelocity_A = _OrbA->GetVelocity();
 	v3float orbVelocity_B = _OrbB->GetVelocity();
 
-	_OrbA->SetVelocity(orbVelocity_B * _OrbB->GetBounce());
-	_OrbB->SetVelocity(orbVelocity_A * _OrbA->GetBounce());
+	_OrbA->SetVelocity((orbVelocity_B * _OrbB->GetBounce()));
+	_OrbB->SetVelocity((orbVelocity_A * _OrbA->GetBounce()));
 }
 
-void Game::Process(float _dt)
+void Game::KillOrb(Orb* _Orb)
 {
+	if (_Orb->GetAlive())
+	{
+		_Orb->SetAlive(false);
+		m_numAlivePlayers--;
+	}
+}
 
+bool Game::Process(float _dt)
+{
+	
 	HandleInput();
 
-	m_pShader_LitTex->SetUpPerFrame();
-	m_pArenaFloor->Process(_dt);
-	 	
-	/*for (UINT row = 0; row < m_pArenaTiles->size(); row++)
+	// Game has Ended
+	if (m_numAlivePlayers <= 1)
 	{
-		for (UINT col = 0; col < m_pArenaTiles->size(); col++)
+		int Winner = 0;
+		if (m_numAlivePlayers == 1)
 		{
-			(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_BLANK);
-		}
-	}*/
-	
-
-	for (UINT i = 0; i < m_pOrbs.size(); i++)
-	{
-		if (m_pOrbs[i]->GetAlive())
-		{
-			// Get and set the surface friction
-			
-
-			// Check Collisions
-			for (UINT j = 0; j < m_pOrbs.size(); j++)
+			// Game has Ended with a Winner 
+			for (UINT i = 0; i < m_pOrbs.size(); i++)
 			{
-				if ((i != j))
+				if (m_pOrbs[i]->GetAlive())
 				{
-					if (m_pOrbs[j]->GetAlive())
+					Winner = i + 1;
+					break;
+				}
+			}
+		}
+
+		if (Winner == 0)
+		{
+			// No Winner the Game is a Draw
+		}
+		else
+		{
+			// Player 'Winner' has won
+		}
+		// This Player has won
+		// TO DO JUR: Print Winner and Press A to Continue
+
+		for (UINT i = 0; i < m_pContollers.size(); i++)
+		{
+			m_pContollers[i]->PreProcess();
+			if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_A))
+			{
+				// Retrun the game end
+				return false;
+			}
+			m_pContollers[i]->PostProcess();
+		}
+		
+	}
+	else
+	{
+
+		m_pShader_LitTex->SetUpPerFrame();
+		m_pArenaFloor->Process(_dt);
+
+		for (UINT i = 0; i < m_pOrbs.size(); i++)
+		{
+			if (m_pOrbs[i]->GetAlive())
+			{
+				// Get and set the surface friction
+
+				// Check Collisions
+				for (UINT j = 0; j < m_pOrbs.size(); j++)
+				{
+					if ((i != j))
 					{
-						if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
+						if (m_pOrbs[j]->GetAlive())
 						{
-							HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+							if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
+							{
+								HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+							}
 						}
 					}
 				}
-			}
 
+				v3float OrbPos = m_pOrbs[i]->GetPosition();
+				v3float tilePos;
+				OrbPos += m_tileScale / 2;
+				int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
+				int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
 
+				if (row < 0)
+				{
+					row = 0;
+					KillOrb(m_pOrbs[i]);
+				}
+				else if (row > (int)m_pArenaTiles->size() - 1)
+				{
+					row = m_pArenaTiles->size() - 1;
+					KillOrb(m_pOrbs[i]);
+				}
+				if (col < 0)
+				{
+					col = 0;
+					KillOrb(m_pOrbs[i]);
+				}
+				else if (col > (int)m_pArenaTiles->size() - 1)
+				{
+					col = m_pArenaTiles->size() - 1;
+					KillOrb(m_pOrbs[i]);
+				}
 
-			v3float OrbPos = m_pOrbs[i]->GetPosition();
-			v3float tilePos;
-			OrbPos += m_tileScale / 2;
-			int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
-			int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
-
-			if (row < 0)
-			{
-				row = 0;
-				m_pOrbs[i]->SetAlive(false);
-			}
-			else if (row > (int)m_pArenaTiles->size() - 1)
-			{
-				row = m_pArenaTiles->size() - 1;
-				m_pOrbs[i]->SetAlive(false);
-			}
-			if (col < 0)
-			{
-				col = 0;
-				m_pOrbs[i]->SetAlive(false);
-			}
-			else if (col > (int)m_pArenaTiles->size() - 1)
-			{
-				col = m_pArenaTiles->size() - 1;
-				m_pOrbs[i]->SetAlive(false);
-			}
-
-			//(*(*m_pArenaTiles)[row])[col]->SetOverlayImage(OTI_POWER_CONFUSION);
-
-			switch ((*(*m_pArenaTiles)[row])[col]->GetBaseImageEnum())
-			{
-			case BTI_SLIPPERY:
-			{
-				m_pOrbs[i]->SetSurfaceFriction(0.0f);
-				//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-			}
-				break;
-			case BTI_ROUGH:
-			{
-				m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
-				//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-			}
-				break;
-			case BTI_STANDARD:
-			{
-				m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-			}
+				switch ((*(*m_pArenaTiles)[row])[col]->GetBaseImageEnum())
+				{
+				case BTI_SLIPPERY:
+				{
+					//m_pOrbs[i]->SetSurfaceFriction(0.0f);
+					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+				}
+					break;
+				case BTI_ROUGH:
+				{
+					//m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+				}
+					break;
+				case BTI_STANDARD:
+				{
+					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+				}
 				default: break;
+				}
+
+					// Kill Orb if its on a Dead Tile
+				if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+				{
+					KillOrb(m_pOrbs[i]);
+				}
+
+				m_pOrbs[i]->Process(_dt);
 			}
-			
-
-			if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
-			{
-				m_pOrbs[i]->SetAlive(false);
-			}
-
-
-
-
-			m_pOrbs[i]->Process(_dt);
 		}
 	}
+
+	return true;
 }
 
 void Game::Render()
 {
 	m_pArenaFloor->Render();
 
+	// Draw all unphased Orbs
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
 		if (m_pOrbs[i]->GetAlive())
 		{
-			m_pOrbs[i]->Render();
+			if (m_pOrbs[i]->GetPhase() == false)
+			{
+				m_pOrbs[i]->Render();
+			}
+		}
+	}
+
+	// Draw all phased Orbs
+	for (UINT i = 0; i < m_pOrbs.size(); i++)
+	{
+		if (m_pOrbs[i]->GetAlive())
+		{
+			if (m_pOrbs[i]->GetPhase() == true)
+			{
+				m_pOrbs[i]->Render();
+			}
 		}
 	}
 }
@@ -257,16 +352,26 @@ void Game::HandleInput()
 			{
 				m_pContollers[i]->PreProcess();
 
+				// Movement
 				v2float LeftAxis;
-
 				if (!m_pContollers[i]->LStick_InDeadZone())
 				{
 					LeftAxis = m_pContollers[i]->GetLStickAxis();
 					m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
 				}
 
+				// Boost
+				m_pOrbs[i]->Boost(m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_R));
+				
+				m_pOrbs[i]->Phase(m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_L));
+
 				m_pContollers[i]->PostProcess();
 			}
 		}
+		else
+		{
+			// 
+		}
+		
 	}
 }

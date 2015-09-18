@@ -195,8 +195,8 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
-	m_pGame = new Game();
-	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+	/*m_pGame = new Game();
+	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, 2));*/
 
 	m_online = true;
 
@@ -386,7 +386,13 @@ bool Application::Process(float _dt)
 			UpdateState(m_menus[3]->GetMenuState());
 			break;
 		case APP_STATE_GAME:
-			m_pGame->Process(_dt);
+			if (m_pGame->Process(_dt) == false)
+			{
+				// If the game has ended
+				ReleasePtr(m_pGame);
+				m_state = APP_STATE_MAIN_MENU;
+				m_menus[0]->Reset();
+ 			}
 			break;
 		default:
 			break;
@@ -593,13 +599,43 @@ void Application::UpdateState(MENU_STATE _state)
 
 		// Match menu states
 	case MENU_STATE_PLAYERS_2:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 2))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 	case MENU_STATE_PLAYERS_3:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 3))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 	case MENU_STATE_PLAYERS_4:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 4))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 
 		// Pause menu states (reuses the main menu states)

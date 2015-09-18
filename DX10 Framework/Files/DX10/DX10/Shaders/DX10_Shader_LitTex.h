@@ -132,7 +132,7 @@ public:
 				
 				if (_eTech == TECH_LITTEX_BLENDTEX2)
 				{
-					m_pMapDiffuse2->SetResource(_litTex.pTex2);
+					//m_pMapDiffuse2->SetResource(_litTex.pTex2);
 				}
 
 				m_pCurrentTech->GetPassByIndex(p)->Apply(0);

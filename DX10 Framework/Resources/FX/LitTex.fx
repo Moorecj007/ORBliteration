@@ -167,10 +167,10 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 {
 	// Get materials from texture maps.
 	float4 diffuse = g_mapDiffuse.Sample(g_triLinearSam, _inputPS.texCoord);
-	float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
+	//float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
 	float4 spec = g_mapSpec.Sample(g_triLinearSam, _inputPS.texCoord);
 
-	diffuse = diffuse + diffuse2;
+	//diffuse = diffuse + diffuse2;
 
 	diffuse.a = diffuse.a - g_reduceAlpha;
 
