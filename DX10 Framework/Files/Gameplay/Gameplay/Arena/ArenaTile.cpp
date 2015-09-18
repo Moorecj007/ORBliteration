@@ -42,29 +42,17 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _p
 		case BTI_SLIPPERY:
 		{
 			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[0]));
-			//VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[1]));
 		}
 		break;
 		case BTI_ROUGH:
 		{
 			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
-			//VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[1]));
 		}
 		break;
 		case BTI_STANDARD:	// Fall through
 		default:
 		{
 			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));
-			/*VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying1.dds", m_pBaseTex[1]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying2.dds", m_pBaseTex[2]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying3.dds", m_pBaseTex[3]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying4.dds", m_pBaseTex[4]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying5.dds", m_pBaseTex[5]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying6.dds", m_pBaseTex[6]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying7.dds", m_pBaseTex[7]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying8.dds", m_pBaseTex[8]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying9.dds", m_pBaseTex[9]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying10.dds", m_pBaseTex[10]));*/
 		}
 	}	// End Switch
 
@@ -92,7 +80,7 @@ void ArenaTile::Process(float _dt)
 
 			if (m_deathTimer >= m_deathIncrement)
 			{
-				m_reduceAlpha += 0.1;
+				m_reduceAlpha += 0.1f;
 				
 				if (m_reduceAlpha >= 1.0f)
 				{
