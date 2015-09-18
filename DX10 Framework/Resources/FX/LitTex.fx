@@ -20,6 +20,7 @@ cbuffer cbPerObject
 {
 	float4x4 g_matWorld;
 	float4x4 g_matTex;
+	float	 g_reduceAlpha;
 };
 
 // Nonnumeric values cannot be added to a cbuffer.
@@ -50,6 +51,20 @@ struct VS_OUT
 	float3 normal		: NORMAL;
     float2 texCoord     : TEXCOORD;
 };
+
+// For transparency values
+BlendState SrcAlphaBlendingAdd
+{
+	BlendEnable[0] = TRUE;
+	SrcBlend = SRC_ALPHA;
+	DestBlend = INV_SRC_ALPHA;
+	BlendOp = ADD;
+	SrcBlendAlpha = ZERO;
+	DestBlendAlpha = ZERO;
+	BlendOpAlpha = ADD;
+	RenderTargetWriteMask[0] = 0x0F;
+};
+
  
 VS_OUT VS_Standard(VS_IN _inputVS)
 {
@@ -113,20 +128,13 @@ technique10 AnimateWaterTech
 float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 {
 	// Get materials from texture maps.
-	float4 diffuse1 = g_mapDiffuse.Sample(g_triLinearSam, _inputPS.texCoord);
+	float4 diffuse = g_mapDiffuse.Sample(g_triLinearSam, _inputPS.texCoord);
 	float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
 	float4 spec = g_mapSpec.Sample(g_triLinearSam, _inputPS.texCoord);
 
-	float4 totalDiffuse;
-	if (diffuse2.a > 0)
-	{
-		totalDiffuse = diffuse2;
-	}
-	else
-	{
-		totalDiffuse = diffuse1;
+	diffuse = diffuse + diffuse2;
 
-	}
+	diffuse.a = diffuse.a - g_reduceAlpha;
 
 	// Map [0,1] --> [0,256]
 	spec.a *= 256.0f;
@@ -134,11 +142,11 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 	// Interpolating normal can make it not be of unit length so normalize it.
 	float3 normal = normalize(_inputPS.normal);
 
-	// Compute the lit color for this pixel.
-	SurfaceInfo surface = { _inputPS.position, normal, totalDiffuse, spec };
+		// Compute the lit color for this pixel.
+		SurfaceInfo surface = { _inputPS.position, normal, diffuse, spec };
 	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
 
-	return float4(litColor, 1);
+	return float4(litColor, diffuse.a);
 }
 
 technique10 BlendTex2Tech
@@ -148,5 +156,8 @@ technique10 BlendTex2Tech
 		SetVertexShader(CompileShader(vs_4_0, VS_Standard()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_4_0, PS_BlendTex2()));
+
+		// For transparency values
+		SetBlendState(SrcAlphaBlendingAdd, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 	}
 }
