@@ -165,8 +165,22 @@ void Game::HandleCollisions(Orb* _OrbA, Orb* _OrbB)
 	v3float orbVelocity_A = _OrbA->GetVelocity();
 	v3float orbVelocity_B = _OrbB->GetVelocity();
 
-	_OrbA->SetVelocity((orbVelocity_B * _OrbB->GetBounce()));
-	_OrbB->SetVelocity((orbVelocity_A * _OrbA->GetBounce()));
+	float velocityMax = orbVelocity_A.Magnitude();
+
+	if (velocityMax < orbVelocity_B.Magnitude())
+	{
+		_OrbA->SetVelocity((orbVelocity_B * _OrbB->GetBounce()));
+		// TO DO JC: Take a small multiple of of the other orbs velocity 
+		_OrbB->SetVelocity({0.0f,0.0f,0.0f});
+	}
+	else
+	{
+		_OrbA->SetVelocity({ 0.0f, 0.0f, 0.0f });
+		// TO DO JC: Take a small multiple of of the other orbs velocity 
+		_OrbB->SetVelocity((orbVelocity_A * _OrbA->GetBounce()));
+
+	}
+
 }
 
 void Game::KillOrb(Orb* _Orb)
