@@ -78,7 +78,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
    
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 0.1f };
+	m_tileScale = { 4, 4, 0.01f };
 	m_areaSize = 15;
 	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
 	

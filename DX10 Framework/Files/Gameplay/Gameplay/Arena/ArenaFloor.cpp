@@ -60,7 +60,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
 
-			eBaseTileImages eBaseImage = BTI_STANDARD; // (eBaseTileImages)(rand() % 3);
+			eBaseTileImages eBaseImage = (eBaseTileImages)(rand() % 3);
 
 			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
