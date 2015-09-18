@@ -54,7 +54,7 @@ public:
 	* @parameter: _dt: The current delta tick
 	* @return: void
 	********************/
-	void Process(float _dt);
+	bool Process(float _dt);
 	
 	/***********************
 	* Render: Render the Game
@@ -70,13 +70,19 @@ public:
 
 	void HandleCollisions(Orb* _OrbA, Orb* _OrbB);
 
+	void KillOrb(Orb* _Orb);
+
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	ArenaFloor* m_pArenaFloor;
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
-	// Contollers
+	// Players
 	int m_numPlayers;
+	int m_numAlivePlayers;
+
+
+	// Contollers
 	XButtonIDs m_XButtons;
 	XStickDirectionIDs m_XStickDirections;
 	std::vector<InputGamePad*> m_pContollers;
@@ -91,6 +97,8 @@ private:
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
 	v3float m_tileScale;
 	int m_areaSize;
+
+
 
 };
 #endif	//__GAME_H__
