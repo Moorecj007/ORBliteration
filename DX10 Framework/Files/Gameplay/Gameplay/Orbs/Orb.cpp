@@ -162,7 +162,7 @@ void Orb::Render()
 		_litTex.reduceAlpha = 0.0f;
 	}
 
-	m_pShader->Render(_litTex, TECH_LITTEX_BLENDTEX2);
+	m_pShader->Render(_litTex, TECH_LITTEX_FADE);
 	
 }
 

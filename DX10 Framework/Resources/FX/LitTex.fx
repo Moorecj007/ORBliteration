@@ -153,6 +153,9 @@ technique10 FadeTech
 {
 	pass P0
 	{
+		// For transparency values
+		SetBlendState(SrcAlphaBlendingAdd, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+
 		SetVertexShader(CompileShader(vs_4_0, VS_Standard()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_4_0, PS_Fade()));
