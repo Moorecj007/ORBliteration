@@ -60,7 +60,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 
 
 	// Create the Orb Mesh
-	float OrbRadius = 0.5f;
+	float OrbRadius = 1.0f;
 	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
 	TVertexNormalUV tempVertNormUV;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
@@ -68,13 +68,30 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 
 	// TO DO JC: This will be based on the number of players selected for a given match
 	// Create the Contollers and the player orbs
+
+	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
 	{
 		m_pContollers.push_back(new InputGamePad());
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, "flare.dds", 2.0f, 1.0f, 100.0f));
+		switch (i)
+		{
+		case 0:
+			temp = "pBall.png";
+			break;
+		case 1:
+			temp = "gBall.png";
+			break;
+		case 2:
+			temp = "Tron/Tile/tron_tile_green.png";
+			break;
+		case 3:
+			temp = "Tron/Tile/tron_tile_white.png";
+			break;
+		}
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, temp, 2.0f, 1.0f, 100.0f));
 		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
 
 		//VALIDATE(m_pContollers[i]->Connected());
@@ -264,14 +281,14 @@ bool Game::Process(float _dt)
 				{
 				case BTI_SLIPPERY:
 				{
-					m_pOrbs[i]->SetSurfaceFriction(0.0f);
-					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					//m_pOrbs[i]->SetSurfaceFriction(0.0f);
+					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_ROUGH:
 				{
-					m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
-					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					//m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_STANDARD:
@@ -299,11 +316,27 @@ void Game::Render()
 {
 	m_pArenaFloor->Render();
 
+	// Draw all unphased Orbs
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
 		if (m_pOrbs[i]->GetAlive())
 		{
-			m_pOrbs[i]->Render();
+			if (m_pOrbs[i]->GetPhase() == false)
+			{
+				m_pOrbs[i]->Render();
+			}
+		}
+	}
+
+	// Draw all phased Orbs
+	for (UINT i = 0; i < m_pOrbs.size(); i++)
+	{
+		if (m_pOrbs[i]->GetAlive())
+		{
+			if (m_pOrbs[i]->GetPhase() == true)
+			{
+				m_pOrbs[i]->Render();
+			}
 		}
 	}
 }

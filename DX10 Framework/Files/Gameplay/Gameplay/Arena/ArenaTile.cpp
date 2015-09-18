@@ -92,7 +92,7 @@ void ArenaTile::Process(float _dt)
 
 			if (m_deathTimer >= m_deathIncrement)
 			{
-				m_reduceAlpha += 0.1;
+				m_reduceAlpha += 0.1f;
 				
 				if (m_reduceAlpha >= 1.0f)
 				{

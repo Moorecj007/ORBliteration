@@ -113,7 +113,7 @@ void Orb::Process(float _dt)
 		m_phaseActiveTime += _dt;
 
 		if (m_phaseActiveTime < m_phaseMaxTime)
-		{
+		{			
 			
 		}
 		else
@@ -144,6 +144,26 @@ void Orb::Process(float _dt)
 	//SetRotPerSecondYaw(-m_pos.x);
 
 	DX10_Obj_LitTex::Process(_dt);
+}
+
+void Orb::Render()
+{
+	TLitTex _litTex;
+	_litTex.pMesh = m_pMesh;
+	_litTex.pMatWorld = &m_matWorld;
+	_litTex.pTexBase = (*m_pTextures)[m_texIndex];
+	
+	if (m_phase)
+	{
+		_litTex.reduceAlpha = 0.5f;
+	}
+	else
+	{
+		_litTex.reduceAlpha = 0.0f;
+	}
+
+	m_pShader->Render(_litTex, TECH_LITTEX_BLENDTEX2);
+	
 }
 
 void Orb::Boost(bool _boost)

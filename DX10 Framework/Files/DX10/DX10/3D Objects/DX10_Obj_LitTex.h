@@ -79,7 +79,7 @@ public:
 	********************/
 	virtual void Render(eTech_LitTex _tech = TECH_LITTEX_STANDARD);
 
-private:
+protected:
 	DX10_Shader_LitTex* m_pShader;
 	std::vector<ID3D10ShaderResourceView*>* m_pTextures;
 	UINT m_texIndex;
