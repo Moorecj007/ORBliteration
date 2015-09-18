@@ -39,6 +39,7 @@ enum eTech_LitTex
 {
 	TECH_LITTEX_STANDARD,
 	TECH_LITTEX_ANIMWATER,
+	TECH_LITTEX_FADE,
 	TECH_LITTEX_BLENDTEX2
 };
 
@@ -151,6 +152,7 @@ private:
 	{
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "StandardTech", m_pFX, m_pTech_Standard));
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "AnimateWaterTech", m_pFX, m_pTech_AnimWater));
+		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "FadeTech", m_pFX, m_pTech_Fade));
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "BlendTex2Tech", m_pFX, m_pTech_BlendTex2));
 
 		return true;
@@ -212,7 +214,8 @@ private:
 		
 		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_Standard, m_pVertexLayout_Standard);
 		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_AnimWater, m_pVertexLayout_AnimWater);
-		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_AnimWater, m_pVertexLayout_BlendTex2);
+		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_Fade, m_pVertexLayout_Fade);
+		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_BlendTex2, m_pVertexLayout_BlendTex2);
 	
 		return true;
 	}
@@ -230,7 +233,7 @@ private:
 			case TECH_LITTEX_STANDARD:
 			{
 				m_pCurrentVertexLayout = m_pVertexLayout_Standard;
-				m_pCurrentTech = 	m_pTech_Standard;
+				m_pCurrentTech = m_pTech_Standard;
 			}
 			break;
 			case TECH_LITTEX_ANIMWATER:
@@ -238,6 +241,13 @@ private:
 				m_pCurrentVertexLayout = m_pVertexLayout_AnimWater;
 				m_pCurrentTech = m_pTech_AnimWater;
 			}
+			break;
+			case TECH_LITTEX_FADE:
+			{
+				m_pCurrentVertexLayout = m_pVertexLayout_Fade;
+				m_pCurrentTech = m_pTech_Fade;
+			}
+			break;
 			case TECH_LITTEX_BLENDTEX2:
 			{
 				m_pCurrentVertexLayout = m_pVertexLayout_BlendTex2;
@@ -260,11 +270,13 @@ private:
 	ID3D10InputLayout* m_pCurrentVertexLayout;
 	ID3D10InputLayout* m_pVertexLayout_Standard;
 	ID3D10InputLayout* m_pVertexLayout_AnimWater;
+	ID3D10InputLayout* m_pVertexLayout_Fade;
 	ID3D10InputLayout* m_pVertexLayout_BlendTex2;
 
 	ID3D10EffectTechnique* m_pCurrentTech;
 	ID3D10EffectTechnique* m_pTech_Standard;
 	ID3D10EffectTechnique* m_pTech_AnimWater;
+	ID3D10EffectTechnique* m_pTech_Fade;
 	ID3D10EffectTechnique* m_pTech_BlendTex2;
 
 	DX10_Renderer*						m_pDX10_Renderer;
