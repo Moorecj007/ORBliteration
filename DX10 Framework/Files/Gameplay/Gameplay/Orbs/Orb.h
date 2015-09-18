@@ -59,6 +59,7 @@ public:
 
 	// TO DO JC:
 	void Process(float _dt);
+	void Render();
 
    	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
