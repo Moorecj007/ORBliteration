@@ -390,7 +390,7 @@ bool DX10_Mesh_Rect_Prism::Initialise(DX10_Renderer* _pRenderer, v3float _scale)
 	DWORD* pIndexBuffer = 0;
 	int vertexCount;
 	int indexCount;
-	std::string fileName = "Resources/Meshes/Mesh_Sphere.obj";
+	std::string fileName = "Resources/Meshes/Mesh_FinitePlane.txt";
 	int stride = sizeof(TVertexNormalUV);
 
 	VALIDATE(m_pRenderer->LoadMeshObj(fileName, pVertexBuffer, pIndexBuffer, &vertexCount, &indexCount, m_scale));

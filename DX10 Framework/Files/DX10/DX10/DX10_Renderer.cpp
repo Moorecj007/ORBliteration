@@ -528,21 +528,9 @@ void DX10_Renderer::RestoreDefaultDrawStates()
 	m_pDX10Device->OMSetBlendState(0, blendFactors, 0xFFFFFFFF);	
 }
 
-// TO DO CAL
-#include <iostream>
-#include <fstream>
-using namespace std;
-
-struct PolygonType
-{
-	int vIndex1, vIndex2, vIndex3;
-	int tIndex1, tIndex2, tIndex3;
-	int nIndex1, nIndex2, nIndex3;
-};
-
 bool DX10_Renderer::ReadFileCounts(std::string _fileName, int& _rVertexCount, int& _rTexCount, int& _rNormalCount, int& _rPolygonCount)
 {
-	ifstream fin;
+	std::ifstream fin;
 	char input;
 
 	// Initialize the counts.
@@ -608,7 +596,7 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 	v3float* pTexUVs;
 	v3float* pNormals;
 	PolygonType *pPolygons;
-	ifstream fin;
+	std::ifstream fin;
 	int vIndex;
 	int tIndex;
 	int nIndex;

@@ -51,7 +51,7 @@ public:
 	* @parameter: _textureTime: Time in seconds to run through all animation frames
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::vector<std::string>* _pTexNames, float _textureTime = 0.0f);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::vector<std::string>* _pTexNames, float _textureTime = 0.0f);
 	
 	/***********************
 	* Initialise: Initialise the Lit Tex Object for use
@@ -62,7 +62,7 @@ public:
 	* @parameter: _textureID: ID of the single texture for this object to display
 	* @return: bool : Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texNames);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texNames);
 
 	/***********************
 	* Process: Process the new frame and update the LitTex Object

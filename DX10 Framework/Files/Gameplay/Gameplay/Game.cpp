@@ -59,13 +59,13 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
 
 	// Create the Orb Mesh
 	float OrbRadius = 0.5f;
-	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
+	m_pOrbMesh = new DX10_Mesh();
 	TVertexNormalUV tempVertNormUV;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
-	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, tempVertNormUV, orbScale));
+	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
 	// TO DO JC: This will be based on the number of players selected for a given match
-	// Create the Contollers and the player orbs
+	// Create the Controllers and the player orbs
 	for (int i = 0; i < m_maxPlayers; i++)
 	{
 		m_pContollers.push_back(new InputGamePad());
@@ -78,7 +78,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer)
    
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 0.1f };
+	m_tileScale = { 4, 4, 4 };
 	m_areaSize = 15;
 	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
 	

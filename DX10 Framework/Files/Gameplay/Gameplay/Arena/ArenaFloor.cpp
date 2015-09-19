@@ -23,18 +23,21 @@ ArenaFloor::ArenaFloor()
 
 ArenaFloor::~ArenaFloor()
 {
-	while (m_pArenaTiles->empty() == false)
+	if (m_pArenaTiles != 0)
 	{
-		while (m_pArenaTiles->back()->empty() == false)
+		while (m_pArenaTiles->empty() == false)
 		{
-			ReleasePtr(m_pArenaTiles->back()->back());
-			m_pArenaTiles->back()->pop_back();
-		}
+			while (m_pArenaTiles->back()->empty() == false)
+			{
+				ReleasePtr(m_pArenaTiles->back()->back());
+				m_pArenaTiles->back()->pop_back();
+			}
 
-		ReleasePtr(m_pArenaTiles->back());
-		m_pArenaTiles->pop_back();
+			ReleasePtr(m_pArenaTiles->back());
+			m_pArenaTiles->pop_back();
+		}
+		ReleasePtr(m_pArenaTiles);
 	}
-	ReleasePtr(m_pArenaTiles);
 
 	ReleasePtr(m_pTileMesh);
 }
@@ -47,9 +50,8 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	m_powerSpawnTimer = 2.0f;
 
 	// Create the Mesh for the Arena Tiles
-	m_pTileMesh = new DX10_Mesh_Rect_Prism();
-	TVertexNormalUV vertNormalUV;
-	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, { 4, 4, 4 }/*_tileScale*/));
+	m_pTileMesh = new DX10_Mesh();
+	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, MT_FINITEPLANE, _tileScale));
 
 	// Create the 2D vector of Arena Tiles
 	m_pArenaTiles = new std::vector<std::vector<ArenaTile*>*>;
@@ -62,7 +64,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
 
-			eBaseTileImages eBaseImage = BTI_SLIPPERY; // (eBaseTileImages)(rand() % 3);
+			eBaseTileImages eBaseImage = (eBaseTileImages)(rand() % 3);
 
 			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
@@ -87,10 +89,9 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	// Ensure the Arena size is even for the next calculation
 	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
 	m_layerCount = evenSize / 2;
-	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
+	m_destroyOutsideTime = m_matchLength / (float)m_layerCount + 1;
 
 	m_destroyedLayers = 0;
-	StartDeathOuterLayer();
 
 	return true;
 }

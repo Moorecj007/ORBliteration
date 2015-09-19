@@ -40,9 +40,7 @@
 #include "DX10\2D Objects\DXSprite.h"
 
 // Meshes
-#include "DX10\Meshes\DX10_Mesh_Generic.h"
-#include "DX10\Meshes\DX10_Mesh_Rect_Prism.h"
-#include "DX10\Meshes\DX10_Mesh_Finite_Plane.h"
+#include "DX10\Meshes\DX10_Mesh.h"
 
 // Cameras
 #include "DX10\Cameras\DX10_Camera_FirstPerson.h"

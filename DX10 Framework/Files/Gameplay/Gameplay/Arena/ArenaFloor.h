@@ -23,7 +23,7 @@
 // Local Includes
 #include "../../../Utility/Utilities.h"
 #include "../../../DX10/DX10/DX10_Renderer.h"
-#include "../../../DX10/DX10/Meshes/DX10_Mesh_Rect_Prism.h"
+#include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
 #include "ArenaTile.h"
 #include "../../../Utility/Mutex_Semaphore.h"
 
@@ -88,14 +88,26 @@ private:
 	* @return: void
 	********************/
 	void StartDeathOuterLayer();
-
-	// TO DO CAL
+	
+	/***********************
+	* StartTileDeath: Start the death animation of a tile
+	* @author: Callan Moore
+	* @parameter: _row: Row of the tile to start dying
+	* @parameter: _col: Column of the tile to start dying
+	* @return: void
+	********************/
 	void StartTileDeath(UINT _row, UINT _col);
+	
+	/***********************
+	* SpawnPowerUp: Spawn a powerup on a randomly selected still active tile
+	* @author: Callan Moore
+	* @return: void
+	********************/
 	void SpawnPowerUp();
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
-	DX10_Mesh_Rect_Prism* m_pTileMesh;
+	DX10_Mesh* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;	
 
 	// Destruction variables
