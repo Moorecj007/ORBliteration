@@ -195,8 +195,8 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
-	m_pGame = new Game();
-	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer));
+	/*m_pGame = new Game();
+	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, 2));*/
 
 	m_online = true;
 
@@ -227,11 +227,11 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_orbliteration.png", 1231, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_start_fill.png", 481, 424, 1, 4); 
-	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration.png", 1231, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4); 
+	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
 	m_menus.back()->AddTitle(0, 0.75f);
 	m_menus.back()->AddButton(MENU_STATE_START, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 2, 0.5f);
@@ -242,21 +242,19 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_button_2_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_3_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_4_fill.png", 106, 424, 1, 4);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 1, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 2, 0.5f);
+	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f, 2);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 0, 0.5f, 3);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 0, 0.5f, 4);
 
 	// Initialise Options Menu
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/toggle_button.png", 95, 61, 1, 2);
-	m_menus.back()->AddSprite("Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_sound_fill.png", 481, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_sound_fill.png", 481, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
 	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.25f);
 	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen);
 	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.25f);
@@ -268,10 +266,10 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
-	m_menus.back()->AddSprite("Button/tron_button_resume_fill.png", 575, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_menus.back()->AddSprite("Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
 	m_menus.back()->AddButton(MENU_STATE_RESUME, 0, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
@@ -386,7 +384,13 @@ bool Application::Process(float _dt)
 			UpdateState(m_menus[3]->GetMenuState());
 			break;
 		case APP_STATE_GAME:
-			m_pGame->Process(_dt);
+			if (m_pGame->Process(_dt) == false)
+			{
+				// If the game has ended
+				ReleasePtr(m_pGame);
+				m_state = APP_STATE_MAIN_MENU;
+				m_menus[0]->Reset();
+ 			}
 			break;
 		default:
 			break;
@@ -564,27 +568,72 @@ void Application::UpdateState(MENU_STATE _state)
 
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isFullscreen = !m_isFullscreen;
+		m_pDX10_Renderer->ToggleFullscreen();
+		m_menus[2]->ToggleButton(0);
 		m_menus[2]->Reset();
+	}
 		break;
 	case MENU_STATE_SOUND:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isSound = !m_isSound;
+		// Toggle sound
+		m_menus[2]->ToggleButton(1);
 		m_menus[2]->Reset();
+	}
 		break;
 	case MENU_STATE_RUMBLE:
+	{
 		m_state = APP_STATE_OPTION_MENU;
+		m_isRumble = !m_isRumble;
+		// Toggle rumble
+		m_menus[2]->ToggleButton(2);
 		m_menus[2]->Reset();
+	}
 		break;
 
 		// Match menu states
 	case MENU_STATE_PLAYERS_2:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 2))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 	case MENU_STATE_PLAYERS_3:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 3))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 	case MENU_STATE_PLAYERS_4:
-		m_state = APP_STATE_GAME;
+		m_pGame = new Game();
+		if (m_pGame->Initialise(m_pDX10_Renderer, 4))
+		{
+			m_state = APP_STATE_GAME;
+		}
+		else
+		{
+			ReleasePtr(m_pGame);
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 
 		// Pause menu states (reuses the main menu states)

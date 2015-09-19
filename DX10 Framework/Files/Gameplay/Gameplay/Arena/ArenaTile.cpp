@@ -17,6 +17,7 @@
 
 ArenaTile::ArenaTile()
 {
+	m_reduceAlpha = 0.0f;
 }
 
 ArenaTile::~ArenaTile()
@@ -42,36 +43,24 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh* _pMesh, DX
 	{
 		case BTI_SLIPPERY:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Slippery.dds", m_pBaseTex[0]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Slippery_Dying.dds", m_pBaseTex[1]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[0]));
 		}
 		break;
 		case BTI_ROUGH:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Rough.dds", m_pBaseTex[0]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Rough_Dying.dds", m_pBaseTex[1]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
 		}
 		break;
 		case BTI_STANDARD:	// Fall Through
 		default:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard.dds", m_pBaseTex[0]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying1.dds", m_pBaseTex[1]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying2.dds", m_pBaseTex[2]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying3.dds", m_pBaseTex[3]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying4.dds", m_pBaseTex[4]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying5.dds", m_pBaseTex[5]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying6.dds", m_pBaseTex[6]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying7.dds", m_pBaseTex[7]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying8.dds", m_pBaseTex[8]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying9.dds", m_pBaseTex[9]));
-			VALIDATE(m_pRenderer->CreateTexture("Tile/Standard_Dying10.dds", m_pBaseTex[10]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));
 		}
 	}	// End Switch
 
 	// Create the array of the overlay textures
 	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_Blank.dds", m_pOverlayTex[OTI_BLANK]));
-	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_Confusion.dds", m_pOverlayTex[OTI_POWER_CONFUSION]));
+	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_Confusion.dds", m_pOverlayTex[OTI_POWER_CONFUSION])); 
 	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SizeIncrease.dds", m_pOverlayTex[OTI_POWER_SIZEINCREASE]));
 	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SpeedIncrease.dds", m_pOverlayTex[OTI_POWER_SPEEDINCREASE]));
 
@@ -93,10 +82,11 @@ void ArenaTile::Process(float _dt)
 
 			if (m_deathTimer >= m_deathIncrement)
 			{
-				m_currentBaseImage++;
+				m_reduceAlpha += 0.1f;
 				
-				if (m_currentBaseImage > 10)
+				if (m_reduceAlpha >= 1.0f)
 				{
+					m_reduceAlpha = 0.0f;
 					SetActive(false);
 				}
 
@@ -116,6 +106,7 @@ void ArenaTile::Render()
 		_litTex.pMatWorld = &m_matWorld;
 		_litTex.pTexBase = m_pBaseTex[m_currentBaseImage];
 		_litTex.pTex2 = m_pOverlayTex[m_currentOverlay];
+		_litTex.reduceAlpha = m_reduceAlpha;
 
 		// Set the Shader to Render the Tile
 		m_pShader_LitTex->Render(_litTex, TECH_LITTEX_BLENDTEX2);

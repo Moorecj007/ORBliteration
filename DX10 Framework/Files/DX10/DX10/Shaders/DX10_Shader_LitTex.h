@@ -32,12 +32,14 @@ struct TLitTex
 	D3DXMATRIX* pMatWorld;
 	ID3D10ShaderResourceView* pTexBase;
 	ID3D10ShaderResourceView* pTex2;
+	float reduceAlpha = 0.0f;
 };
 
 enum eTech_LitTex
 {
 	TECH_LITTEX_STANDARD,
 	TECH_LITTEX_ANIMWATER,
+	TECH_LITTEX_FADE,
 	TECH_LITTEX_BLENDTEX2
 };
 
@@ -125,15 +127,16 @@ public:
 				m_pMatWorld->SetMatrix((float*)&matWorld);
 				m_pMatTex->SetMatrix((float*)&matTex);
 				m_pMapDiffuse->SetResource(_litTex.pTexBase);
-				m_pMapSpecular->SetResource(m_pSpecularTex);	
-
+				m_pMapSpecular->SetResource(m_pSpecularTex);
+				m_pReduceAlpha->SetRawValue(&_litTex.reduceAlpha, 0, sizeof(float));
+				
 				if (_eTech == TECH_LITTEX_BLENDTEX2)
 				{
 					m_pMapDiffuse2->SetResource(_litTex.pTex2);
 				}
 
 				m_pCurrentTech->GetPassByIndex(p)->Apply(0);
-				_litTex.pMesh->Render();	
+				_litTex.pMesh->Render();			
 			}
 		}
 	}
@@ -149,6 +152,7 @@ private:
 	{
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "StandardTech", m_pFX, m_pTech_Standard));
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "AnimateWaterTech", m_pFX, m_pTech_AnimWater));
+		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "FadeTech", m_pFX, m_pTech_Fade));
 		VALIDATE(m_pDX10_Renderer->BuildFX("litTex.fx", "BlendTex2Tech", m_pFX, m_pTech_BlendTex2));
 
 		return true;
@@ -165,12 +169,13 @@ private:
 		m_pLight = m_pFX->GetVariableByName("g_light");
 		m_pEyePos = m_pFX->GetVariableByName("g_eyePosW");
 
-		m_pMatView = m_pFX->GetVariableByName("g_matView")->AsMatrix();;
-		m_pMatProj = m_pFX->GetVariableByName("g_matProj")->AsMatrix();;
+		m_pMatView = m_pFX->GetVariableByName("g_matView")->AsMatrix();
+		m_pMatProj = m_pFX->GetVariableByName("g_matProj")->AsMatrix();
 
 		// Per Object
-		m_pMatWorld = m_pFX->GetVariableByName("g_matWorld")->AsMatrix();;
-		m_pMatTex = m_pFX->GetVariableByName("g_matTex")->AsMatrix();;
+		m_pMatWorld = m_pFX->GetVariableByName("g_matWorld")->AsMatrix();
+		m_pMatTex = m_pFX->GetVariableByName("g_matTex")->AsMatrix();
+		m_pReduceAlpha = m_pFX->GetVariableByName("g_reduceAlpha")->AsScalar();
 
 		// Globals
 		m_pMapDiffuse = m_pFX->GetVariableByName("g_mapDiffuse")->AsShaderResource();
@@ -183,6 +188,7 @@ private:
 		VALIDATE(m_pMatProj != 0);
 		VALIDATE(m_pMatWorld != 0);
 		VALIDATE(m_pMatTex != 0);
+		VALIDATE(m_pReduceAlpha != 0);
 		VALIDATE(m_pMapDiffuse != 0);
 		VALIDATE(m_pMapDiffuse2 != 0);
 		VALIDATE(m_pMapSpecular != 0);
@@ -208,7 +214,8 @@ private:
 		
 		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_Standard, m_pVertexLayout_Standard);
 		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_AnimWater, m_pVertexLayout_AnimWater);
-		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_AnimWater, m_pVertexLayout_BlendTex2);
+		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_Fade, m_pVertexLayout_Fade);
+		m_pDX10_Renderer->CreateVertexLayout(vertexDesc, elementNum, m_pTech_BlendTex2, m_pVertexLayout_BlendTex2);
 	
 		return true;
 	}
@@ -226,7 +233,7 @@ private:
 			case TECH_LITTEX_STANDARD:
 			{
 				m_pCurrentVertexLayout = m_pVertexLayout_Standard;
-				m_pCurrentTech = 	m_pTech_Standard;
+				m_pCurrentTech = m_pTech_Standard;
 			}
 			break;
 			case TECH_LITTEX_ANIMWATER:
@@ -234,6 +241,13 @@ private:
 				m_pCurrentVertexLayout = m_pVertexLayout_AnimWater;
 				m_pCurrentTech = m_pTech_AnimWater;
 			}
+			break;
+			case TECH_LITTEX_FADE:
+			{
+				m_pCurrentVertexLayout = m_pVertexLayout_Fade;
+				m_pCurrentTech = m_pTech_Fade;
+			}
+			break;
 			case TECH_LITTEX_BLENDTEX2:
 			{
 				m_pCurrentVertexLayout = m_pVertexLayout_BlendTex2;
@@ -256,11 +270,13 @@ private:
 	ID3D10InputLayout* m_pCurrentVertexLayout;
 	ID3D10InputLayout* m_pVertexLayout_Standard;
 	ID3D10InputLayout* m_pVertexLayout_AnimWater;
+	ID3D10InputLayout* m_pVertexLayout_Fade;
 	ID3D10InputLayout* m_pVertexLayout_BlendTex2;
 
 	ID3D10EffectTechnique* m_pCurrentTech;
 	ID3D10EffectTechnique* m_pTech_Standard;
 	ID3D10EffectTechnique* m_pTech_AnimWater;
+	ID3D10EffectTechnique* m_pTech_Fade;
 	ID3D10EffectTechnique* m_pTech_BlendTex2;
 
 	DX10_Renderer*						m_pDX10_Renderer;
@@ -272,6 +288,7 @@ private:
 
 	ID3D10EffectMatrixVariable*			m_pMatWorld;
 	ID3D10EffectMatrixVariable*			m_pMatTex;
+	ID3D10EffectVariable*				m_pReduceAlpha;
 
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse;
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse2;
