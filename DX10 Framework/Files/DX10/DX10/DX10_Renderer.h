@@ -21,12 +21,20 @@
 #include <map>
 #include <typeinfo> 
 #include <time.h>
+#include <fstream>
 
 // Local Includes
 #include "DX10_Utilities.h"
 #include "../../Utility/Utilities.h"
 #include "DX10_Vertex.h"
 #include "Systems/DX10_Buffer.h"
+
+struct PolygonType
+{
+	int vIndex1, vIndex2, vIndex3;
+	int tIndex1, tIndex2, tIndex3;
+	int nIndex1, nIndex2, nIndex3;
+};
 
 class DX10_Renderer
 {
@@ -207,6 +215,31 @@ public:
 	* @return: void
 	********************/
 	void RestoreDefaultDrawStates();
+	
+	/***********************
+	* ReadFileCounts: Reads and counts all the vertices, texture coords, normals and polygons in the mesh file
+	* @author: Callan Moore
+	* @parameter: filename: The file name of the mesh with file path
+	* @parameter: _rVertexCount: Storage variable to hold the vertex count
+	* @parameter: _rTexCount: Storage variable to hold the texture coordinate count
+	* @parameter: _rNormalCount: Storage variable to hold the normals count
+	* @parameter: _rPolygonCount: Storage variable to hold the polygon count
+	* @return: bool: Successful or not
+	********************/
+	bool ReadFileCounts(std::string  filename, int& _rVertexCount, int& _rTexCount, int& _rNormalCount, int& _rPolygonCount);
+	
+	/***********************
+	* LoadMeshObj: Load in a Mesh Object from a file
+	* @author: Callan Moore
+	* @parameter: _fileName: The file name of the mesh with file path
+	* @parameter: _prVertexBuffer: Storage variable to hold the created Vertex buffer
+	* @parameter: _prIndexBuffer: Storage variable to hold the created Index buffer
+	* @parameter: _pVertexCount: Storage variable to hold the created Vertex count
+	* @parameter: _pIndexCount: Storage variable to hold the created Index count
+	* @parameter: _scale: The scale to load the mesh with
+	* @return: bool: Successful or not
+	********************/
+	bool LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVertexBuffer, DWORD*& _prIndexBuffer, int* _pVertexCount, int* _pIndexCount, v3float _scale);
 
 	/***********************
 	* SetPrimitiveTopology: Sets the primitive topology for a Mesh before drawing

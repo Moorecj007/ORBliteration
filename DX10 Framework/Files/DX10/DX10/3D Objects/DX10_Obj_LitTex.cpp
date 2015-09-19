@@ -30,7 +30,7 @@ DX10_Obj_LitTex::~DX10_Obj_LitTex()
 	ReleasePtr(m_pTextures);
 }
 
-bool DX10_Obj_LitTex::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::vector<std::string>* _pTexNames, float _textureTime)
+bool DX10_Obj_LitTex::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::vector<std::string>* _pTexNames, float _textureTime)
 {
 	if (_pRenderer == 0 || _pMesh == 0 || _pShader == 0 || _pTexNames == 0|| _textureTime < 0)
 	{
@@ -63,7 +63,7 @@ bool DX10_Obj_LitTex::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _
 	return true;
 }
 
-bool DX10_Obj_LitTex::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName)
+bool DX10_Obj_LitTex::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName)
 {
 	if (_pRenderer == 0 || _pMesh == 0 || _pShader == 0)
 	{

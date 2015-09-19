@@ -29,7 +29,7 @@ Orb::~Orb()
 	
 }
 
-bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _speed, float _maxSpeed)
+bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _speed, float _maxSpeed)
 {	
  	// Initialise the object this is derived from
 	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _texName));

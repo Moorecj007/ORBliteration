@@ -24,7 +24,7 @@ ArenaTile::~ArenaTile()
 {
 }
 
-bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, eBaseTileImages _baseImage)
+bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, eBaseTileImages _baseImage)
 {
 	if (_pDX10_Renderer == 0 || _pMesh == 0 || _pShader == 0)
 	{
@@ -35,6 +35,8 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _p
 	m_pRenderer = _pDX10_Renderer;
 	m_pMesh = _pMesh;
 	m_pShader_LitTex = _pShader;
+
+	SetRotationPitch(DegreesToRadians(-90));
 	
 	// Create the Base Tile Image texture
 	switch (_baseImage)
@@ -49,7 +51,7 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _p
 			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
 		}
 		break;
-		case BTI_STANDARD:	// Fall through
+		case BTI_STANDARD:	// Fall Through
 		default:
 		{
 			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));

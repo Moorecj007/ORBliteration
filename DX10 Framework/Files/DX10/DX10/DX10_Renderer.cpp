@@ -41,7 +41,7 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
 
-	m_activeLight.dir = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
+	m_activeLight.dir = D3DXVECTOR3(0, 0.0f, -1.0f);
 	m_activeLight.ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
 	m_activeLight.diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_activeLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -527,6 +527,272 @@ void DX10_Renderer::RestoreDefaultDrawStates()
 	m_pDX10Device->OMSetDepthStencilState(0, 0);
 	m_pDX10Device->OMSetBlendState(0, blendFactors, 0xFFFFFFFF);	
 }
+
+bool DX10_Renderer::ReadFileCounts(std::string _fileName, int& _rVertexCount, int& _rTexCount, int& _rNormalCount, int& _rPolygonCount)
+{
+	std::ifstream fin;
+	char input;
+
+	// Initialize the counts.
+	_rVertexCount = 0;
+	_rTexCount = 0;
+	_rNormalCount = 0;
+	_rPolygonCount = 0;
+
+	// Open the file.
+	fin.open(_fileName.c_str());
+
+	// Check if it was successful in opening the file.
+	if (fin.fail() == true)
+	{
+		return false;
+	}
+
+	// Read from the file and continue to read until the end of the file is reached.
+	fin.get(input);
+	while (!fin.eof())
+	{
+		// If the line starts with 'v' then count either the vertex, the texture coordinates, or the normal vector.
+		if (input == 'v')
+		{
+			fin.get(input);
+			if (input == ' ') { _rVertexCount++; }
+			if (input == 't') { _rTexCount++; }
+			if (input == 'n') { _rNormalCount++; }
+		}
+
+		// If the line starts with 'f' then increment the face count.
+		if (input == 'f')
+		{
+			fin.get(input);
+			if (input == ' ') { _rPolygonCount++; }
+		}
+
+		// Otherwise read in the remainder of the line.
+		while (input != '\n')
+		{
+			fin.get(input);
+		}
+
+		// Start reading the beginning of the next line.
+		fin.get(input);
+	}
+
+	// Close the file.
+	fin.close();
+
+	return true;
+}
+
+bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVertexBuffer, DWORD*& _prIndexBuffer, int* _pVertexCount, int* _pIndexCount, v3float _scale)
+{
+	int vertexCount;
+	int texCount;
+	int normalCount;
+	int polygonCount;
+	ReadFileCounts(_fileName, vertexCount, texCount, normalCount, polygonCount);
+
+	v3float* pVertices;
+	v3float* pTexUVs;
+	v3float* pNormals;
+	PolygonType *pPolygons;
+	std::ifstream fin;
+	int vIndex;
+	int tIndex;
+	int nIndex;
+	char input;
+	char input2;
+	//ofstream fout;
+
+	// Initialize the four data structures.
+	pVertices = new v3float[vertexCount];
+	VALIDATE(pVertices);
+
+	pTexUVs = new v3float[texCount];
+	VALIDATE(pTexUVs);
+
+	pNormals = new v3float[normalCount];
+	VALIDATE(pNormals);
+
+	pPolygons = new PolygonType[polygonCount];
+	VALIDATE(pPolygons);
+
+	// Create and Initialize the indexes.
+	int vertexIndex = 0;
+	int texcoordIndex = 0;
+	int normalIndex = 0;
+	int faceIndex = 0;
+
+	// Open the file.
+	fin.open(_fileName.c_str());
+
+	// Check if it was successful in opening the file.
+	VALIDATE(!fin.fail());
+
+	// Read in the vertices, texture coordinates, and normals into the data structures.
+	// Important: Also convert to left hand coordinate system since Maya uses right hand coordinate system.
+	fin.get(input);
+	while (!fin.eof())
+	{
+		if (input == 'v')
+		{
+			fin.get(input);
+
+			// Read in the vertices.
+			if (input == ' ')
+			{
+				fin >> pVertices[vertexIndex].x >> pVertices[vertexIndex].y >> pVertices[vertexIndex].z;
+
+				// Invert the Z vertex to change to left hand system.
+				pVertices[vertexIndex].z = pVertices[vertexIndex].z * -1.0f;
+				vertexIndex++;
+			}
+
+			// Read in the texture uv coordinates.
+			if (input == 't')
+			{
+				fin >> pTexUVs[texcoordIndex].x >> pTexUVs[texcoordIndex].y;
+
+				// Invert the V texture coordinates to left hand system.
+				pTexUVs[texcoordIndex].y = 1.0f - pTexUVs[texcoordIndex].y;
+				texcoordIndex++;
+			}
+
+			// Read in the normals.
+			if (input == 'n')
+			{
+				fin >> pNormals[normalIndex].x >> pNormals[normalIndex].y >> pNormals[normalIndex].z;
+
+				// Invert the Z normal to change to left hand system.
+				pNormals[normalIndex].z = pNormals[normalIndex].z * -1.0f;
+				normalIndex++;
+			}
+		}
+
+		// Read in the faces.
+		if (input == 'f')
+		{
+			fin.get(input);
+			if (input == ' ')
+			{
+				// Read the face data in backwards to convert it to a left hand system from right hand system.
+				fin >> pPolygons[faceIndex].vIndex3 >> input2 >> pPolygons[faceIndex].tIndex3 >> input2 >> pPolygons[faceIndex].nIndex3
+					>> pPolygons[faceIndex].vIndex2 >> input2 >> pPolygons[faceIndex].tIndex2 >> input2 >> pPolygons[faceIndex].nIndex2
+					>> pPolygons[faceIndex].vIndex1 >> input2 >> pPolygons[faceIndex].tIndex1 >> input2 >> pPolygons[faceIndex].nIndex1;
+				faceIndex++;
+			}
+		}
+
+		// Read in the remainder of the line.
+		while (input != '\n')
+		{
+			fin.get(input);
+		}
+
+		// Start reading the beginning of the next line.
+		fin.get(input);
+	}
+
+	// Close the file.
+	fin.close();
+
+	//// Open the output file.
+	//fout.open("model.txt");
+	//
+	//// Write out the file header that our model format uses.
+	//fout << "Vertex Count: " << (_polygonCount * 3) << endl;
+	//fout << endl;
+	//fout << "Data:" << endl;
+	//fout << endl;
+	//
+	//// Now loop through all the faces and output the three vertices for each face.
+	//for (int i = 0; i < faceIndex; i++)
+	//{
+	//	vIndex = pPolygons[i].vIndex1 - 1;
+	//	tIndex = pPolygons[i].tIndex1 - 1;
+	//	nIndex = pPolygons[i].nIndex1 - 1;
+	//
+	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
+	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
+	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
+	//
+	//	vIndex = pPolygons[i].vIndex2 - 1;
+	//	tIndex = pPolygons[i].tIndex2 - 1;
+	//	nIndex = pPolygons[i].nIndex2 - 1;
+	//
+	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
+	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
+	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
+	//
+	//	vIndex = pPolygons[i].vIndex3 - 1;
+	//	tIndex = pPolygons[i].tIndex3 - 1;
+	//	nIndex = pPolygons[i].nIndex3 - 1;
+	//
+	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
+	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
+	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
+	//}
+	//
+	//// Close the output file.
+	//fout.close();
+
+	TVertexNormalUV* pVertexBuffer = new TVertexNormalUV[polygonCount * 3];
+	DWORD* pIndexBuffer = new DWORD[polygonCount * 3];
+	int vertexBufferIndex = 0;
+	int indexBufferIndex = 0;
+	for (int i = 0; i < faceIndex; i++)
+	{
+		// Converting to zero-index
+		vIndex = pPolygons[i].vIndex1 - 1;
+		tIndex = pPolygons[i].tIndex1 - 1;
+		nIndex = pPolygons[i].nIndex1 - 1;
+
+		pVertexBuffer[vertexBufferIndex++] = {  { pVertices[vIndex].x * _scale.x, pVertices[vIndex].y * _scale.y, pVertices[vIndex].z * _scale.z },
+												{ pNormals[nIndex].x, pNormals[nIndex].y, pNormals[nIndex].z },
+												{ pTexUVs[tIndex].x, pTexUVs[tIndex].y } };
+
+		pIndexBuffer[indexBufferIndex++] = (vertexBufferIndex - 1);
+
+		// Converting to zero-index
+		vIndex = pPolygons[i].vIndex2 - 1;
+		tIndex = pPolygons[i].tIndex2 - 1;
+		nIndex = pPolygons[i].nIndex2 - 1;
+
+		pVertexBuffer[vertexBufferIndex++] = {  { pVertices[vIndex].x * _scale.x, pVertices[vIndex].y * _scale.y, pVertices[vIndex].z * _scale.z },
+												{ pNormals[nIndex].x, pNormals[nIndex].y, pNormals[nIndex].z },
+												{ pTexUVs[tIndex].x, pTexUVs[tIndex].y } };
+
+		pIndexBuffer[indexBufferIndex++] = (vertexBufferIndex - 1);
+
+		// Converting to zero-index
+		vIndex = pPolygons[i].vIndex3 - 1;
+		tIndex = pPolygons[i].tIndex3 - 1;
+		nIndex = pPolygons[i].nIndex3 - 1;
+
+		pVertexBuffer[vertexBufferIndex++] = {  { pVertices[vIndex].x * _scale.x, pVertices[vIndex].y * _scale.y, pVertices[vIndex].z * _scale.z },
+												{ pNormals[nIndex].x, pNormals[nIndex].y, pNormals[nIndex].z },
+												{ pTexUVs[tIndex].x, pTexUVs[tIndex].y } };
+
+		pIndexBuffer[indexBufferIndex++] = (vertexBufferIndex - 1);
+	}
+
+	// Release the four data structures.
+	ReleasePtrArray(pVertices);
+	ReleasePtrArray(pTexUVs);
+	ReleasePtrArray(pNormals);
+	ReleasePtrArray(pPolygons);
+
+	_prVertexBuffer = pVertexBuffer;
+	*_pVertexCount = vertexBufferIndex;
+	_prIndexBuffer = pIndexBuffer;
+	*_pIndexCount = indexBufferIndex;
+
+	return true;
+}
+
+
+
+
 
 void DX10_Renderer::SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _primitiveType)
 {

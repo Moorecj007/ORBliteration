@@ -23,18 +23,21 @@ ArenaFloor::ArenaFloor()
 
 ArenaFloor::~ArenaFloor()
 {
-	while (m_pArenaTiles->empty() == false)
+	if (m_pArenaTiles != 0)
 	{
-		while (m_pArenaTiles->back()->empty() == false)
+		while (m_pArenaTiles->empty() == false)
 		{
-			ReleasePtr(m_pArenaTiles->back()->back());
-			m_pArenaTiles->back()->pop_back();
-		}
+			while (m_pArenaTiles->back()->empty() == false)
+			{
+				ReleasePtr(m_pArenaTiles->back()->back());
+				m_pArenaTiles->back()->pop_back();
+			}
 
-		ReleasePtr(m_pArenaTiles->back());
-		m_pArenaTiles->pop_back();
+			ReleasePtr(m_pArenaTiles->back());
+			m_pArenaTiles->pop_back();
+		}
+		ReleasePtr(m_pArenaTiles);
 	}
-	ReleasePtr(m_pArenaTiles);
 
 	ReleasePtr(m_pTileMesh);
 }
@@ -43,11 +46,12 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 {
 	m_pDX10_Renderer = _pDX10_Renderer;
 	m_matchLength = _matchLength;
+	m_maxPowerSpawnTimer = 2.0f;
+	m_powerSpawnTimer = 2.0f;
 
 	// Create the Mesh for the Arena Tiles
-	m_pTileMesh = new DX10_Mesh_Rect_Prism();
-	TVertexNormalUV vertNormalUV;
-	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, vertNormalUV, _tileScale));
+	m_pTileMesh = new DX10_Mesh();
+	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, MT_FINITEPLANE, _tileScale));
 
 	// Create the 2D vector of Arena Tiles
 	m_pArenaTiles = new std::vector<std::vector<ArenaTile*>*>;
@@ -85,10 +89,9 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	// Ensure the Arena size is even for the next calculation
 	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
 	m_layerCount = evenSize / 2;
-	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
+	m_destroyOutsideTime = m_matchLength / (float)m_layerCount + 1;
 
 	m_destroyedLayers = 0;
-	StartDeathOuterLayer();
 
 	return true;
 }
@@ -101,6 +104,13 @@ void ArenaFloor::Process(float _dt)
 		StartDeathOuterLayer();
 
 		m_timeElapsed = 0.0f;
+	}
+
+	m_powerSpawnTimer -= _dt;
+	if (m_powerSpawnTimer <= 0.0f)
+	{
+		//SpawnPowerUp();
+		m_powerSpawnTimer = m_maxPowerSpawnTimer;
 	}
 
 	// Process all the Tiles in the 2D vector
@@ -164,4 +174,23 @@ void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
 	modifier = modifier / 100.0f + 1.0f;
 
 	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
+}
+
+void ArenaFloor::SpawnPowerUp()
+{
+	// TO DO CAL - BROKEN
+
+	if (m_destroyedLayers == m_layerCount)
+	{
+		// Last tile left and on destruction sequence, spawn no more power ups
+		return;
+	}
+	int layersLeft = (m_layerCount * 2 - 2) - (m_destroyedLayers * 2);
+
+	int randomRow = ((rand() % layersLeft) + (m_destroyedLayers * 2));
+	int randomCol = ((rand() % layersLeft) + (m_destroyedLayers * 2));
+
+	eOverlayTileImages powerImage = (eOverlayTileImages)(rand() % 3 + 1);
+
+	(*(*m_pArenaTiles)[randomRow])[randomCol]->SetOverlayImage(powerImage);
 }

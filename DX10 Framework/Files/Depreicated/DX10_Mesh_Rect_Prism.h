@@ -83,6 +83,9 @@ public:
 	* @return: void
 	********************/
 	virtual void Render();
+
+	// TO DO CAL
+	bool Initialise(DX10_Renderer* _pRenderer, v3float _scale);
 };
 #endif	// __DX10_MESH_RECT_PRISM_H__
 
