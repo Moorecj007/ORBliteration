@@ -691,11 +691,11 @@ void Application::UpdateState(MENU_STATE _state)
 		m_menus[2]->Reset();
 	}
 		break;
-
+		
 		// Match menu states
 	case MENU_STATE_PLAYERS_2:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, 2))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2))
 		{
 			m_state = APP_STATE_GAME;
 		}
@@ -708,7 +708,7 @@ void Application::UpdateState(MENU_STATE _state)
 		break;
 	case MENU_STATE_PLAYERS_3:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, 3))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3))
 		{
 			m_state = APP_STATE_GAME;
 		}
@@ -721,7 +721,7 @@ void Application::UpdateState(MENU_STATE _state)
 		break;
 	case MENU_STATE_PLAYERS_4:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, 4))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4))
 		{
 			m_state = APP_STATE_GAME;
 		}

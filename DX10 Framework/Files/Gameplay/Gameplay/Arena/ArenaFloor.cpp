@@ -66,7 +66,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 
 			// Create the smooth/rough tiles
 			eBaseTileImages eBaseImage;
-			int randomChance = rand() % 10;
+			int randomChance =  rand() % 10;
 			if (randomChance < 1)
 			{
 				eBaseImage = BTI_ROUGH;
