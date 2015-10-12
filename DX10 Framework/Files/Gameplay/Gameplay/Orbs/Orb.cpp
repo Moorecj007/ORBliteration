@@ -42,7 +42,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 	// Store the initial state of the variables
 	m_bounce = _density;
-	m_radius = _pMesh->GetScale().x / 2;
+	m_radius = _pMesh->GetScale().x / 2 ;
 	m_speed = _speed;
 	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;

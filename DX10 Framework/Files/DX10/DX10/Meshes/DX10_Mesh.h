@@ -46,7 +46,7 @@ public:
 	* Initialise: Initialise a new mesh
 	* @author: Callan Moore
 	* @parameter: _pRenderer: The renderer for the mesh
-	* @parameter: _meshType: The type fo mesh to create
+	* @parameter: _meshType: The type for mesh to create
 	* @parameter: _scale: 3D scalar for the mesh
 	* @return: bool: Successful or not
 	********************/

@@ -30,7 +30,7 @@ GUI_Button::~GUI_Button()
 	//ReleasePtr(m_pSprite);
 }
 
-bool GUI_Button::Initialize(DX10_Renderer* _pDX10_Renderer, DXSprite* _pSprite, float _x, float _y, float _width, float _height)
+bool GUI_Button::Initialise(DX10_Renderer* _pDX10_Renderer, DXSprite* _pSprite, float _x, float _y, float _width, float _height)
 {
 	if (!_pDX10_Renderer && !_pSprite)
 		return false;
@@ -52,6 +52,9 @@ bool GUI_Button::Initialize(DX10_Renderer* _pDX10_Renderer, DXSprite* _pSprite, 
 	// Intialize the bounds
 	m_bounds.m_w = m_position.x + m_width - m_boundsOffset;
 	m_bounds.m_h = m_position.y + m_height - m_boundsOffset;
+
+	m_pSprite->SetSize(m_width, m_height);
+	m_pSprite->SetPosition(m_position.x, m_position.y);
 
 	return true;
 }
@@ -84,6 +87,8 @@ float GUI_Button::GetHeight()
 void GUI_Button::SetPosition(v2float _position)
 {
 	m_position = _position;
+
+	m_pSprite->SetPosition(m_position.x, m_position.y);
 
 	m_bounds.m_x = m_position.x + m_boundsOffset;
 	m_bounds.m_y = m_position.y + m_boundsOffset;
@@ -131,35 +136,8 @@ void GUI_Button::Draw()
 		break;
 	}
 
-	m_pSprite->SetSize(m_width, m_height);
-	m_pSprite->SetPosition(m_position.x, m_position.y);
 	m_pSprite->Render();
 }
-
-/*void GUI_Button::Process(float _deltaTime)
-{
-	if (m_state == BUTTON_STATE::BUTTON_STATE_DEACTIVATED)
-		return;
-
-	DIMOUSESTATE mouseCurrState = m_pInput->GetMouseState();
-
-	D3DXVECTOR2 mousePosition;
-	m_pInput->GetMousePosition(mousePosition);
-
-	if (mousePosition.x >= m_bounds.m_x && mousePosition.x <= m_bounds.m_w &&
-		mousePosition.y >= m_bounds.m_y && mousePosition.y <= m_bounds.m_h)
-	{
-		if (mouseCurrState.rgbButtons[0] && !m_pInput->IsMouseBtnLocked(0))
-		{
-			m_pInput->LockMouseBtn(0);
-			m_state = eState::ES_SELECTED;
-		}
-		else
-			m_state = eState::ES_HOVER;
-	}
-	else
-		m_state = eState::ES_DEFAULT;
-}*/
 
 bool GUI_Button::IsInBounds(v2float _point)
 {

@@ -25,11 +25,9 @@ class DX10_Shader_Sprite
 {
 	// Functions
 	public:
-		/*******************
-		-> Default constructor.
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	...
+		/***********************
+		* DX10_Shader_Sprite: Default constructor for the Shader Sprite class.
+		* @author: Juran Griffith.
 		********************/
 		DX10_Shader_Sprite()
 		{
@@ -46,19 +44,9 @@ class DX10_Shader_Sprite
 			D3DXMatrixIdentity(&m_matWorld);
 		}
 
-		/*******************
-		-> Copy constructor.
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	...
-		********************/
-		//FXTexture(const FXTexture&);
-
-		/*******************
-		-> Default destructor.
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	...
+		/***********************
+		* ~DX10_Shader_Sprite: Default destructor for the Shader Sprite class.
+		* @author: Juran Griffith.
 		********************/
 		~DX10_Shader_Sprite()
 		{
@@ -69,15 +57,16 @@ class DX10_Shader_Sprite
 		}
 
 		/*******************
-		-> Intializes the object
-		@author:	Juran Griffith.
-		@parameter: _pDX10_Renderer	- The graphics device.
-		@parameter: _pHWnd			- The handler to the window.
-		@return:	bool			- Returns true if the initialization succeeds otherwise the error on why it failed.
+		* Initialise: Intialises the shader sprite class.
+		* @author: Juran Griffith.
+		* @parameter: _pDX10_Renderer: The graphics device.
+		* @parameter: _pHWnd: The handler to the window.
+		* @return: bool: Returns true if the initialization succeeds otherwise the error on why it failed.
 		********************/
-		bool Initialize(DX10_Renderer* _pDX10_Renderer, HWND* _pHWnd)
+		bool Initialise(DX10_Renderer* _pDX10_Renderer, HWND* _pHWnd)
 		{
 			m_pDX10_Renderer = _pDX10_Renderer;
+			m_pHWnd = _pHWnd;
 			m_pDX10_Renderer->BuildFX("Sprite.fx", "Render", m_pFX, m_pTech);
 			
 			// Get pointers to the three matrices inside the shader so we can update them from this class.
@@ -110,16 +99,17 @@ class DX10_Shader_Sprite
 				D3DXMatrixOrthoLH(&m_matOrtho, static_cast<float>(rect.right - rect.left), static_cast<float>(rect.bottom - rect.top), 0.1f, 100.0f);
 			}
 
-			m_matView = *m_pDX10_Renderer->GetViewMatrix();
+			// Set the view matrix. No need for a camera.
+			D3DXMatrixLookAtLH(&m_matView, &D3DXVECTOR3(0.0f, 0.0f, -1.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
 			return true;
 		}
 
 		/*******************
-		-> This updates the world, view and projection constant buffer variables for the effect to use when rendering 
-		@author:	Juran Griffith.
-		@parameter: _deltaTime	- The current delta time.
-		@return:	void
+		* Update: This updates the shader files constant buffer variables for the effect to use when rendering.
+		* @author: Juran Griffith.
+		* @parameter: _deltaTime: The current delta time.
+		* @return: void.
 		********************/
 		void Update(float _deltaTime)
 		{
@@ -131,11 +121,11 @@ class DX10_Shader_Sprite
 		}
 
 		/*******************
-		-> Draws the 2D texture
-		@author:	Juran Griffith.
-		@parameter: _pBuff	- Buffer of the object
-		@parameter: _pTex	- Texture to be used
-		@return:	void
+		* Render: Draws the 2D texture.
+		* @author: Juran Griffith.
+		* @parameter: _pBuff: Buffer of the object.
+		* @parameter: _pTex: Texture to be used.
+		* @return: void.
 		********************/
 		void Render(DX10_Buffer* _pBuff, ID3D10ShaderResourceView* _pTex)
 		{
@@ -157,6 +147,15 @@ class DX10_Shader_Sprite
 			}
 		}
 
+		/*******************
+		* GetHWnd: Gets the handler to the current window.
+		* @author: Juran Griffith.
+		* @return: HWND*: The pointer for the handler to the window.
+		********************/
+		HWND GetHWnd()
+		{
+			return *m_pHWnd;
+		}
 	protected:
 	private:
 
@@ -165,6 +164,7 @@ class DX10_Shader_Sprite
 	protected:
 	private:
 		DX10_Renderer*						m_pDX10_Renderer;
+		HWND*								m_pHWnd;
 
 		ID3D10EffectMatrixVariable*			m_pEmvView;
 		ID3D10EffectMatrixVariable*			m_pEmvProjection;
@@ -172,9 +172,9 @@ class DX10_Shader_Sprite
 		ID3D10EffectVariable*				m_pEvDeltaTime;
 		ID3D10EffectShaderResourceVariable* m_pEsrvTexture;
 
-		ID3D10Effect* m_pFX;
-		ID3D10EffectTechnique* m_pTech;
-		ID3D10InputLayout* m_pVertexLayout;
+		ID3D10Effect*						m_pFX;
+		ID3D10EffectTechnique*				m_pTech;
+		ID3D10InputLayout*					m_pVertexLayout;
 		D3DXMATRIX							m_matWorld;
 		D3DXMATRIX							m_matView;
 		D3DXMATRIX							m_matOrtho;

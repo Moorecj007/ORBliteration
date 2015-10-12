@@ -60,7 +60,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 
 
 	// Create the Orb Mesh
-	float OrbRadius = 1.0f;
+	float OrbRadius = 2.0f;
 	m_pOrbMesh = new DX10_Mesh;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
@@ -294,14 +294,14 @@ bool Game::Process(float _dt)
 				{
 				case BTI_SLIPPERY:
 				{
-					//m_pOrbs[i]->SetSurfaceFriction(0.0f);
-					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.0f);
+					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_ROUGH:
 				{
-					//m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
-					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.15f / _dt);
+					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_STANDARD:

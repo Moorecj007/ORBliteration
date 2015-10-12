@@ -64,7 +64,21 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			// Create a new Tile
 			ArenaTile* pTile = new ArenaTile();
 
-			eBaseTileImages eBaseImage = (eBaseTileImages)(rand() % 3);
+			// Create the smooth/rough tiles
+			eBaseTileImages eBaseImage;
+			int randomChance = rand() % 10;
+			if (randomChance < 1)
+			{
+				eBaseImage = BTI_ROUGH;
+			}
+			else if (randomChance < 4)
+			{
+				eBaseImage = BTI_SLIPPERY;
+			}
+			else
+			{
+				eBaseImage = BTI_STANDARD;
+			}
 
 			VALIDATE(pTile->Initialise(m_pDX10_Renderer, m_pTileMesh, _pShader, eBaseImage));
 
