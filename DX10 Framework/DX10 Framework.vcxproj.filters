@@ -22,9 +22,6 @@
     <Filter Include="Header Files\DX10\Meshes">
       <UniqueIdentifier>{c69ee119-2ba5-4605-bf7b-1b15c0bcabfd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\DX10\Meshes">
-      <UniqueIdentifier>{c811de54-86d4-477a-b759-efcce14280f4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\FX Files">
       <UniqueIdentifier>{575c96b6-4ddb-46ab-a0a6-4d6507d27ec0}</UniqueIdentifier>
     </Filter>
@@ -54,9 +51,6 @@
     </Filter>
     <Filter Include="Header Files\DX10\Systems">
       <UniqueIdentifier>{b76c8d14-58fe-4db0-b2fd-8c8b01f6d5c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\DX10\Systems">
-      <UniqueIdentifier>{594f7cb3-9e53-44bd-aeaa-c73facc748bf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\DX10\Shaders">
       <UniqueIdentifier>{b4d3c7e4-c102-46cd-b922-cb8e7f260829}</UniqueIdentifier>
@@ -135,15 +129,6 @@
     <ClInclude Include="Files\DX10\DX10\DX10_Vertex.h">
       <Filter>Header Files\DX10</Filter>
     </ClInclude>
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Finite_Plane.h">
-      <Filter>Header Files\DX10\Meshes</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Generic.h">
-      <Filter>Header Files\DX10\Meshes</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Rect_Prism.h">
-      <Filter>Header Files\DX10\Meshes</Filter>
-    </ClInclude>
     <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.h">
       <Filter>Header Files\DX10\Cameras</Filter>
     </ClInclude>
@@ -219,6 +204,9 @@
     <ClInclude Include="Files\Gameplay\Gameplay\Orbs\Orb.h">
       <Filter>Header Files\Gameplay\Orbs</Filter>
     </ClInclude>
+    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh.h">
+      <Filter>Header Files\DX10\Meshes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Files\Application.cpp">
@@ -229,12 +217,6 @@
     </ClCompile>
     <ClCompile Include="Files\Utility\Timer.cpp">
       <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\DX10\DX10\Meshes\DX10_Mesh_Finite_Plane.cpp">
-      <Filter>Source Files\DX10\Meshes</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\DX10\DX10\Meshes\DX10_Mesh_Rect_Prism.cpp">
-      <Filter>Source Files\DX10\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\DX10_Renderer.cpp">
       <Filter>Source Files\DX10</Filter>
@@ -292,14 +274,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\FX\LightStructures.fx">
+    <CustomBuild Include="Resources\FX\LightStructures.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\FX\LitTex.fx">
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\LitTex.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\FX\Sprite.fx">
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\Sprite.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
+    </CustomBuild>
   </ItemGroup>
 </Project>

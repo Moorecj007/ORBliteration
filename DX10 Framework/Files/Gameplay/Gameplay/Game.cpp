@@ -60,14 +60,13 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 
 
 	// Create the Orb Mesh
-	float OrbRadius = 1.0f;
-	m_pOrbMesh = new DX10_Mesh_Rect_Prism();
-	TVertexNormalUV tempVertNormUV;
+	float OrbRadius = 2.0f;
+	m_pOrbMesh = new DX10_Mesh;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
-	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, tempVertNormUV, orbScale));
+	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
 	// TO DO JC: This will be based on the number of players selected for a given match
-	// Create the Contollers and the player orbs
+	// Create the Controllers and the player orbs
 
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
@@ -99,7 +98,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
    
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 0.01f };
+	m_tileScale = { 4, 4, 4 };
 	m_areaSize = 15;
 	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
 	
@@ -123,10 +122,10 @@ bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
 			if (distance < combinedRadius)
 			{
 				
-				// Move objects out of collidiong with each other
+				// Move objects out of colliding with each other
 				while (distance < combinedRadius)
 				{
-					// Calulate Peirce
+					// Calculate Peirce
 					float peirce = combinedRadius - distance;
 
 					// Calculate the direction of collision
@@ -230,7 +229,7 @@ bool Game::Process(float _dt)
 			m_pContollers[i]->PreProcess();
 			if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_A))
 			{
-				// Retrun the game end
+				// Return the game end
 				return false;
 			}
 			m_pContollers[i]->PostProcess();
@@ -295,14 +294,14 @@ bool Game::Process(float _dt)
 				{
 				case BTI_SLIPPERY:
 				{
-					//m_pOrbs[i]->SetSurfaceFriction(0.0f);
-					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.0f);
+					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_ROUGH:
 				{
-					//m_pOrbs[i]->SetSurfaceFriction(0.5f / _dt);
-					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
+					m_pOrbs[i]->SetSurfaceFriction(0.15f / _dt);
+					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
 				}
 					break;
 				case BTI_STANDARD:
@@ -330,7 +329,7 @@ void Game::Render()
 {
 	m_pArenaFloor->Render();
 
-	// Draw all unphased Orbs
+	// Draw all un phased Orbs
 	for (UINT i = 0; i < m_pOrbs.size(); i++)
 	{
 		if (m_pOrbs[i]->GetAlive())

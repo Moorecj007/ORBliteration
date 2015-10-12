@@ -90,7 +90,7 @@ private:
 	// Player Controller Orbs
 	std::vector<Orb*> m_pOrbs;
 
-	DX10_Mesh_Generic* m_pOrbMesh;
+	DX10_Mesh* m_pOrbMesh;
 
 
 	// TO DO JC: Temp remove

@@ -176,7 +176,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_state = APP_STATE_MAIN_MENU;	// TO DO - Change to title screen 
+	m_state = APP_STATE_MAIN_MENU;	// TO DO JURAN - Change to title screen 
 	m_isFullscreen = false;
 	m_isSound = false;
 	m_isRumble = false;
@@ -238,7 +238,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 3, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_EXIT, 4, 0.5f);
 
-	// Intialise Match Menu
+	// Initialise Match Menu
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
@@ -247,7 +247,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 0, 0.5f, 3);
 	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 0, 0.5f, 4);
 
-	// Intialise Options Menu
+	// Initialise Options Menu
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
@@ -262,7 +262,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 3, 0.25f);
 	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(2), 0, m_isRumble);
 
-	// Intialise Pause Menu
+	// Initialise Pause Menu
 	m_menus.push_back(new Menu());
 	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
 
@@ -310,7 +310,7 @@ void Application::ShutDown()
 			m_menus.pop_back();
 		}
 		
-		// Gameplay objects memory release
+		// Game play objects memory release
 		ReleasePtr(m_pGame);
 
 		// Release the renderers resources
@@ -327,18 +327,17 @@ void Application::ExecuteOneFrame()
 	m_deltaTick += dt;
 	m_fpsTimer += dt;
 
-	// Limit to 60 FPS
+	if (Process(dt) == false)
+	{
+		// A process failed to create something
+		m_online = false;
+		return;
+	}
+
+	// Limit to 60 FPS for Renderering
 	if (m_deltaTick > (1.0 / 60.0f))
 	{
-		if (Process(m_deltaTick) == false)
-		{
-			// A process failed to create something
-			m_online = false;
-			return;
-		}
-		
 		Render();
-		
 		m_deltaTick = 0;
 		m_fps++;
 	}	
@@ -346,7 +345,6 @@ void Application::ExecuteOneFrame()
 	// Reset FPS counters
 	if (m_fpsTimer >= 1.0f)
 	{
-		//printf("FPS: %d \n", m_fps);
 		m_fpsTimer -= 1.0f;
 		m_fps = 0;
 	}

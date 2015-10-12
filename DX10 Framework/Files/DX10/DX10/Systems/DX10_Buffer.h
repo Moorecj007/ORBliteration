@@ -133,8 +133,6 @@ public:
 		return m_pVertexBuffer;
 	}
 
-
-
 private:
 	ID3D10Device* m_pDX10Device;
 	ID3D10Buffer* m_pVertexBuffer;

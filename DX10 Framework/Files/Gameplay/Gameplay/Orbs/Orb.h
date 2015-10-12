@@ -54,7 +54,7 @@ public:
 	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _Speed, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _Speed, float _maxSpeed);
 
 
 	// TO DO JC:

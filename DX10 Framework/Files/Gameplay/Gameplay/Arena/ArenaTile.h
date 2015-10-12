@@ -19,7 +19,7 @@
 
 // Local Includes
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_Generic.h"
-#include "../../../DX10/DX10/Meshes/DX10_Mesh_Generic.h"
+#include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
 #include "../../../DX10/DX10/Shaders/DX10_Shader_LitTex.h"
 
 /***********************
@@ -74,7 +74,7 @@ public:
 	* @parameter: _baseImage: Enum to indicate which image to display as the tiles base image
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh_Generic* _pMesh, DX10_Shader_LitTex* _pShader, eBaseTileImages _baseImage);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, eBaseTileImages _baseImage);
 	
 	/***********************
 	* Process: Process the Tile
@@ -121,7 +121,12 @@ public:
 	********************/
 	void SetActive(bool _active){ m_active = _active; };
 
-	// TO DO CAL
+	/***********************
+	* SetDeathTimer: Set the time taken for this tile to die and start that timer
+	* @author: Callan Moore
+	* @parameter: _deathTime: The time taken for this tile to die and become inactive
+	* @return: void
+	********************/
 	void SetDeathTimer(float _deathTime) { m_deathTimer = 0; m_deathIncrement = _deathTime / 10;};
 
 private:

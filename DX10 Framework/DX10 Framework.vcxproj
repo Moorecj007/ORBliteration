@@ -119,8 +119,6 @@
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.cpp" />
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.cpp" />
     <ClCompile Include="Files\DX10\DX10\DX10_Renderer.cpp" />
-    <ClCompile Include="Files\DX10\DX10\Meshes\DX10_Mesh_Finite_Plane.cpp" />
-    <ClCompile Include="Files\DX10\DX10\Meshes\DX10_Mesh_Rect_Prism.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaFloor.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaTile.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Game.cpp" />
@@ -148,9 +146,7 @@
     <ClInclude Include="Files\DX10\DX10\DX10_Renderer.h" />
     <ClInclude Include="Files\DX10\DX10\DX10_Utilities.h" />
     <ClInclude Include="Files\DX10\DX10\DX10_Vertex.h" />
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Finite_Plane.h" />
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Generic.h" />
-    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh_Rect_Prism.h" />
+    <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh.h" />
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_LitTex.h" />
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_Sprite.h" />
     <ClInclude Include="Files\DX10\DX10\Systems\DX10_Buffer.h" />
@@ -175,9 +171,27 @@
     <ClInclude Include="Files\Utility\Utility_Math.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\FX\LightStructures.fx" />
-    <FxCompile Include="Resources\FX\LitTex.fx" />
-    <FxCompile Include="Resources\FX\Sprite.fx" />
+    <CustomBuild Include="Resources\FX\LightStructures.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\LitTex.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\Sprite.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

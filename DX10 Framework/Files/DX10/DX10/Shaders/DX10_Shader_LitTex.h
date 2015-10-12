@@ -28,7 +28,7 @@
 ********************/
 struct TLitTex
 {
-	DX10_Mesh_Generic* pMesh;
+	DX10_Mesh* pMesh;
 	D3DXMATRIX* pMatWorld;
 	ID3D10ShaderResourceView* pTexBase;
 	ID3D10ShaderResourceView* pTex2;
