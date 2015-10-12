@@ -20,6 +20,7 @@
 // Local Includes
 #include "..\DX10\DX10\2D Objects\GUI_Button.h"
 #include "..\Input\InputGamePad.h"
+#include "..\Sound\SoundManager.h"
 
 enum MENU_STATE
 {
@@ -77,157 +78,150 @@ class Menu
 {
 	// Functions
 	public:
-		/*******************
-		-> Default constructor.
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	...
+		/***********************
+		* Menu: Default constructor for the menu class.
+		* @author: Juran Griffith.
 		********************/
 		Menu();
 
-		/*******************
-		-> Default destructor.
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	...
+		/***********************
+		* Menu: Default destructor for the menu class.
+		* @author: Juran Griffith.
 		********************/
 		~Menu();
 
 		/***********************
-		-> Initialize the object
-		@author:	Juran Griffith.
-		@parameter: _pDX10_Renderer	- The graphics device.
-		@parameter: _pHWnd			- The handler to the window.
-		@parameter: _gamePad		- The gamepad controller to listen to.
-		@parameter: _layout			- How to layout the menu items.
-		@return:	bool			- Successful or not
+		* Initialise: Initialise the menu.
+		* @author:	Juran Griffith.
+		* @parameter: _pDX10_Renderer: The graphics device.
+		* @parameter: _pShader: The shader object to use for rendering the sprite.
+		* @parameter: _pSoundManager: The sound manager to help play sound effects in the menu.
+		* @parameter: _pGamepad: The gamepad controller to listen to.
+		* @parameter: _pKeyDown
+		* @parameter: _layout: How to layout the menu items.
+		* @return:	bool: Successful or not
 		********************/
-		bool Initialize(DX10_Renderer* _pDX10_Renderer, HWND* _pHWnd, InputGamePad* _pGamepad, MENU_LAYOUT _layout = MENU_LAYOUT_CENTRE);
+		bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager*	_pSoundManager, InputGamePad* _pGamepad, bool* _pKeyDown, MENU_LAYOUT _layout = MENU_LAYOUT_CENTRE);
 
 		/*******************
-		-> Draws the object
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:	void
+		* Draw: Draws the object
+		* @author:	Juran Griffith.
+		* @return:	void
 		********************/
 		void Draw();
 
 		/*******************
-		-> Process the object
-		@author:	Juran Griffith.
-		@parameter:	_deltaTime	- The application change in time.
-		@return:	void
+		* Process: Process the object.
+		* @author:	Juran Griffith.
+		* @parameter: _deltaTime: The application change in time.
+		* @return:	void.
 		********************/
 		void Process(float _deltaTime);
 
 		/***********************
-		-> Adds a new sprite to the menus list of sprites (may need to improve this). This also loads the sprite aswell.
-		@author:	Juran Griffith.
-		@parameter: _filename		- The filename/path of the image
-		@parameter: _imageWidth		- The image width.
-		@parameter: _imageHeight	- The image height.
-		@parameter: _sliceWidth		- How many slices along the width of the image to do to split the image up into sections. (For sprite sheets etc...)
-		@parameter: _sliceHeight	- How many slices along the height of the image to do to split the image up into sections. (For sprite sheets etc...)
-		@return:	bool			- True if added otherwise false.
+		* AddSprite: Adds a new sprite to the menus list of sprites (may need to improve this). This also loads the sprite aswell.
+		* @author:	Juran Griffith.
+		* @parameter: _filename: The filename/path of the image
+		* @parameter: _imageWidth: The image width.
+		* @parameter: _imageHeight: The image height.
+		* @parameter: _sliceWidth: How many slices along the width of the image to do to split the image up into sections. (For sprite sheets etc...)
+		* @parameter: _sliceHeight: How many slices along the height of the image to do to split the image up into sections. (For sprite sheets etc...)
+		* @return:	bool: True if added otherwise false.
 		********************/
 		bool AddSprite(std::string _filename, UINT _imageWidth, UINT _imageHeight, UINT _sliceWidth = 1, UINT _sliceHeight = 1);
 
 		/***********************
-		-> Adds a new button to the menu. By default it is placed after the last button added.
-		@author:	Juran Griffith.
-		@parameter: _option			- The menu state option this button refers to
-		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
-		@parameter: _scale			- How big to make the object.
-		@parameter: _position		- The position to put the button.
-		@parameter: _col			- The col image index
-		@parameter: _row			- The row image index
-		@return:	bool			- True if added otherwise false.
+		* AddButton: Adds a new button to the menu. By default it is placed after the last button added.
+		* @author:	Juran Griffith.
+		* @parameter: _option: The menu state option this button refers to.
+		* @parameter: _spriteIndex: The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
+		* @parameter: _scale: How big to make the object.
+		* @parameter: _col: The col image index.
+		* @parameter: _row: The row image index.
+		* @return:	bool: True if added otherwise false.
 		********************/
 		bool AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale = 1.0f, UINT _col = 0, UINT _row = 0);
 
 		/***********************
-		-> Adds a new button to the menu. By default it is placed after the last button added.
-		@author:	Juran Griffith.
-		@parameter: _button			- The button struct to attach this toggle to.
-		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
-		@parameter: _toggled		- Sets the toggled buttons intial state.
-		@parameter: _scale			- How big to make the object.
-		@return:	bool			- True if added otherwise false.
+		* AddToggleButton: Adds a new button to the menu. By default it is placed after the last button added.
+		* @author:	Juran Griffith.
+		* @parameter: _button: The button struct to attach this toggle to.
+		* @parameter: _spriteIndex: The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
+		* @parameter: _toggled: Sets the toggled buttons intial state.
+		* @parameter: _scale: How big to make the object.
+		* @return:	bool: True if added otherwise false.
 		********************/
 		bool AddToggleButton(TButton* _button, UINT _spriteIndex, bool _toggled = true, float _scale = 1.0f);
 
 		/***********************
-		-> Adds a title to the menu.
-		@author:	Juran Griffith.
-		@parameter: _spriteIndex	- The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
-		@parameter: _scale			- How big to make the object.
-		@parameter: _position		- Where to place the item. (make sure to set the menu layout to custom to use this)
-		@return:	bool			- True if added otherwise false.
+		* AddTitle: Adds a title to the menu.
+		* @author:	Juran Griffith.
+		* @parameter: _spriteIndex: The sprite index to set as the buttons image. (make sure to load a sprite to the menu object using the add sprite function)
+		* @parameter: _scale: How big to make the object.
+		* @parameter: _position: Where to place the item. (make sure to set the menu layout to custom to use this)
+		* @return:	bool: True if added otherwise false.
 		********************/
 		bool AddTitle(UINT _spriteIndex, float _scale = 1.0f, v2float _position = v2float(0.0f, 0.0f));
 
 		/***********************
-		-> Gets the current button state based on the menu index provided.
-		@author:	Juran Griffith.
-		@parameter: _index			- The button index to check.
-		@return:	BUTTON_STATE	- The current buttons state.
+		* GetButtonState: Gets the current button state based on the menu index provided.
+		* @author:	Juran Griffith.
+		* @parameter: _index: The button index to check.
+		* @return:	BUTTON_STATE: The current buttons state.
 		********************/
 		BUTTON_STATE GetButtonState(UINT _index);
 
 		/***********************
-		-> Gets the button at the current index.
-		@author:	Juran Griffith.
-		@parameter: _index		- The button index.
-		@return:	TButton		- The pointer to the button struct in this menu
+		* GetButton: Gets the button at the current index.
+		* @author:	Juran Griffith.
+		* @parameter: _index: The button index.
+		* @return:	TButton: The pointer to the button struct in this menu.
 		********************/
 		TButton* GetButton(UINT _index);
 
 		/***********************
-		-> Gets the current menu item the menu is hovering over(for mouse) or at(xbox)
-		@author:	Juran Griffith.
-		@parameter: None.
-		@return:	UINT	- The current menu item
+		* GetCurrentMenuItem: Gets the current menu item the menu is hovering over(for mouse) or at(xbox).
+		* @author:	Juran Griffith.
+		* @return:	UINT	- The current menu item
 		********************/
 		UINT GetCurrentMenuItem();
 
 		/***********************
-		-> Gets the menus current state
-		@author:	Juran Griffith.
-		@parameter: None.
-		@return:	MENU_STATE	- The current menu state
+		* GetMenuState: Gets the menus current state.
+		* @author:	Juran Griffith.
+		* @return:	MENU_STATE	- The current menu state
 		********************/
 		MENU_STATE GetMenuState();
 
 		/***********************
-		-> Sets the menus position
-		@author:	Juran Griffith.
-		@parameter: _position		- The new position to set the menu
-		@return:	void
+		* SetPosition: Sets the menus position.
+		* @author:	Juran Griffith.
+		* @parameter: _position: The new position to set the menu
+		* @return:	void.
 		********************/
 		void SetPosition(v2float _position);
 
 		/***********************
-		-> Sets the current index buttons position.
-		@author:	Juran Griffith.
-		@parameter: _index		- The button index.
-		@parameter: _position	- The new position for the button.
-		@return:	void
+		* SetButtonPosition: Sets the current index buttons position.
+		* @author:	Juran Griffith.
+		* @parameter: _index: The button index.
+		* @parameter: _position: The new position for the button.
+		* @return:	void.
 		********************/
 		void SetButtonPosition(UINT _index, v2float _position);
 
 		/***********************
-		-> Resets the menu states
-		@author:	Juran Griffith.
-		@parameter: None.
-		@return:	void
+		* Reset: Resets the menu states
+		* @author:	Juran Griffith.
+		* @return:	void
 		********************/
 		void Reset();
 
 		/***********************
-		-> Toggles the button at the given index
-		@author:	Juran Griffith.
-		@parameter: _index		- The toggle button index.
-		@return:	void
+		* ToggleButton: Toggles the button at the given index
+		* @author:	Juran Griffith.
+		* @parameter: _index		- The toggle button index.
+		* @return:	void.
 		********************/
 		void ToggleButton(UINT _index);
 	protected:
@@ -237,8 +231,8 @@ class Menu
 	public:
 	protected:
 	private:
-		HWND*						m_pHWnd;
 		DX10_Renderer*				m_pDX10_Renderer;
+		DX10_Shader_Sprite*			m_pShader_Sprite;
 
 		float						m_space;
 
@@ -248,7 +242,6 @@ class Menu
 		std::vector<TButton*>		m_buttons;
 		std::vector<GUI_Button*>	m_toggleButtons;
 
-		DX10_Shader_Sprite*			m_pShader_Sprite;
 		v2float						m_position;
 		GUI_Button*					m_title;
 
@@ -263,6 +256,11 @@ class Menu
 
 		float						m_elaspedTime;
 		UINT						m_imageIndex;
+
+		bool*						m_pKeyDown;
+
+		// Sound
+		SoundManager*				m_pSoundManager;
 };
 
 #endif

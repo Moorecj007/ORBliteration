@@ -103,6 +103,12 @@
     <Filter Include="Source Files\Menus">
       <UniqueIdentifier>{1dced5e0-6e38-411e-b515-4b7d7926cd3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sound">
+      <UniqueIdentifier>{79487ff9-ad11-4ca6-bd5f-97f53a242f68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sound">
+      <UniqueIdentifier>{8895a6cd-578c-49b1-8371-d2df046ae732}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Files\Application.h">
@@ -207,6 +213,12 @@
     <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh.h">
       <Filter>Header Files\DX10\Meshes</Filter>
     </ClInclude>
+    <ClInclude Include="Files\Sound\SoundSystem.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Files\Sound\SoundManager.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Files\Application.cpp">
@@ -272,16 +284,22 @@
     <ClCompile Include="Files\Gameplay\Gameplay\Orbs\Orb.cpp">
       <Filter>Source Files\Gameplay\Orbs</Filter>
     </ClCompile>
+    <ClCompile Include="Files\Sound\SoundSystem.cpp">
+      <Filter>Source Files\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Files\Sound\SoundManager.cpp">
+      <Filter>Source Files\Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\FX\LightStructures.fx">
+    <CustomBuild Include="Resources\FX\LightStructures.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\FX\LitTex.fx">
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\LitTex.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\FX\Sprite.fx">
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\Sprite.fx">
       <Filter>Resource Files\FX Files</Filter>
-    </FxCompile>
+    </CustomBuild>
   </ItemGroup>
 </Project>

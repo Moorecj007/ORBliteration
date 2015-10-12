@@ -41,7 +41,7 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
 
-	m_activeLight.dir = D3DXVECTOR3(0, 0.0f, -1.0f);
+	m_activeLight.dir = D3DXVECTOR3(0, 0.0f, 1.0f);
 	m_activeLight.ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
 	m_activeLight.diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_activeLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -695,46 +695,6 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 
 	// Close the file.
 	fin.close();
-
-	//// Open the output file.
-	//fout.open("model.txt");
-	//
-	//// Write out the file header that our model format uses.
-	//fout << "Vertex Count: " << (_polygonCount * 3) << endl;
-	//fout << endl;
-	//fout << "Data:" << endl;
-	//fout << endl;
-	//
-	//// Now loop through all the faces and output the three vertices for each face.
-	//for (int i = 0; i < faceIndex; i++)
-	//{
-	//	vIndex = pPolygons[i].vIndex1 - 1;
-	//	tIndex = pPolygons[i].tIndex1 - 1;
-	//	nIndex = pPolygons[i].nIndex1 - 1;
-	//
-	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
-	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
-	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
-	//
-	//	vIndex = pPolygons[i].vIndex2 - 1;
-	//	tIndex = pPolygons[i].tIndex2 - 1;
-	//	nIndex = pPolygons[i].nIndex2 - 1;
-	//
-	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
-	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
-	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
-	//
-	//	vIndex = pPolygons[i].vIndex3 - 1;
-	//	tIndex = pPolygons[i].tIndex3 - 1;
-	//	nIndex = pPolygons[i].nIndex3 - 1;
-	//
-	//	fout << pVertices[vIndex].x << ' ' << pVertices[vIndex].y << ' ' << pVertices[vIndex].z << ' '
-	//		<< pTexUVs[tIndex].x << ' ' << pTexUVs[tIndex].y << ' '
-	//		<< pNormals[nIndex].x << ' ' << pNormals[nIndex].y << ' ' << pNormals[nIndex].z << endl;
-	//}
-	//
-	//// Close the output file.
-	//fout.close();
 
 	TVertexNormalUV* pVertexBuffer = new TVertexNormalUV[polygonCount * 3];
 	DWORD* pIndexBuffer = new DWORD[polygonCount * 3];

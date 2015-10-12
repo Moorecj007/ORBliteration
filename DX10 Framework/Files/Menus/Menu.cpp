@@ -6,7 +6,7 @@
 //
 // (c) 2005 - 2015 Media Design School
 //
-// File Name	:	GUI_Button.cpp
+// File Name	:	Menu.cpp
 // Description	:	The implementation file.
 // Author(s)	:	Juran Griffith.
 // Mail			:	juran.griffith@mediadesignschool.com
@@ -30,7 +30,6 @@ Menu::Menu()
 Menu::~Menu()
 {
 	// Release all sprite related resources
-	ReleasePtr(m_pShader_Sprite);
 	ReleasePtr(m_title);
 
 	while (!m_sprites.empty())
@@ -52,19 +51,23 @@ Menu::~Menu()
 	}
 }
 
-bool Menu::Initialize(DX10_Renderer*_pDX10_Renderer, HWND* _pHWnd, InputGamePad* _pGamepad, MENU_LAYOUT _layout)
+bool Menu::Initialise(DX10_Renderer*_pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager* _pSoundManager, InputGamePad* _pGamepad, bool* _pKeyDown, MENU_LAYOUT _layout)
 {
-	m_pDX10_Renderer = _pDX10_Renderer;
-	m_pHWnd = _pHWnd;
-	m_pGamepad = _pGamepad;
-	m_layout = _layout;
+	if (_pDX10_Renderer && _pShader && _pSoundManager && _pGamepad && _pKeyDown)
+	{
+		m_pDX10_Renderer = _pDX10_Renderer;
+		m_pShader_Sprite = _pShader;
+		m_pSoundManager = _pSoundManager;
+		m_pGamepad = _pGamepad;
+		m_pKeyDown = _pKeyDown;
+		m_layout = _layout;
 
-	m_menuItem = 0;
+		m_menuItem = 0;
 
-	m_pShader_Sprite = new DX10_Shader_Sprite();
-	VALIDATE(m_pShader_Sprite->Initialize(m_pDX10_Renderer, m_pHWnd));
-
-	return true;
+		return true;
+	}
+	
+	return false;
 }
 
 void Menu::Process(float _deltaTime)
@@ -97,25 +100,16 @@ void Menu::Process(float _deltaTime)
 			}
 		}
 
-		// Process all the buttons
-		/*for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
-		{
-			(*button)->m_pButton->Process(_deltaTime);
-		}
-
-		for (auto button = m_toggleButtons.begin(); button != m_toggleButtons.end(); button++)
-		{
-			(*button)->Process(_deltaTime);
-		}*/
-
 		// Handle Controller Input
 		m_pGamepad->PreProcess();
 
 		// Menu Item Navigation
-		if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Down))
+		if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Down) || m_pKeyDown[VK_DOWN])
 		{
+			m_pKeyDown[VK_DOWN] = false;
 			if (m_menuItem < m_buttons.size() - 1)
 			{
+				m_pSoundManager->PlayMenuNavigate();
 				if (m_menuItem >= 0)
 				{
 					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
@@ -128,10 +122,12 @@ void Menu::Process(float _deltaTime)
 				}
 			}
 		}
-		else if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Up) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Up))
+		else if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Up) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Up) || m_pKeyDown[VK_UP])
 		{
+			m_pKeyDown[VK_UP] = false;
 			if (m_menuItem > 0)
 			{
+				m_pSoundManager->PlayMenuNavigate();
 				if (m_menuItem >= 0)
 				{
 					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
@@ -146,12 +142,27 @@ void Menu::Process(float _deltaTime)
 		}
 
 		// Menu Item Selected
-		if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_A)) // Confirm Selection
+		if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN]) // Confirm Selection
 		{
+			m_pKeyDown[VK_RETURN] = false;
 			m_state = m_buttons[m_menuItem]->m_option;
+
+			switch (m_state)
+			{
+				case MENU_STATE_FULL_SCREEN: // Fall through
+				case MENU_STATE_SOUND: // Fall through
+				case MENU_STATE_RUMBLE: // Fall Through
+					m_pSoundManager->PlayMenuToggles();
+					break;
+				default:
+					m_pSoundManager->PlayMenuAccept();
+					break;
+			}
 		}
-		else if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_B))
+		else if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
 		{
+			m_pSoundManager->PlayMenuBack();
+			m_pKeyDown[VK_BACK] = false;
 			m_state = MENU_STATE_EXIT;
 		}
 
@@ -175,11 +186,18 @@ void Menu::Draw()
 		// Draw all the buttons
 		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
 		{
+			/*if (m_sprites.size() == 1) // TO DO - Juran (clean this up, some test code)
+			{
+				m_sprites[0]->SetSize(m_buttons[0]->m_pButton->GetWidth(), m_buttons[0]->m_pButton->GetHeight());
+				m_sprites[0]->SetPosition((*button)->m_pButton->GetPosition().x, (*button)->m_pButton->GetPosition().y);
+			}*/
 			(*button)->m_pButton->Draw();
 		}
 
 		for (auto button = m_toggleButtons.begin(); button != m_toggleButtons.end(); button++)
 		{
+			m_sprites[0]->SetSize(m_toggleButtons[0]->GetWidth(), m_toggleButtons[0]->GetHeight());
+			m_sprites[0]->SetPosition((*button)->GetPosition().x, (*button)->GetPosition().y);
 			(*button)->Draw();
 		}
 
@@ -194,7 +212,7 @@ bool Menu::AddSprite(std::string _filename, UINT _imageWidth, UINT _imageHeight,
 	//  - Dynamically find the width and height of image files (may need to check which type of image it is too)
 	//	- Check for duplicate sprites
 	m_sprites.push_back(new DXSprite());
-	VALIDATE(m_sprites.back()->Initialize(m_pHWnd, m_pDX10_Renderer, m_pShader_Sprite, _filename, _imageWidth, _imageHeight, _sliceWidth, _sliceHeight));
+	VALIDATE(m_sprites.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, _filename, _imageWidth, _imageHeight, _sliceWidth, _sliceHeight));
 
 	return true;
 }
@@ -219,7 +237,7 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, UINT _
 			float m_screenHeight = 0.0f;
 
 			RECT rect;
-			if (GetClientRect(*m_pHWnd, &rect))
+			if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left);
 				m_screenHeight = static_cast<float>(rect.bottom - rect.top);
@@ -228,7 +246,7 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, UINT _
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
 			m_screenHeight = m_screenHeight * 0.5f;
 
-			VALIDATE(temp->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+			VALIDATE(temp->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
 				m_position.x + m_screenWidth,
 				m_position.y + m_screenHeight + (m_space + offsety) * (m_buttons.size() - 1),
 				m_sprites[_spriteIndex]->GetWidth() * _scale,
@@ -237,7 +255,7 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, UINT _
 			
 			break;
 		case MENU_LAYOUT_CUSTOM:
-			VALIDATE(temp->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+			VALIDATE(temp->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
 				m_position.x,
 				m_position.y,
 				m_sprites[_spriteIndex]->GetWidth() * _scale,
@@ -261,8 +279,9 @@ bool Menu::AddToggleButton(TButton* _button, UINT _spriteIndex, bool _toggled, f
 	if (_spriteIndex < m_sprites.size())
 	{
 		m_toggleButtons.push_back(new GUI_Button());
+		m_toggleButtons.back()->SetState((BUTTON_STATE)_toggled);
 
-		VALIDATE(m_toggleButtons.back()->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+		VALIDATE(m_toggleButtons.back()->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
 			_button->m_pButton->GetPosition().x + _button->m_pButton->GetWidth() + m_space,
 			_button->m_pButton->GetPosition().y,
 			m_sprites[_spriteIndex]->GetWidth() * _scale,
@@ -284,21 +303,21 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 			float m_screenHeight = 0.0f;
 
 			RECT rect;
-			if (GetClientRect(*m_pHWnd, &rect))
+			if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left);
 				m_screenHeight = static_cast<float>(rect.bottom - rect.top);
 			}
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
-			m_screenHeight = m_screenHeight * 0.25f;
+			m_screenHeight = m_screenHeight * 0.125f; // TO DO - Juran (work on a better system)
 
 			if (m_position.x + m_screenWidth + m_sprites[_spriteIndex]->GetWidth() * _scale > static_cast<float>(rect.right - rect.left))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left) * 0.125f * 0.125f;
 			}
 
-			VALIDATE(m_title->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+			VALIDATE(m_title->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
 				m_position.x + m_screenWidth,
 				m_position.y + m_screenHeight,
 				m_sprites[_spriteIndex]->GetWidth() * _scale,
@@ -307,7 +326,7 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 			
 			break;
 		case MENU_LAYOUT_CUSTOM:
-			VALIDATE(m_title->Initialize(m_pDX10_Renderer, m_sprites[_spriteIndex],
+			VALIDATE(m_title->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
 				m_position.x + _position.x,
 				m_position.y + _position.y,
 				m_sprites[_spriteIndex]->GetWidth() * _scale,
@@ -369,13 +388,4 @@ void Menu::ToggleButton(UINT _index)
 void Menu::Reset()
 {
 	m_state = MENU_STATE_DEFAULT;
-	
-	// Reset all buttons
-	/*m_menuItem = 0;
-	for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
-	{
-		(*button)->m_pButton->SetState(BUTTON_STATE_DEFAULT);
-	}
-
-	m_buttons[0]->m_pButton->SetState(BUTTON_STATE_HOVER);*/
 }

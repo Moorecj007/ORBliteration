@@ -176,10 +176,10 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_state = APP_STATE_MAIN_MENU;	// TO DO JURAN - Change to title screen 
+	m_state = APP_STATE_SPLASH;
 	m_isFullscreen = false;
-	m_isSound = false;
-	m_isRumble = false;
+	m_isSoundOn = true;
+	m_isRumbleOn = false;
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
@@ -206,6 +206,12 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_fps = 0;
 	m_deltaTick = 0;
 	m_fpsTimer = 0;
+
+	// Animation variables
+	m_animationTime = 0.0f;
+	m_animationSpeed = 1.0f / 15.0f; // 15 FPS
+	m_waitTime = 1.5f; // seconds 
+	m_wait = false;
 	
 	return true;
 }
@@ -223,16 +229,24 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
 
+	// Initialise the sprite shader
+	m_pShader_Sprite = new DX10_Shader_Sprite();
+	VALIDATE(m_pShader_Sprite->Initialise(m_pDX10_Renderer, &m_hWnd));
+
+	// Initialize our sound system
+	m_pSoundManager = new SoundManager();
+	VALIDATE(m_pSoundManager->Intialise());
+
 	// Initialise Main Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
 
-	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration.png", 1231, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration_title.png", 1600, 800);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4); 
 	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
-	m_menus.back()->AddTitle(0, 0.75f);
+	m_menus.back()->AddTitle(0, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_START, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 2, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 3, 0.5f);
@@ -240,31 +254,33 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Match Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4); // To DO - Juran (improve this)
 	m_menus.back()->AddButton(MENU_STATE_PLAYERS_2, 0, 0.5f, 2);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 0, 0.5f, 3);
-	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 0, 0.5f, 4);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_3, 1, 0.5f, 3);
+	m_menus.back()->AddButton(MENU_STATE_PLAYERS_4, 2, 0.5f, 4);
 
 	// Initialise Options Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_sound_fill.png", 481, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
 	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.25f);
-	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen, 0.75f);
 	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.25f);
-	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(1), 0, m_isSound);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(1), 0, m_isSoundOn);
 	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 3, 0.25f);
-	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(2), 0, m_isRumble);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(2), 0, m_isRumbleOn);
 
 	// Initialise Pause Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialize(m_pDX10_Renderer, &m_hWnd, m_pGamepadPlayerOne));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
@@ -274,6 +290,18 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_EXIT, 3, 0.5f);
+
+	VALIDATE(m_splash_ps.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Phenomena/phenomena_splash.png", 4000, 2400, 5, 4));
+	m_splash_ps.SetPosition(100,50);
+	m_splash_ps.SetSize(800, 600);
+	m_splash_ps.SetImageIndex(0);
+
+	VALIDATE(m_splash_orb.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_splash.png", 4000, 1200, 5, 3));
+	m_splash_orb.SetPosition(100, 150);
+	m_splash_orb.SetSize(800, 400);
+	m_splash_orb.SetImageIndex(0);
+
+	m_pSoundManager->PlayPhenomenaSplash();
 
 	return true;
 }
@@ -294,6 +322,8 @@ void Application::ShutDown()
 	ReleasePtr(m_pKeyDown);
 	ReleasePtr(m_pTimer);
 
+	ReleasePtr(m_pSoundManager);
+
 	// Delete and free the memory from the Renderer
 	if (m_pDX10_Renderer != 0)
 	{ 
@@ -310,6 +340,8 @@ void Application::ShutDown()
 			m_menus.pop_back();
 		}
 		
+		ReleasePtr(m_pShader_Sprite);
+
 		// Game play objects memory release
 		ReleasePtr(m_pGame);
 
@@ -361,9 +393,55 @@ bool Application::Process(float _dt)
 
 		ProcessShaders();
 
+		m_pShader_Sprite->Update(_dt);
+
 		switch (m_state)
 		{
+		case APP_STATE_SPLASH:
+			{
+				m_animationTime += _dt;
+				if (!m_splash_ps.IsAtLastFrame())
+				{
+					if (m_animationTime > m_animationSpeed) // TO DO - Juran (Port to the sprite class)
+					{
+						m_splash_ps.IncrementIndex();
+						m_animationTime = 0.0f;
+					}
+				}
+				else if (m_waitTime < m_animationTime)
+				{
+					m_state = APP_STATE_TITLE;
+					m_animationTime = 0.0f;
+				}
+			}
+			break;
 		case APP_STATE_TITLE:
+			{
+				m_animationTime += _dt;
+				if (!m_splash_orb.IsAtLastFrame())
+				{
+					if (m_animationTime > m_animationSpeed) // TO DO - Juran (Port to the sprite class)
+					{
+						m_splash_orb.IncrementIndex();
+						m_animationTime = 0.0f;
+
+						if (m_splash_orb.IsAtLastFrame())
+						{
+							m_wait = true;
+						}
+					}
+				}
+				else if (m_waitTime < m_animationTime)
+				{
+					// To Add - Controller Feedback
+					m_state = APP_STATE_MAIN_MENU;
+
+					// Play Menu Music
+					m_pSoundManager->PlaySong(0);
+
+					m_animationTime = 0.0f;
+				}
+			}
 			break;
 		case APP_STATE_MAIN_MENU:
 			m_menus[0]->Process(_dt);
@@ -384,13 +462,15 @@ bool Application::Process(float _dt)
 			UpdateState(m_menus[3]->GetMenuState());
 			break;
 		case APP_STATE_GAME:
-			if (m_pGame->Process(_dt) == false)
 			{
-				// If the game has ended
-				ReleasePtr(m_pGame);
-				m_state = APP_STATE_MAIN_MENU;
-				m_menus[0]->Reset();
- 			}
+				if (m_pGame->Process(_dt) == false)
+				{
+					// If the game has ended
+					ReleasePtr(m_pGame);
+					m_state = APP_STATE_MAIN_MENU;
+					m_menus[0]->Reset();
+				}
+			}
 			break;
 		default:
 			break;
@@ -415,7 +495,11 @@ void Application::Render()
 
 		switch (m_state)
 		{
+		case APP_STATE_SPLASH:
+			m_splash_ps.Render();
+			break;
 		case APP_STATE_TITLE:
+			m_splash_orb.Render();
 			break;
 		case APP_STATE_MAIN_MENU:
 			m_menus[0]->Draw();
@@ -569,9 +653,14 @@ void Application::UpdateState(MENU_STATE _state)
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
 	{
+		// Set the menu state
 		m_state = APP_STATE_OPTION_MENU;
+
+		// Toggle
 		m_isFullscreen = !m_isFullscreen;
 		m_pDX10_Renderer->ToggleFullscreen();
+
+		// Update button
 		m_menus[2]->ToggleButton(0);
 		m_menus[2]->Reset();
 	}
@@ -579,17 +668,25 @@ void Application::UpdateState(MENU_STATE _state)
 	case MENU_STATE_SOUND:
 	{
 		m_state = APP_STATE_OPTION_MENU;
-		m_isSound = !m_isSound;
-		// Toggle sound
+		
+		// Toggle
+		m_isSoundOn = !m_isSoundOn;
+		m_pSoundManager->Mute(!m_isSoundOn);
+
+		// Update button
 		m_menus[2]->ToggleButton(1);
 		m_menus[2]->Reset();
 	}
 		break;
 	case MENU_STATE_RUMBLE:
 	{
+		// Set the menu state
 		m_state = APP_STATE_OPTION_MENU;
-		m_isRumble = !m_isRumble;
-		// Toggle rumble
+		
+		// Toggle
+		m_isRumbleOn = !m_isRumbleOn;
+
+		// Update button
 		m_menus[2]->ToggleButton(2);
 		m_menus[2]->Reset();
 	}

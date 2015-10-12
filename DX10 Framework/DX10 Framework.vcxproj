@@ -41,15 +41,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Libraries\VLD\include;$(ProjectDir)Libraries\Box2D;$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
-    <LibraryPath>$(ProjectDir)Libraries\VLD\lib\Win32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libraries\Box2D</LibraryPath>
+    <IncludePath>$(ProjectDir)Libraries\FMOD\include;$(ProjectDir)Libraries\VLD\include;$(ProjectDir)Libraries\Box2D;$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(ProjectDir)Libraries\FMOD\lib;$(ProjectDir)Libraries\VLD\lib\Win32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libraries\Box2D</LibraryPath>
     <OutDir>..\Output\Debug\</OutDir>
     <IntDir>..\Output\Debug\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)Libraries\VLD\include;$(ProjectDir)Libraries\Box2D;$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
-    <LibraryPath>$(ProjectDir)Libraries\VLD\lib\Win32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libraries\Box2D</LibraryPath>
+    <IncludePath>$(ProjectDir)Libraries\FMOD\include;$(ProjectDir)Libraries\VLD\include;$(ProjectDir)Libraries\Box2D;$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(ProjectDir)Libraries\FMOD\lib;$(ProjectDir)Libraries\VLD\lib\Win32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libraries\Box2D</LibraryPath>
     <OutDir>..\Output\Release\</OutDir>
     <IntDir>..\Output\Debug\</IntDir>
   </PropertyGroup>
@@ -130,6 +130,8 @@
     <ClCompile Include="Files\Physics\2D Physics\Physics_Collision_Listener.cpp" />
     <ClCompile Include="Files\Physics\2D Physics\Physics_Rope_2D.cpp" />
     <ClCompile Include="Files\Physics\2D Physics\Physics_Pulley_2D.cpp" />
+    <ClCompile Include="Files\Sound\SoundManager.cpp" />
+    <ClCompile Include="Files\Sound\SoundSystem.cpp" />
     <ClCompile Include="Files\Utility\DirectInput.cpp" />
     <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp" />
     <ClCompile Include="Files\Utility\Timer.cpp" />
@@ -164,6 +166,8 @@
     <ClInclude Include="Files\Physics\2D Physics\Physics_Pulley_2D.h" />
     <ClInclude Include="Files\Physics\2D Physics\Physics_Utilities.h" />
     <ClInclude Include="Files\Physics\Physics_2D.h" />
+    <ClInclude Include="Files\Sound\SoundManager.h" />
+    <ClInclude Include="Files\Sound\SoundSystem.h" />
     <ClInclude Include="Files\Utility\DirectInput.h" />
     <ClInclude Include="Files\Utility\Mutex_Semaphore.h" />
     <ClInclude Include="Files\Utility\Timer.h" />
@@ -171,9 +175,27 @@
     <ClInclude Include="Files\Utility\Utility_Math.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\FX\LightStructures.fx" />
-    <FxCompile Include="Resources\FX\LitTex.fx" />
-    <FxCompile Include="Resources\FX\Sprite.fx" />
+    <CustomBuild Include="Resources\FX\LightStructures.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\LitTex.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Resources\FX\Sprite.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(DXSDK_DIR)Utilities\bin\x86\"fxc.exe /T fx_4_0 /Fo "%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(filename).fxo</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

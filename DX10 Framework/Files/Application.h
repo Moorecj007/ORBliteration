@@ -39,9 +39,11 @@
 #include "Input\InputGamePad.h"
 #include "Menus\Menu.h"
 #include "Gameplay\Gameplay.h"
+#include "Sound\SoundManager.h"
 
 enum APP_STATE
 {
+	APP_STATE_SPLASH,
 	APP_STATE_TITLE,
 	APP_STATE_MAIN_MENU,
 	APP_STATE_MATCH_MENU,
@@ -177,7 +179,7 @@ public:
 	* SetMouseDown: Set the state of the mouse button being clicked
 	* @author: Callan Moore
 	* @parameter: _mouseDown: The new state of the mouse button
-	* @return: void
+	* @return: void.
 	********************/
 	void SetMouseDown(bool _mouseDown) { m_mouseDown = _mouseDown; };
 
@@ -188,18 +190,16 @@ private:
 	Application& operator= (const Application& _kr);
 
 	/*******************
-	-> Exits the application
-	@author:	Juran Griffith.
-	@parameter:	None.
-	@return:	void
+	* ExitApp: Exits the application.
+	* @author:	Juran Griffith.
+	* @return:	void.
 	********************/
 	void ExitApp();
 
 	/*******************
-	-> Updates the application based on the menu item selected
-	@author:	Juran Griffith.
-	@parameter:	None.
-	@return:	void
+	* UpdateState: Updates the application based on the menu item selected
+	* @author:	Juran Griffith.
+	* @return:	void.
 	********************/
 	void UpdateState(MENU_STATE _state);
 
@@ -234,17 +234,27 @@ private:
 	XStickDirectionIDs m_XStickDirections; //TO DO Jc - Maybe use enums
 	InputGamePad* m_pGamepadPlayerOne;
 
-	// Menu Objects
-	std::vector<Menu*> m_menus;
-
 	// Game play Objects
 	Game* m_pGame;
 
 	// App State
 	APP_STATE m_state;
 	bool m_isFullscreen;
-	bool m_isSound;
-	bool m_isRumble;
+	bool m_isSoundOn;
+	bool m_isRumbleOn;
+
+	// Sound
+	SoundManager* m_pSoundManager;
+
+	// 2D Objects
+	DX10_Shader_Sprite*	m_pShader_Sprite;
+	std::vector<Menu*> m_menus;
+	DXSprite m_splash_ps;
+	DXSprite m_splash_orb;
+	float m_animationTime;
+	float m_animationSpeed;
+	float m_waitTime;
+	bool m_wait;
 };
 
 #endif // __APPLICATION_H__
