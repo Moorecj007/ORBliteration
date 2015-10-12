@@ -9,7 +9,9 @@
 * File Name : Game.cpp
 * Description : Runs all Game play processes
 * Author :	Callan Moore
+* Author :	Jc Fowles
 * Mail :	Callan.Moore@mediadesign.school.nz
+* Mail :	Jc.Fowles@mediadesign.school.nz
 */
 
 // Inclusion Guards
@@ -42,21 +44,39 @@ Game::~Game()
 
 }
 
-bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
+bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers)
 {
-	if (_pDX10_Renderer == 0)
+	if ((_pDX10_Renderer == 0) || (_pSoundManager == 0))
 	{
-		// If the Renderer is NULL the Game cannot be utilized
+		// If the Renderer or the sound manger is NULL the Game cannot be utilized
 		return false;
 	}
 
 	m_numPlayers = _numPlayers;
 	m_numAlivePlayers = _numPlayers;
 	m_pDX10_Renderer = _pDX10_Renderer;
-														
+	m_pSoundManager = _pSoundManager;
+
+	m_matchWon = false;
+
+	// TO DO JUR: Temp all to be Remove
+	m_pSpriteShader = _pSpriteShader;
+	VictroyPlayerOne = new DXSprite();
+	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 2280, 601, 3, 1);
+	VictroyPlayerOne->SetSize(800, 800);
+	VictroyPlayerOne->SetPosition(100,100);
+
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
+
+	// Create and Initialise the Arena Floor
+	m_pArenaFloor = new ArenaFloor();
+	m_tileScale = { 4, 4, 4 };
+	m_areaSize = 15;
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
+
+	m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
 
 
 	// Create the Orb Mesh
@@ -65,9 +85,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
-	// TO DO JC: This will be based on the number of players selected for a given match
+	
 	// Create the Controllers and the player orbs
-
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
 	{
@@ -75,48 +94,68 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, int _numPlayers)
 		VALIDATE(m_pContollers[i]->Initialise(i + 1));
 
 		m_pOrbs.push_back(new Orb());
+		int row, col;
+		
 		switch (i)
 		{
 		case 0:
-			temp = "pBall.png";
+			{
+				temp = "pBall.png";
+				row = 1;
+				col = 13;
+	
+			}
 			break;
 		case 1:
-			temp = "gBall.png";
+			{
+				temp = "gBall.png";
+				row = 1;
+				col = 1;
+			}
 			break;
 		case 2:
-			temp = "Tron/Tile/tron_tile_green.png";
+			{
+				temp = "Tron/Tile/tron_tile_green.png";
+				row = 13;
+				col = 13;
+			}
 			break;
 		case 3:
-			temp = "Tron/Tile/tron_tile_white.png";
+			{
+				temp = "Tron/Tile/tron_tile_white.png";
+				row = 13;
+				col = 1;
+			}
 			break;
 		}
 		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, temp, 2.0f, 1.0f, 100.0f));
-		m_pOrbs[i]->SetPosition({ (float(i)*5.0f), 0.0f, -2.0f });
+		
+		// Set the Orbs Postions
+		v3float	OrbPos = (*(*m_pArenaTiles)[row])[col]->GetPosition();
+		OrbPos.z = -2.0f;
+		m_pOrbs[i]->SetPosition(OrbPos);
 
 		//VALIDATE(m_pContollers[i]->Connected());
 	}
    
-	// Create and Initialise the Arena Floor
-	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 4 };
-	m_areaSize = 15;
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
-	
-	m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
+
+
+	// TO DO JUR: remove to  UI Temp
+
 
 	return true;
 }
 
-bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
+bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 {
-	if ((_OrbA != _OrbB))
+	if ((_pOrbA != _pOrbB))
 	{
-		if (_OrbA->GetPhase() == _OrbB->GetPhase())
+		if (_pOrbA->GetPhase() == _pOrbB->GetPhase())
 		{
 			// Calculate the distance between the two orbs
-			float distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
+			float distance = (_pOrbA->GetPosition() - _pOrbB->GetPosition()).Magnitude();
 			// Calculate the combined Radius of the two orbs
-			float combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
+			float combinedRadius = _pOrbA->GetRadius() + _pOrbB->GetRadius();
 
 			// Check if the orbs are colliding
 			if (distance < combinedRadius)
@@ -129,15 +168,15 @@ bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
 					float peirce = combinedRadius - distance;
 
 					// Calculate the direction of collision
-					v3float Direction = (_OrbA->GetPosition() - _OrbB->GetPosition());
+					v3float Direction = (_pOrbA->GetPosition() - _pOrbB->GetPosition());
 			
-					_OrbA->SetPosition(_OrbA->GetPosition() + (Direction *  peirce));
-					_OrbB->SetPosition(_OrbB->GetPosition() + (Direction *  -peirce));
+					_pOrbA->SetPosition(_pOrbA->GetPosition() + (Direction *  peirce));
+					_pOrbB->SetPosition(_pOrbB->GetPosition() + (Direction *  -peirce));
 					
 					// Calculate the distance between the two orbs
-					distance = (_OrbA->GetPosition() - _OrbB->GetPosition()).Magnitude();
+					distance = (_pOrbA->GetPosition() - _pOrbB->GetPosition()).Magnitude();
 					// Calculate the combined Radius of the two orbs
-					combinedRadius = _OrbA->GetRadius() + _OrbB->GetRadius();
+					combinedRadius = _pOrbA->GetRadius() + _pOrbB->GetRadius();
 				}
 				
 
@@ -159,42 +198,45 @@ bool Game::IsOrbsColliding(Orb* _OrbA, Orb* _OrbB)
 	}
 }
 
-void Game::HandleCollisions(Orb* _OrbA, Orb* _OrbB)
+void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 {
-	v3float orbVelocity_A = _OrbA->GetVelocity();
-	v3float orbVelocity_B = _OrbB->GetVelocity();
+	v3float orbVelocity_A = _pOrbA->GetVelocity();
+	v3float orbVelocity_B = _pOrbB->GetVelocity();
 
 	float velocityMax = orbVelocity_A.Magnitude();
 
 	if (velocityMax < orbVelocity_B.Magnitude())
 	{
-		_OrbA->SetVelocity((orbVelocity_B * _OrbB->GetBounce()));
+		_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
 		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_OrbB->SetVelocity({0.0f,0.0f,0.0f});
+		_pOrbB->SetVelocity({ 0.0f, 0.0f, 0.0f });
 	}
 	else
 	{
-		_OrbA->SetVelocity({ 0.0f, 0.0f, 0.0f });
+		_pOrbA->SetVelocity({ 0.0f, 0.0f, 0.0f });
 		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_OrbB->SetVelocity((orbVelocity_A * _OrbA->GetBounce()));
+		_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
 
 	}
 
 }
 
-void Game::KillOrb(Orb* _Orb)
+void Game::KillOrb(Orb* _pOrb)
 {
-	if (_Orb->GetAlive())
+	if (_pOrb->GetAlive())
 	{
-		_Orb->SetAlive(false);
+		_pOrb->SetAlive(false);
 		m_numAlivePlayers--;
 	}
 }
 
 bool Game::Process(float _dt)
 {
-	
-	HandleInput();
+	// Set up the shader
+	m_pShader_LitTex->SetUpPerFrame();
+
+	// Process Inputs
+	//HandleInput();
 
 	// Game has Ended
 	if (m_numAlivePlayers <= 1)
@@ -219,6 +261,7 @@ bool Game::Process(float _dt)
 		}
 		else
 		{
+			m_matchWon = true;
 			// Player 'Winner' has won
 		}
 		// This Player has won
@@ -236,18 +279,17 @@ bool Game::Process(float _dt)
 		}
 		
 	}
-	else
+	else // Game Still running
 	{
-
-		m_pShader_LitTex->SetUpPerFrame();
+		
+		// Process the arena Floor
 		m_pArenaFloor->Process(_dt);
 
+		// Process the Orbs
 		for (UINT i = 0; i < m_pOrbs.size(); i++)
 		{
 			if (m_pOrbs[i]->GetAlive())
 			{
-				// Get and set the surface friction
-
 				// Check Collisions
 				for (UINT j = 0; j < m_pOrbs.size(); j++)
 				{
@@ -263,12 +305,15 @@ bool Game::Process(float _dt)
 					}
 				}
 
+				// Calculate the tile the Orb is on
 				v3float OrbPos = m_pOrbs[i]->GetPosition();
-				v3float tilePos;
 				OrbPos += m_tileScale / 2;
 				int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
 				int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
 
+				// Check if the orb is with in the Arena if not Kill it
+				
+				// Check if it in the bounds of the Rows
 				if (row < 0)
 				{
 					row = 0;
@@ -279,6 +324,7 @@ bool Game::Process(float _dt)
 					row = m_pArenaTiles->size() - 1;
 					KillOrb(m_pOrbs[i]);
 				}
+				// Check if it in the bounds of the Columns
 				if (col < 0)
 				{
 					col = 0;
@@ -290,32 +336,19 @@ bool Game::Process(float _dt)
 					KillOrb(m_pOrbs[i]);
 				}
 
-				switch ((*(*m_pArenaTiles)[row])[col]->GetBaseImageEnum())
-				{
-				case BTI_SLIPPERY:
-				{
-					m_pOrbs[i]->SetSurfaceFriction(0.0f);
-					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-				}
-					break;
-				case BTI_ROUGH:
-				{
-					m_pOrbs[i]->SetSurfaceFriction(0.15f / _dt);
-					//m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-				}
-					break;
-				case BTI_STANDARD:
-				{
-					m_pOrbs[i]->SetSurfaceFriction(0.05f / _dt);
-				}
-				default: break;
-				}
-
-					// Kill Orb if its on a Dead Tile
+				// Kill Orb if its on a Dead Tile
 				if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
 				{
 					KillOrb(m_pOrbs[i]);
 				}
+				// Orb is still alive 
+				else
+				{
+					// Set the tile the Orb is On
+					m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
+				}
+				
+				HandleInput(i);
 
 				m_pOrbs[i]->Process(_dt);
 			}
@@ -352,39 +385,45 @@ void Game::Render()
 			}
 		}
 	}
+
+	if (m_matchWon)
+	{
+		m_pDX10_Renderer->TurnZBufferOff();
+
+		VictroyPlayerOne->Render();
+
+		m_pDX10_Renderer->TurnZBufferOn();
+	}
 }
 
-void Game::HandleInput()
+void Game::HandleInput(int _playerNum)
 {
-	// Handle the Controller Inputs
-	for (UINT i = 0; i < m_pContollers.size(); i++)
+	if (m_pOrbs[_playerNum]->GetAlive())
 	{
-		if (m_pOrbs[i]->GetAlive())
+		if (m_pContollers[_playerNum]->Connected())
 		{
-			if (m_pContollers[i]->Connected())
+			m_pContollers[_playerNum]->PreProcess();
+
+			// Movement
+			v2float LeftAxis;
+			if (!m_pContollers[_playerNum]->LStick_InDeadZone())
 			{
-				m_pContollers[i]->PreProcess();
-
-				// Movement
-				v2float LeftAxis;
-				if (!m_pContollers[i]->LStick_InDeadZone())
-				{
-					LeftAxis = m_pContollers[i]->GetLStickAxis();
-					m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
-				}
-
-				// Boost
-				m_pOrbs[i]->Boost(m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_R));
-				
-				m_pOrbs[i]->Phase(m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_L));
-
-				m_pContollers[i]->PostProcess();
+				LeftAxis = m_pContollers[_playerNum]->GetLStickAxis();
+				m_pOrbs[_playerNum]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
 			}
+
+			// Boost
+			m_pOrbs[_playerNum]->Boost(m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_R));
+				
+			m_pOrbs[_playerNum]->Phase(m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_L));
+
+			m_pContollers[_playerNum]->PostProcess();
 		}
-		else
-		{
-			// 
-		}
-		
 	}
+	else
+	{
+		// 
+	}
+		
+	
 }
