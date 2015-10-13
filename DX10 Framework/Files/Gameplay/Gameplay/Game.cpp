@@ -19,6 +19,14 @@
 
 Game::Game()
 {
+	//m_pOrbs.reserve(4);
+	//m_pContollers.reserve(4);
+	//
+	//for (UINT i = 0; i < 4; i++)
+	//{
+	//	m_pOrbs[i] = 0;
+	//	m_pContollers[i] = 0;
+	//}
 }
 
 Game::~Game()
@@ -64,9 +72,19 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	// TO DO JUR: Temp all to be Remove
 	m_pSpriteShader = _pSpriteShader;
 	VictroyPlayerOne = new DXSprite();
-	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 2280, 601, 3, 1);
+	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 760, 601);
 	VictroyPlayerOne->SetSize(800, 800);
 	VictroyPlayerOne->SetPosition(100,100);
+
+	TempPause = new DXSprite();
+	TempPause->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P2.png", 760, 601);
+	TempPause->SetSize(800, 800);
+	TempPause->SetPosition(100, 100);
+
+	TempError = new DXSprite();
+	TempError->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P3.png", 760, 601);
+	TempError->SetSize(800, 800);
+	TempError->SetPosition(100, 100);
 
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -198,34 +216,37 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 
 void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 {
-	v3float orbVelocity_A, orbVelocity_B;
-	
-	orbVelocity_A = _pOrbA->GetVelocity();
-	orbVelocity_B = _pOrbB->GetVelocity();
-		
-	
-	if (orbVelocity_A.Magnitude() < orbVelocity_B.Magnitude())
+	if ((_pOrbA != 0) && (_pOrbB != 0))
 	{
-		// Orb B has the Higher Velocity
+		v3float orbVelocity_A, orbVelocity_B;
 
-		_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_pOrbB->SetVelocity(orbVelocity_A * 0.0f);
-	}
-	else if (orbVelocity_A.Magnitude() > orbVelocity_B.Magnitude())
-	{
-		// Orb A has the Higher Velocity
+		orbVelocity_A = _pOrbA->GetVelocity();
+		orbVelocity_B = _pOrbB->GetVelocity();
 
-		_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
-		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_pOrbA->SetVelocity(orbVelocity_B * 0.0f);
-	}
-	else
-	{
-		// Velocities are the same
 
-		_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-		_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+		if (orbVelocity_A.Magnitude() < orbVelocity_B.Magnitude())
+		{
+			// Orb B has the Higher Velocity
+
+			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
+			// TO DO JC: Take a small multiple of of the other orbs velocity 
+			_pOrbB->SetVelocity(orbVelocity_A * 0.0f);
+		}
+		else if (orbVelocity_A.Magnitude() > orbVelocity_B.Magnitude())
+		{
+			// Orb A has the Higher Velocity
+
+			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+			// TO DO JC: Take a small multiple of of the other orbs velocity 
+			_pOrbA->SetVelocity(orbVelocity_B * 0.0f);
+		}
+		else
+		{
+			// Velocities are the same
+
+			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
+			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+		}
 	}
 
 }
@@ -291,8 +312,6 @@ bool Game::Process(float _dt)
 	}
 	else // Game Still running
 	{
-		bool process = true;
-		m_contollerError = false;
 
 		// Process the Orbs
 		for (UINT i = 0; i < m_pOrbs.size(); i++)
@@ -300,91 +319,84 @@ bool Game::Process(float _dt)
 			if (m_pOrbs[i]->GetAlive())
 			{
 				// Process Inputs
-				if (HandleInput(i))
+				HandleInput(i);
+				
+				if (m_gameState == GAME_STATE_PROCESS)
 				{
-					if (m_gameState == GAME_STATE_PROCESS)
+					// Check Collisions
+					for (UINT j = 0; j < m_pOrbs.size(); j++)
 					{
-						// Check Collisions
-						for (UINT j = 0; j < m_pOrbs.size(); j++)
+						if ((i != j))
 						{
-							if ((i != j))
+							if (m_pOrbs[j]->GetAlive())
 							{
-								if (m_pOrbs[j]->GetAlive())
+								if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
 								{
-									if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
-									{
-										m_pContollers[i]->Vibrate(1.0f, 1.0f);
-										m_pContollers[j]->Vibrate(1.0f, 1.0f);
-										HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+									m_pContollers[i]->Vibrate(1.0f, 1.0f);
+									m_pContollers[j]->Vibrate(1.0f, 1.0f);
+									HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
 
-										m_pSoundManager->PlayPlayerHit();
-									}
+									m_pSoundManager->PlayPlayerHit();
 								}
 							}
 						}
-
-						// Stop the Vibrations after half a second
-						if (m_pContollers[i]->GetVibrate())
-						{
-							m_vibrateTimers[i] += _dt;
-							if (m_vibrateTimers[i] >= 0.5f)
-							{
-								m_pContollers[i]->StopVibrate();
-								m_vibrateTimers[i] = 0.0f;
-							}
-						}
-
-						// Calculate the tile the Orb is on
-						v3float OrbPos = m_pOrbs[i]->GetPosition();
-						OrbPos += m_tileScale / 2;
-						int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
-						int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
-
-						// Check if the orb is with in the Arena if not Kill it
-
-						// Check if it in the bounds of the Rows
-						if (row < 0)
-						{
-							row = 0;
-							KillOrb(m_pOrbs[i]);
-						}
-						else if (row > (int)m_pArenaTiles->size() - 1)
-						{
-							row = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-						// Check if it in the bounds of the Columns
-						if (col < 0)
-						{
-							col = 0;
-							KillOrb(m_pOrbs[i]);
-						}
-						else if (col > (int)m_pArenaTiles->size() - 1)
-						{
-							col = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-
-						// Kill Orb if its on a Dead Tile
-						if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
-						{
-							KillOrb(m_pOrbs[i]);
-						}
-						// Orb is still alive 
-						else
-						{
-							// Set the tile the Orb is On
-							m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
-						}
-
-						m_pOrbs[i]->Process(_dt);
 					}
-					//else
-					//{
-					//	m_gameState = GAME_STATE_PAUSED;
-					//	//m_contollerError = true;
-					//	//process = false;
-					//}
+
+					// Stop the Vibrations after half a second
+					if (m_pContollers[i]->GetVibrate())
+					{
+						m_vibrateTimers[i] += _dt;
+						if (m_vibrateTimers[i] >= 0.5f)
+						{
+							m_pContollers[i]->StopVibrate();
+							m_vibrateTimers[i] = 0.0f;
+						}
+					}
+
+					// Calculate the tile the Orb is on
+					v3float OrbPos = m_pOrbs[i]->GetPosition();
+					OrbPos += m_tileScale / 2;
+					int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
+					int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
+
+					// Check if the orb is with in the Arena if not Kill it
+
+					// Check if it in the bounds of the Rows
+					if (row < 0)
+					{
+						row = 0;
+						KillOrb(m_pOrbs[i]);
+					}
+					else if (row > (int)m_pArenaTiles->size() - 1)
+					{
+						row = m_pArenaTiles->size() - 1;
+						KillOrb(m_pOrbs[i]);
+					}
+					// Check if it in the bounds of the Columns
+					if (col < 0)
+					{
+						col = 0;
+						KillOrb(m_pOrbs[i]);
+					}
+					else if (col > (int)m_pArenaTiles->size() - 1)
+					{
+						col = m_pArenaTiles->size() - 1;
+						KillOrb(m_pOrbs[i]);
+					}
+
+					// Kill Orb if its on a Dead Tile
+					if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+					{
+						KillOrb(m_pOrbs[i]);
+					}
+					// Orb is still alive 
+					else
+					{
+						// Set the tile the Orb is On
+						m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
+					}
+
+					m_pOrbs[i]->Process(_dt);
 				}
 			}
 
@@ -441,7 +453,16 @@ void Game::Render()
 	{
 		m_pDX10_Renderer->TurnZBufferOff();
 
-		VictroyPlayerOne->Render();
+		TempPause->Render();
+		
+		m_pDX10_Renderer->TurnZBufferOn();
+	}
+
+	if (m_gameState == GAME_STATE_ERROR)
+	{
+		m_pDX10_Renderer->TurnZBufferOff();
+
+		TempError->Render();
 
 		m_pDX10_Renderer->TurnZBufferOn();
 	}
@@ -449,7 +470,8 @@ void Game::Render()
 
 bool Game::HandleInput(int _playerNum)
 {
-	
+	bool allConnected = true;
+
 	if (m_pContollers[_playerNum]->Connected())
 	{
 		m_pContollers[_playerNum]->PreProcess();
@@ -482,11 +504,24 @@ bool Game::HandleInput(int _playerNum)
 
 		m_pContollers[_playerNum]->PostProcess();
 
+		//return true;
+	}
+	else
+	{
+		allConnected = false;
+	}
+
+	if (allConnected)
+	{
+		//if (m_gameState == GAME_STATE_ERROR)
+		//{
+		//	m_gameState = GAME_STATE_PAUSED;
+		//}
 		return true;
 	}
 	else
 	{
-		m_gameState = GAME_STATE_PAUSED;
+		//m_gameState = GAME_STATE_ERROR;
 		return false;
 	}
 
