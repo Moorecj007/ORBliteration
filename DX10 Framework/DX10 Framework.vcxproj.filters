@@ -295,10 +295,10 @@
     <CustomBuild Include="Resources\FX\LightStructures.fx">
       <Filter>Resource Files\FX Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Resources\FX\LitTex.fx">
+    <CustomBuild Include="Resources\FX\Sprite.fx">
       <Filter>Resource Files\FX Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Resources\FX\Sprite.fx">
+    <CustomBuild Include="Resources\FX\LitTex.fx">
       <Filter>Resource Files\FX Files</Filter>
     </CustomBuild>
   </ItemGroup>

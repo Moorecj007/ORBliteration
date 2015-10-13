@@ -123,7 +123,6 @@ private:
 	float m_phaseActiveTime;
 	float m_phaseCoolDownTime;
 
-
 	
 };
 

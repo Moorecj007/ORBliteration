@@ -176,7 +176,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_state = APP_STATE_SPLASH;
+	m_state = APP_STATE_MAIN_MENU;
 	m_isFullscreen = false;
 	m_isSoundOn = true;
 	m_isRumbleOn = false;
@@ -300,6 +300,9 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_splash_orb.SetPosition(100, 150);
 	m_splash_orb.SetSize(800, 400);
 	m_splash_orb.SetImageIndex(0);
+
+	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
+	m_instructions.SetSize((float)m_clientWidth, (float)m_clientHeight);
 
 	m_pSoundManager->PlayPhenomenaSplash();
 
@@ -452,6 +455,12 @@ bool Application::Process(float _dt)
 			UpdateState(m_menus[1]->GetMenuState());
 			break;
 		case APP_STATE_INSTRUCTIONS_MENU:
+			if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN])
+			{
+				m_pKeyDown[VK_RETURN] = false;
+				//UpdateState(MENU_STATE_INSTRUCTIONS);
+				m_state = APP_STATE_MAIN_MENU;
+			}
 			break;
 		case APP_STATE_OPTION_MENU:
 			m_menus[2]->Process(_dt);
@@ -508,6 +517,7 @@ void Application::Render()
 			m_menus[1]->Draw();
 			break;
 		case APP_STATE_INSTRUCTIONS_MENU:
+			m_instructions.Render();
 			break;
 		case APP_STATE_OPTION_MENU:
 			m_menus[2]->Draw();
@@ -625,7 +635,7 @@ void Application::UpdateState(MENU_STATE _state)
 		m_menus[1]->Reset();
 		break;
 	case MENU_STATE_INSTRUCTIONS:
-		//m_state = APP_STATE_INSTRUCTIONS_MENU;
+		m_state = APP_STATE_INSTRUCTIONS_MENU;
 		m_menus[0]->Reset();
 		break;
 	case MENU_STATE_OPTIONS:
@@ -633,23 +643,25 @@ void Application::UpdateState(MENU_STATE _state)
 		m_menus[2]->Reset();
 		break;
 	case MENU_STATE_EXIT:
+		ExitApp();
+		break;
+	case MENU_STATE_BACK:
 		switch (m_state)
 		{
-		case APP_STATE_MAIN_MENU:
-			ExitApp();
-			break;
-		case APP_STATE_MATCH_MENU:			// Fall through
-		case APP_STATE_INSTRUCTIONS_MENU:	// Fall through
-		case APP_STATE_OPTION_MENU:			// Fall through
-			m_state = APP_STATE_MAIN_MENU;
-			m_menus[0]->Reset();
-			break;
-		case APP_STATE_PAUSE_MENU:
-			m_state = APP_STATE_GAME;
-			break;
+			case APP_STATE_MATCH_MENU:			// Fall through
+			case APP_STATE_INSTRUCTIONS_MENU:	// Fall through
+			case APP_STATE_OPTION_MENU:			// Fall through
+				m_state = APP_STATE_MAIN_MENU;
+				m_menus[0]->Reset();
+				break;
+			case APP_STATE_PAUSE_MENU:
+				m_state = APP_STATE_GAME;
+				break;
+			default:
+				m_menus[0]->Reset();
+				break;
 		}
 		break;
-
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
 	{

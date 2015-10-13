@@ -25,6 +25,7 @@ Menu::Menu()
 	m_state = MENU_STATE_DEFAULT;
 	m_elaspedTime = 0.0f;
 	m_imageIndex = 0;
+	m_exitPushed = false;
 }
 
 Menu::~Menu()
@@ -163,7 +164,11 @@ void Menu::Process(float _deltaTime)
 		{
 			m_pSoundManager->PlayMenuBack();
 			m_pKeyDown[VK_BACK] = false;
-			m_state = MENU_STATE_EXIT;
+			if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
+			{
+				m_state = MENU_STATE_EXIT;
+			}
+			m_state = MENU_STATE_BACK;
 		}
 
 		m_pGamepad->PostProcess();
