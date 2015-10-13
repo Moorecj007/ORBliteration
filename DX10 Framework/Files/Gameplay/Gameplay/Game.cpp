@@ -25,6 +25,7 @@ Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
+	ReleasePtr(VictroyPlayerOne);
 
 	// TO DO CAL: To move to a shut down
 

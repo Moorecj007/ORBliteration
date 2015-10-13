@@ -255,6 +255,8 @@ private:
 	float m_animationSpeed;
 	float m_waitTime;
 	bool m_wait;
+
+	DXSprite m_instructions;
 };
 
 #endif // __APPLICATION_H__
