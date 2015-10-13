@@ -106,25 +106,28 @@ float4 PS_Standard(VS_OUT _inputPS) : SV_Target
 	float3 litColor = float3(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < g_lightCount; i++)
 	{
-		if (g_light[i].type == 0)
+		if (g_light[i].active == true)
 		{
-			litColor += ParallelLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 1)
-		{
-			litColor += PointLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 2)
-		{
-			litColor += SpotLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 3)
-		{
-			float glowLerp = GlowLight(surface, g_light[i]);
-
-			if (glowLerp > 0.0f)
+			if (g_light[i].type == 0)
 			{
-				litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				litColor += ParallelLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 1)
+			{
+				litColor += PointLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 2)
+			{
+				litColor += SpotLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 3)
+			{
+				float glowLerp = GlowLight(surface, g_light[i]);
+
+				if (glowLerp > 0.0f)
+				{
+					litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				}
 			}
 		}
 	}
@@ -216,25 +219,28 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 
 	for (int i = 0; i < g_lightCount; i++)
 	{
-		if (g_light[i].type == 0)
+		if (g_light[i].active == true)
 		{
-			litColor += ParallelLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 1)
-		{
-			litColor += PointLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 2)
-		{
-			litColor += SpotLight(surface, g_light[i], g_eyePosW);
-		}
-		else if (g_light[i].type == 3)
-		{
-			float glowLerp = GlowLight(surface, g_light[i]);
-
-			if (glowLerp > 0.0f)
+			if (g_light[i].type == 0)
 			{
-				litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				litColor += ParallelLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 1)
+			{
+				litColor += PointLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 2)
+			{
+				litColor += SpotLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 3)
+			{
+				float glowLerp = GlowLight(surface, g_light[i]);
+
+				if (glowLerp > 0.0f)
+				{
+					litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				}
 			}
 		}
 	}

@@ -233,6 +233,7 @@ struct Light
 	{
 		// Ensure the Memory is zeroed on creation
 		ZeroMemory(this, sizeof(Light));
+		active = true;
 	}
 
 	D3DXVECTOR4 pos_range;
@@ -242,7 +243,9 @@ struct Light
 	D3DXCOLOR specular;
 	D3DXVECTOR4 att;
 	int type;
-	D3DXVECTOR3 pad;
+	bool active;
+	float pad1;
+	float pad2;
 };
 
 

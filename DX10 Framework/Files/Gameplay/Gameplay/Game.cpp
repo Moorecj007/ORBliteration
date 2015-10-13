@@ -119,39 +119,34 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		
 		switch (i)
 		{
-		case 0:
+			case 0:
 			{
-				temp = "pBall.png";
 				row = 1;
 				col = 13;
-	
 			}
 			break;
-		case 1:
+			case 1:
 			{
-				temp = "gBall.png";
 				row = 1;
 				col = 1;
 			}
 			break;
-		case 2:
+			case 2:
 			{
-				temp = "Tron/Tile/tron_tile_green.png";
 				row = 13;
 				col = 13;
 			}
 			break;
-		case 3:
+			case 3:
 			{
-				temp = "Tron/Tile/tron_tile_white.png";
 				row = 13;
 				col = 1;
 			}
 			break;
 		}
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, temp, 2.0f, 5.0f, 1000.0f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 2.0f, 5.0f, 1000.0f));
 		
-		// Set the Orbs Postions
+		// Set the Orbs Positions
 		v3float	OrbPos = (*(*m_pArenaTiles)[row])[col]->GetPosition();
 		OrbPos.z = -2.0f;
 		m_pOrbs[i]->SetPosition(OrbPos);
