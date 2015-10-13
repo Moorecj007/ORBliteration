@@ -19,14 +19,14 @@
 
 Game::Game()
 {
-	m_pOrbs.reserve(5);
-	m_pContollers.reserve(5);
-
-	for (UINT i = 0; i < 4; i++)
-	{
-		m_pOrbs[i] = 0;
-		m_pContollers[i] = 0;
-	}
+	//m_pOrbs.reserve(4);
+	//m_pContollers.reserve(4);
+	//
+	//for (UINT i = 0; i < 4; i++)
+	//{
+	//	m_pOrbs[i] = 0;
+	//	m_pContollers[i] = 0;
+	//}
 }
 
 Game::~Game()
@@ -312,8 +312,6 @@ bool Game::Process(float _dt)
 	}
 	else // Game Still running
 	{
-		bool process = true;
-		m_contollerError = false;
 
 		// Process the Orbs
 		for (UINT i = 0; i < m_pOrbs.size(); i++)
@@ -321,91 +319,84 @@ bool Game::Process(float _dt)
 			if (m_pOrbs[i]->GetAlive())
 			{
 				// Process Inputs
-				if (HandleInput(i))
+				HandleInput(i);
+				
+				if (m_gameState == GAME_STATE_PROCESS)
 				{
-					if (m_gameState == GAME_STATE_PROCESS)
+					// Check Collisions
+					for (UINT j = 0; j < m_pOrbs.size(); j++)
 					{
-						// Check Collisions
-						for (UINT j = 0; j < m_pOrbs.size(); j++)
+						if ((i != j))
 						{
-							if ((i != j))
+							if (m_pOrbs[j]->GetAlive())
 							{
-								if (m_pOrbs[j]->GetAlive())
+								if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
 								{
-									if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
-									{
-										m_pContollers[i]->Vibrate(1.0f, 1.0f);
-										m_pContollers[j]->Vibrate(1.0f, 1.0f);
-										HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+									m_pContollers[i]->Vibrate(1.0f, 1.0f);
+									m_pContollers[j]->Vibrate(1.0f, 1.0f);
+									HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
 
-										m_pSoundManager->PlayPlayerHit();
-									}
+									m_pSoundManager->PlayPlayerHit();
 								}
 							}
 						}
-
-						// Stop the Vibrations after half a second
-						if (m_pContollers[i]->GetVibrate())
-						{
-							m_vibrateTimers[i] += _dt;
-							if (m_vibrateTimers[i] >= 0.5f)
-							{
-								m_pContollers[i]->StopVibrate();
-								m_vibrateTimers[i] = 0.0f;
-							}
-						}
-
-						// Calculate the tile the Orb is on
-						v3float OrbPos = m_pOrbs[i]->GetPosition();
-						OrbPos += m_tileScale / 2;
-						int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
-						int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
-
-						// Check if the orb is with in the Arena if not Kill it
-
-						// Check if it in the bounds of the Rows
-						if (row < 0)
-						{
-							row = 0;
-							KillOrb(m_pOrbs[i]);
-						}
-						else if (row > (int)m_pArenaTiles->size() - 1)
-						{
-							row = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-						// Check if it in the bounds of the Columns
-						if (col < 0)
-						{
-							col = 0;
-							KillOrb(m_pOrbs[i]);
-						}
-						else if (col > (int)m_pArenaTiles->size() - 1)
-						{
-							col = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-
-						// Kill Orb if its on a Dead Tile
-						if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
-						{
-							KillOrb(m_pOrbs[i]);
-						}
-						// Orb is still alive 
-						else
-						{
-							// Set the tile the Orb is On
-							m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
-						}
-
-						m_pOrbs[i]->Process(_dt);
 					}
-					//else
-					//{
-					//	m_gameState = GAME_STATE_PAUSED;
-					//	//m_contollerError = true;
-					//	//process = false;
-					//}
+
+					// Stop the Vibrations after half a second
+					if (m_pContollers[i]->GetVibrate())
+					{
+						m_vibrateTimers[i] += _dt;
+						if (m_vibrateTimers[i] >= 0.5f)
+						{
+							m_pContollers[i]->StopVibrate();
+							m_vibrateTimers[i] = 0.0f;
+						}
+					}
+
+					// Calculate the tile the Orb is on
+					v3float OrbPos = m_pOrbs[i]->GetPosition();
+					OrbPos += m_tileScale / 2;
+					int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
+					int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
+
+					// Check if the orb is with in the Arena if not Kill it
+
+					// Check if it in the bounds of the Rows
+					if (row < 0)
+					{
+						row = 0;
+						KillOrb(m_pOrbs[i]);
+					}
+					else if (row > (int)m_pArenaTiles->size() - 1)
+					{
+						row = m_pArenaTiles->size() - 1;
+						KillOrb(m_pOrbs[i]);
+					}
+					// Check if it in the bounds of the Columns
+					if (col < 0)
+					{
+						col = 0;
+						KillOrb(m_pOrbs[i]);
+					}
+					else if (col > (int)m_pArenaTiles->size() - 1)
+					{
+						col = m_pArenaTiles->size() - 1;
+						KillOrb(m_pOrbs[i]);
+					}
+
+					// Kill Orb if its on a Dead Tile
+					if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+					{
+						KillOrb(m_pOrbs[i]);
+					}
+					// Orb is still alive 
+					else
+					{
+						// Set the tile the Orb is On
+						m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
+					}
+
+					m_pOrbs[i]->Process(_dt);
 				}
 			}
 
@@ -479,14 +470,10 @@ void Game::Render()
 
 bool Game::HandleInput(int _playerNum)
 {
-	
+	bool allConnected = true;
+
 	if (m_pContollers[_playerNum]->Connected())
 	{
-		if (m_gameState == GAME_STATE_ERROR)
-		{
-			m_gameState = GAME_STATE_PAUSED;
-		}
-
 		m_pContollers[_playerNum]->PreProcess();
 
 		// Movement
@@ -517,11 +504,24 @@ bool Game::HandleInput(int _playerNum)
 
 		m_pContollers[_playerNum]->PostProcess();
 
+		//return true;
+	}
+	else
+	{
+		allConnected = false;
+	}
+
+	if (allConnected)
+	{
+		//if (m_gameState == GAME_STATE_ERROR)
+		//{
+		//	m_gameState = GAME_STATE_PAUSED;
+		//}
 		return true;
 	}
 	else
 	{
-		m_gameState = GAME_STATE_ERROR;
+		//m_gameState = GAME_STATE_ERROR;
 		return false;
 	}
 
