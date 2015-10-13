@@ -42,7 +42,10 @@ enum MENU_STATE
 	MENU_STATE_PLAYERS_4,
 
 	// Pause menu states (reuses the main menu states)
-	MENU_STATE_RESUME
+	MENU_STATE_RESUME,
+
+	// Return to the previous menu
+	MENU_STATE_BACK
 };
 
 enum MENU_LAYOUT
@@ -258,6 +261,7 @@ class Menu
 		UINT						m_imageIndex;
 
 		bool*						m_pKeyDown;
+		bool						m_exitPushed;	// For main menu exit button
 
 		// Sound
 		SoundManager*				m_pSoundManager;

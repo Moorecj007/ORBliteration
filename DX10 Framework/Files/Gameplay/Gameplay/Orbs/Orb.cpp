@@ -17,6 +17,8 @@
  
 Orb::Orb()
 {
+	m_pTile = 0;
+
 	m_acceleration = {0.0f,0.0f,0.0f};
 	m_velocity = { 0.0f, 0.0f, 0.0f };
 	m_bounce = 0.0f;
@@ -26,22 +28,21 @@ Orb::Orb()
 
 Orb::~Orb()
 {
-	
 }
 
-bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _speed, float _maxSpeed)
+bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _bounce, float _speed, float _maxSpeed)
 {	
  	// Initialise the object this is derived from
 	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _texName));
 
 	// Check the passed in parameters
-	if ((_density < 0.0f) || (_maxSpeed < 0.0f))
+	if ((_bounce < 0.0f) || (_maxSpeed < 0.0f))
 	{
 		return false;
 	}
 
 	// Store the initial state of the variables
-	m_bounce = _density;
+	m_bounce = _bounce;
 	m_radius = _pMesh->GetScale().x / 2 ;
 	m_speed = _speed;
 	m_maxSpeed = _maxSpeed;
@@ -67,12 +68,45 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	return true;
 }
   
+void Orb::ProcessFrcition()
+{
+	if (m_pTile != 0)
+	{
+		// Calculate the fiction on the tile and whether or not t process inputs
+		switch (m_pTile->GetBaseImageEnum())
+		{
+		case BTI_SLIPPERY:
+		{
+			m_surfaceFriction = 0.0f;
+		}
+			break;
+		case BTI_ROUGH:
+		{
+			m_surfaceFriction = 0.15f;
+		}
+			break;
+		case BTI_STANDARD:
+		{
+			m_surfaceFriction = 0.05f;
+		}
+			break;
+		default:
+		{
+			m_surfaceFriction = 0.05f;
+		}
+			break;
+		}
+	}
+}
+
 void Orb::Process(float _dt)
 {
+
+	ProcessFrcition();
 	
 	m_velocity += ((m_acceleration* _dt)* m_speed);
 	m_acceleration *= 0.0f;
-	m_velocity = m_velocity - (m_velocity * m_surfaceFriction* _dt);
+	m_velocity = m_velocity - (m_velocity* (m_surfaceFriction / _dt)  * _dt);
 	m_velocity.Limit(m_maxSpeed);
 		
 
@@ -165,6 +199,23 @@ void Orb::Render()
 	}
 }
 
+void Orb::SetAcceleration(v3float _acceleration)
+{
+	if (m_pTile != 0)
+	{
+		if (m_pTile->GetBaseImageEnum() != BTI_SLIPPERY)
+		{
+			// Only Set the Acceleration if the Orb is not on a Slippery tile
+			m_acceleration = _acceleration;
+		}
+		else if (m_velocity.Magnitude() == 0)
+		{
+			// Only Set the Acceleration if the Orb is not on a Slippery tile
+			m_acceleration = _acceleration * 2.0f;
+		}
+	}
+};
+
 void Orb::Boost(bool _boost)
 {
 	if (_boost == true)
@@ -204,3 +255,4 @@ void Orb::Phase(bool _phase)
 		m_phaseActiveTime = 0.0f;
 	}
 }
+

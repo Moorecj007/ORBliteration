@@ -106,6 +106,14 @@ public:
 	bool GetActive() { return m_active; };
 
 	/***********************
+	* SetBaseImageEnum: Sets the Base Image indicator for which image is displayed on the tile
+	* @author: Jc Fowles
+	* @parameter: _baseImage: The new enum to determine the base image
+	* @return: bool: Succesfull set
+	********************/
+	bool SetBaseImageEnum(eBaseTileImages _baseImage);
+
+	/***********************
 	* SetOverlayImage: Set the Overlay image to a new one
 	* @author: Callan Moore
 	* @parameter: _overlay: The new enum to determine the Overlay image

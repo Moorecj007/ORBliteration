@@ -112,3 +112,32 @@ void ArenaTile::Render()
 		m_pShader_LitTex->Render(_litTex, TECH_LITTEX_BLENDTEX2);
 	}
 }
+
+bool ArenaTile::SetBaseImageEnum(eBaseTileImages _baseImage)
+{ 
+	m_baseImage = _baseImage;
+
+	// Create the Base Tile Image texture
+	switch (_baseImage)
+	{
+	case BTI_SLIPPERY:
+	{
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[0]));
+	}
+		break;
+	case BTI_ROUGH:
+	{
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
+	}
+		break;
+	case BTI_STANDARD:	// Fall Through
+	default:
+	{
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));
+	}
+	}	// End Switch
+
+	//succesfull set
+	return true;
+
+};

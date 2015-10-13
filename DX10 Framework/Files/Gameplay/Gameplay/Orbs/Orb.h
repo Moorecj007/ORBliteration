@@ -21,6 +21,7 @@
 // Local Includes
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_Generic.h"
 #include "../../../DX10/DX10/3D Objects/DX10_Obj_LitTex.h"
+#include "../Arena/ArenaFloor.h"
 
 class Orb :
 	public DX10_Obj_LitTex
@@ -49,37 +50,43 @@ public:
 	* @parameter: _pMesh: Mesh for the Orb
 	* @parameter: _pShader: The Shader for the Orb
 	* @parameter: _texName: file name of the single texture for the Orb to display
-	* @parameter: _density: The Density of the Orb to calculate its mass
+	* @parameter: _bounce: The Bounce strength of the Orb 
 	* @parameter: _speed: The speed at which the Orb accelerates 
 	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _Speed, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _bounce, float _Speed, float _maxSpeed);
 
 
 	// TO DO JC:
+	void ProcessFrcition();
 	void Process(float _dt);
 	void Render();
 
-   	void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
-	void SetAcceleration(v3float _acceleration){ m_acceleration = _acceleration; };
+   	//void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
 	
-	void SetAlive(bool _alive){ m_isAlive = _alive; };
-	bool GetAlive(){ return m_isAlive; };
-
-	float GetRadius(){ return m_radius; };
-	// TO DO JC: Set radius
-
-	v3float GetVelocity(){ return m_velocity; };
+	void SetAcceleration(v3float _acceleration);
+	void SetTile(ArenaTile* _pTile){ m_pTile = _pTile; };
 	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
-
-	float GetBounce(){ return m_bounce; };
+	void SetAlive(bool _alive){ m_isAlive = _alive; };
 	void SetBounce(float _bounce){ m_bounce = _bounce; };
+
+	ArenaTile* GetTile(){ return m_pTile; };
+	bool GetAlive(){ return m_isAlive; };
+	float GetRadius(){ return m_radius; };
+	v3float GetVelocity(){ return m_velocity; };
+	float GetBounce(){ return m_bounce; };
+	bool GetPhase(){ return m_phase; };
+
+
 
 	void Boost(bool _boost);
 	void Phase(bool _phase);
 
-	bool GetPhase(){ return m_phase; };
+	
+
+	
+
 
 protected:
 private:
@@ -88,13 +95,16 @@ public:
 protected:
 private:
 
+	ArenaTile* m_pTile;
+
 	v3float m_acceleration;
 	v3float m_velocity;
 	float m_surfaceFriction;
 	float m_speed;
 	float m_maxSpeed;
-	// TO DO JC: Currently unused
+
 	float m_bounce;
+	
 	float m_radius;
 	bool m_isAlive;
 

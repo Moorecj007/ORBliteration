@@ -66,7 +66,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 
 			// Create the smooth/rough tiles
 			eBaseTileImages eBaseImage;
-			int randomChance = rand() % 10;
+			int randomChance =  rand() % 10;
 			if (randomChance < 1)
 			{
 				eBaseImage = BTI_ROUGH;
@@ -97,6 +97,12 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 		}
 		m_pArenaTiles->push_back(pRowOfTiles);
 	}
+
+	// Set Spawning tiles to standard
+	(*(*m_pArenaTiles)[ 1])[1]->SetBaseImageEnum(BTI_STANDARD);
+	(*(*m_pArenaTiles)[1])[_arenaSize - 2]->SetBaseImageEnum(BTI_STANDARD);
+	(*(*m_pArenaTiles)[_arenaSize - 2])[1]->SetBaseImageEnum(BTI_STANDARD);
+	(*(*m_pArenaTiles)[_arenaSize - 2])[_arenaSize - 2]->SetBaseImageEnum(BTI_STANDARD);
 
 	// Calculate the time interval for destroying the outer layer
 	int evenSize;
