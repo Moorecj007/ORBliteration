@@ -156,14 +156,13 @@ void Orb::Render()
 	if (m_phase)
 	{
 		_litTex.reduceAlpha = 0.5f;
+		m_pShader->Render(_litTex, TECH_LITTEX_FADE);
 	}
 	else
 	{
 		_litTex.reduceAlpha = 0.0f;
+		m_pShader->Render(_litTex, TECH_LITTEX_STANDARD);
 	}
-
-	m_pShader->Render(_litTex, TECH_LITTEX_FADE);
-	
 }
 
 void Orb::Boost(bool _boost)

@@ -34,17 +34,33 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 
 	VALIDATE(InitialiseDeviceAndSwapChain());
 
-	m_clearColor = BLACK; //YELLOW
+	m_clearColor = BLACK;
 
 	//Initialise the ID Keys for the Maps
 	m_nextInputLayoutID = 0;
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
+	
+	//Light* pLight = new Light();
+	//pLight->type = LT_GLOW;
+	//pLight->diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	//pLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, -1.0f, 3.5f);
+	//AddLight("zGlowTest1", pLight);
 
-	m_activeLight.dir = D3DXVECTOR3(0, 0.0f, 1.0f);
-	m_activeLight.ambient = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
-	m_activeLight.diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	m_activeLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	Light* pLight = new Light();
+	pLight->type = LT_DIRECTIONAL;
+	pLight->dir_spotPow = D3DXVECTOR4(0.0f, 0.0f, 1.0f, 0.0f);
+	pLight->ambient = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
+	pLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pLight->specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	AddLight("Main", pLight);
+	
+	
+	
+
+	
+	
+	
 
 	return true;
 }
@@ -91,6 +107,16 @@ void DX10_Renderer::ShutDown()
 		ReleasePtr(iterBuffers->second);
 		iterBuffers++;
 	}
+
+	// Delete the Graphics memory stored as Lights
+	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	while (iterLights != m_mapLights.end())
+	{
+		ReleasePtr(iterLights->second);
+		iterLights++;
+	}
+	
+	ReleasePtr(m_pArrLights);
 	ReleaseCOM(m_pDepthStencilStateNormal);
 	ReleaseCOM(m_pDepthStencilStateZDisabled);
 	ReleaseCOM(m_pDepthStencilView);
@@ -750,9 +776,52 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 	return true;
 }
 
+bool DX10_Renderer::AddLight(std::string _lightName, Light* _light)
+{
+	// Delete the pointer to current array of lights
+	ReleasePtr(m_pArrLights);
 
+	// Create a pair of the Light name and the Light
+	std::pair<std::string, Light*> pairLight(_lightName, _light);
 
+	// Insert the pair and validate the insertion
+	VALIDATE(m_mapLights.insert(pairLight).second);
 
+	// Re-create the array of lights for passing to shaders
+	m_pArrLights = new Light[m_mapLights.size()];
+	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	int index = 0;
+	while (iterLights != m_mapLights.end())
+	{
+		m_pArrLights[index] = *iterLights->second;
+
+		index++;
+		iterLights++;
+	}
+	m_lightCount = index;
+
+	return true;
+}
+
+Light* DX10_Renderer::GetActiveLights()
+{
+	// Delete the pointer to current array of lights
+	ReleasePtr(m_pArrLights);
+
+	m_pArrLights = new Light[m_mapLights.size()];
+	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	int index = 0;
+	while (iterLights != m_mapLights.end())
+	{
+		m_pArrLights[index] = *iterLights->second;
+
+		index++;
+		iterLights++;
+	}
+	m_lightCount = index;
+
+	return m_pArrLights;
+};
 
 void DX10_Renderer::SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY _primitiveType)
 {

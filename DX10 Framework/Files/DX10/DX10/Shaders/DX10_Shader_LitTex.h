@@ -89,7 +89,10 @@ public:
 	********************/
 	void SetUpPerFrame()
 	{
-		m_pLight->SetRawValue(m_pDX10_Renderer->GetActiveLight(), 0, sizeof(Light));
+		int lightCount = m_pDX10_Renderer->GetLightCount();
+
+		m_pLight->SetRawValue(m_pDX10_Renderer->GetActiveLights(), 0, lightCount * sizeof(Light));
+		m_pLightCount->SetInt(lightCount);
 		m_pEyePos->SetRawValue(m_pDX10_Renderer->GetEyePos(), 0, sizeof(D3DXVECTOR3));
 		m_pMatView->SetMatrix((float*)m_pDX10_Renderer->GetViewMatrix());
 		m_pMatProj->SetMatrix((float*)m_pDX10_Renderer->GetProjMatrix());
@@ -167,6 +170,7 @@ private:
 	{
 		// Per Frame
 		m_pLight = m_pFX->GetVariableByName("g_light");
+		m_pLightCount = m_pFX->GetVariableByName("g_lightCount")->AsScalar();
 		m_pEyePos = m_pFX->GetVariableByName("g_eyePosW");
 
 		m_pMatView = m_pFX->GetVariableByName("g_matView")->AsMatrix();
@@ -183,6 +187,7 @@ private:
 		m_pMapSpecular = m_pFX->GetVariableByName("g_mapSpec")->AsShaderResource();
 
 		VALIDATE(m_pLight != 0);
+		VALIDATE(m_pLightCount != 0);
 		VALIDATE(m_pEyePos != 0);
 		VALIDATE(m_pMatView != 0);
 		VALIDATE(m_pMatProj != 0);
@@ -282,6 +287,7 @@ private:
 	DX10_Renderer*						m_pDX10_Renderer;
 
 	ID3D10EffectVariable*				m_pLight;
+	ID3D10EffectScalarVariable*			m_pLightCount;
 	ID3D10EffectVariable*				m_pEyePos;
 	ID3D10EffectMatrixVariable*			m_pMatView;
 	ID3D10EffectMatrixVariable*			m_pMatProj;
@@ -289,6 +295,7 @@ private:
 	ID3D10EffectMatrixVariable*			m_pMatWorld;
 	ID3D10EffectMatrixVariable*			m_pMatTex;
 	ID3D10EffectVariable*				m_pReduceAlpha;
+	
 
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse;
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse2;
