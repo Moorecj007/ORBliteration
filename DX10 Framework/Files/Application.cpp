@@ -695,7 +695,7 @@ void Application::UpdateState(MENU_STATE _state)
 		// Match menu states
 	case MENU_STATE_PLAYERS_2:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn))
 		{
 			m_state = APP_STATE_GAME;
 		}
@@ -708,7 +708,7 @@ void Application::UpdateState(MENU_STATE _state)
 		break;
 	case MENU_STATE_PLAYERS_3:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn))
 		{
 			m_state = APP_STATE_GAME;
 		}
@@ -721,7 +721,7 @@ void Application::UpdateState(MENU_STATE _state)
 		break;
 	case MENU_STATE_PLAYERS_4:
 		m_pGame = new Game();
-		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4))
+		if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn))
 		{
 			m_state = APP_STATE_GAME;
 		}

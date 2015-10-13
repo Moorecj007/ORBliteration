@@ -50,12 +50,12 @@ public:
 	* @parameter: _pMesh: Mesh for the Orb
 	* @parameter: _pShader: The Shader for the Orb
 	* @parameter: _texName: file name of the single texture for the Orb to display
-	* @parameter: _density: The Density of the Orb to calculate its mass
+	* @parameter: _bounce: The Bounce strength of the Orb 
 	* @parameter: _speed: The speed at which the Orb accelerates 
 	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _density, float _Speed, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _bounce, float _Speed, float _maxSpeed);
 
 
 	// TO DO JC:
@@ -103,7 +103,6 @@ private:
 	float m_speed;
 	float m_maxSpeed;
 
-	// TO DO JC: Currently unused
 	float m_bounce;
 	
 	float m_radius;
