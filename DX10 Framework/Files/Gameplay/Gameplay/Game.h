@@ -32,6 +32,7 @@ enum eGameState
 	GAME_STATE_START,
 	GAME_STATE_PROCESS,
 	GAME_STATE_PAUSED,
+	GAME_STATE_ERROR,
 	GAME_STATE_END
 };
 
@@ -148,6 +149,8 @@ private:
 	bool m_contollerError;
 
 	DXSprite* VictroyPlayerOne;
+	DXSprite* TempPause;
+	DXSprite* TempError;
 	DX10_Shader_Sprite* m_pSpriteShader;
 
 };

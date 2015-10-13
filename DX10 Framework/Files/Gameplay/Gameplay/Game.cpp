@@ -19,6 +19,14 @@
 
 Game::Game()
 {
+	m_pOrbs.reserve(5);
+	m_pContollers.reserve(5);
+
+	for (UINT i = 0; i < 4; i++)
+	{
+		m_pOrbs[i] = 0;
+		m_pContollers[i] = 0;
+	}
 }
 
 Game::~Game()
@@ -64,9 +72,19 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	// TO DO JUR: Temp all to be Remove
 	m_pSpriteShader = _pSpriteShader;
 	VictroyPlayerOne = new DXSprite();
-	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 2280, 601, 3, 1);
+	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 760, 601);
 	VictroyPlayerOne->SetSize(800, 800);
 	VictroyPlayerOne->SetPosition(100,100);
+
+	TempPause = new DXSprite();
+	TempPause->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P2.png", 760, 601);
+	TempPause->SetSize(800, 800);
+	TempPause->SetPosition(100, 100);
+
+	TempError = new DXSprite();
+	TempError->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P3.png", 760, 601);
+	TempError->SetSize(800, 800);
+	TempError->SetPosition(100, 100);
 
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -198,34 +216,37 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 
 void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 {
-	v3float orbVelocity_A, orbVelocity_B;
-	
-	orbVelocity_A = _pOrbA->GetVelocity();
-	orbVelocity_B = _pOrbB->GetVelocity();
-		
-	
-	if (orbVelocity_A.Magnitude() < orbVelocity_B.Magnitude())
+	if ((_pOrbA != 0) && (_pOrbB != 0))
 	{
-		// Orb B has the Higher Velocity
+		v3float orbVelocity_A, orbVelocity_B;
 
-		_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_pOrbB->SetVelocity(orbVelocity_A * 0.0f);
-	}
-	else if (orbVelocity_A.Magnitude() > orbVelocity_B.Magnitude())
-	{
-		// Orb A has the Higher Velocity
+		orbVelocity_A = _pOrbA->GetVelocity();
+		orbVelocity_B = _pOrbB->GetVelocity();
 
-		_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
-		// TO DO JC: Take a small multiple of of the other orbs velocity 
-		_pOrbA->SetVelocity(orbVelocity_B * 0.0f);
-	}
-	else
-	{
-		// Velocities are the same
 
-		_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-		_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+		if (orbVelocity_A.Magnitude() < orbVelocity_B.Magnitude())
+		{
+			// Orb B has the Higher Velocity
+
+			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
+			// TO DO JC: Take a small multiple of of the other orbs velocity 
+			_pOrbB->SetVelocity(orbVelocity_A * 0.0f);
+		}
+		else if (orbVelocity_A.Magnitude() > orbVelocity_B.Magnitude())
+		{
+			// Orb A has the Higher Velocity
+
+			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+			// TO DO JC: Take a small multiple of of the other orbs velocity 
+			_pOrbA->SetVelocity(orbVelocity_B * 0.0f);
+		}
+		else
+		{
+			// Velocities are the same
+
+			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
+			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
+		}
 	}
 
 }
@@ -441,7 +462,16 @@ void Game::Render()
 	{
 		m_pDX10_Renderer->TurnZBufferOff();
 
-		VictroyPlayerOne->Render();
+		TempPause->Render();
+		
+		m_pDX10_Renderer->TurnZBufferOn();
+	}
+
+	if (m_gameState == GAME_STATE_ERROR)
+	{
+		m_pDX10_Renderer->TurnZBufferOff();
+
+		TempError->Render();
 
 		m_pDX10_Renderer->TurnZBufferOn();
 	}
@@ -452,6 +482,11 @@ bool Game::HandleInput(int _playerNum)
 	
 	if (m_pContollers[_playerNum]->Connected())
 	{
+		if (m_gameState == GAME_STATE_ERROR)
+		{
+			m_gameState = GAME_STATE_PAUSED;
+		}
+
 		m_pContollers[_playerNum]->PreProcess();
 
 		// Movement
@@ -486,7 +521,7 @@ bool Game::HandleInput(int _playerNum)
 	}
 	else
 	{
-		m_gameState = GAME_STATE_PAUSED;
+		m_gameState = GAME_STATE_ERROR;
 		return false;
 	}
 
