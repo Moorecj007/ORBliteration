@@ -27,6 +27,14 @@
 #include "../../DX10/DX10.h"
 #include "../../Sound/SoundManager.h"
 
+enum eGameState
+{
+	GAME_STATE_START,
+	GAME_STATE_PROCESS,
+	GAME_STATE_PAUSED,
+	GAME_STATE_END
+};
+
 class Game
 {
 public:
@@ -51,9 +59,10 @@ public:
 	* @parameter: _pSoundManager: The Sound manager for the Game
 	* @parameter: TO DO JUR: UI Manager
 	* @parameter: _numPlayers: Number of players to play this match
+	* @parameter: _AllowVibrate: Allows or dissAllows vibration
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate);
 	
 	/***********************
 	* Process: Process the Game
@@ -73,9 +82,9 @@ public:
 	/***********************
 	* HandleInput: Handle the input for the given Orb
 	* @author: Jc Fowles
-	* @return: void
+	* @return: bool: Whether the contoler passed in is connected
 	********************/
-	void HandleInput(int _playerNum);
+	bool HandleInput(int _playerNum);
 
 	/***********************
 	* IsOrbsColliding: Checks to see if the two Orbs collide
@@ -110,7 +119,7 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
-	bool m_matchWon;
+	eGameState m_gameState;
 
 	// Players
 	int m_numPlayers;
@@ -120,6 +129,8 @@ private:
 	XButtonIDs m_XButtons;
 	XStickDirectionIDs m_XStickDirections;
 	std::vector<InputGamePad*> m_pContollers;
+
+	float m_vibrateTimers[4];
 
 	// Player Controller Orbs
 	std::vector<Orb*> m_pOrbs;
@@ -134,6 +145,8 @@ private:
 	SoundManager* m_pSoundManager;
 
 	// TO DO JUR: Temp to be removed
+	bool m_contollerError;
+
 	DXSprite* VictroyPlayerOne;
 	DX10_Shader_Sprite* m_pSpriteShader;
 
