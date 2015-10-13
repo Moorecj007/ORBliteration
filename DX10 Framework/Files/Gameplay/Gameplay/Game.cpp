@@ -34,6 +34,9 @@ Game::~Game()
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
 	ReleasePtr(VictroyPlayerOne);
+	ReleasePtr(TempPause);
+	ReleasePtr(m_pPausesMenu);
+	ReleasePtr(TempError);
 
 	// TO DO CAL: To move to a shut down
 
@@ -53,9 +56,9 @@ Game::~Game()
 
 }
 
-bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate)
+bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown)
 {
-	if ((_pDX10_Renderer == 0) || (_pSoundManager == 0))
+	if ((_pDX10_Renderer == 0) || (_pSoundManager == 0) || (_pKeyDown == 0))
 	{
 		// If the Renderer or the sound manger is NULL the Game cannot be utilized
 		return false;
@@ -86,6 +89,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	TempError->SetSize(800, 800);
 	TempError->SetPosition(100, 100);
 
+	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
@@ -117,6 +121,10 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		m_pOrbs.push_back(new Orb());
 		int row, col;
 		
+		float scale = 0.5f;
+		float width = 671.0f;
+		float height = 457.0f;
+
 		switch (i)
 		{
 		case 0:
@@ -124,6 +132,12 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				temp = "pBall.png";
 				row = 1;
 				col = 13;
+
+				DXSprite uiPlayer1;
+				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p1.png", (UINT)width, (UINT)height));
+				uiPlayer1.SetPosition(10, 10);
+				uiPlayer1.SetSize(width * scale, height * scale);
+				m_uiPlayers.push_back(uiPlayer1);
 	
 			}
 			break;
@@ -132,6 +146,12 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				temp = "gBall.png";
 				row = 1;
 				col = 1;
+
+				DXSprite uiPlayer2;
+				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p2.png", (UINT)width, (UINT)height));
+				uiPlayer2.SetPosition(990 - (width*scale), 10);
+				uiPlayer2.SetSize(width * scale, height * scale);
+				m_uiPlayers.push_back(uiPlayer2);
 			}
 			break;
 		case 2:
@@ -139,6 +159,13 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				temp = "Tron/Tile/tron_tile_green.png";
 				row = 13;
 				col = 13;
+
+				DXSprite uiPlayer3;
+				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p3.png", (UINT)width, (UINT)height));
+				uiPlayer3.SetPosition(10, 990 - (height*scale));
+				uiPlayer3.SetSize(width * scale, height * scale);
+				m_uiPlayers.push_back(uiPlayer3);
+
 			}
 			break;
 		case 3:
@@ -146,6 +173,12 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				temp = "Tron/Tile/tron_tile_white.png";
 				row = 13;
 				col = 1;
+
+				DXSprite uiPlayer4;
+				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p4.png", (UINT)width, (UINT)height));
+				uiPlayer4.SetPosition(990 - (width*scale), 990 - (height*scale));
+				uiPlayer4.SetSize(width * scale, height * scale);
+				m_uiPlayers.push_back(uiPlayer4);
 			}
 			break;
 		}
@@ -159,6 +192,23 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		//VALIDATE(m_pContollers[i]->Connected());
 	}
    
+
+	m_pPausesMenu = new Menu();
+	VALIDATE(m_pPausesMenu->Initialise(m_pDX10_Renderer, m_pSpriteShader, m_pSoundManager, m_pContollers[0], _pKeyDown));
+
+	m_pPausesMenu->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
+	m_pPausesMenu->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
+	m_pPausesMenu->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
+	m_pPausesMenu->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_pPausesMenu->AddButton(MENU_STATE_RESUME, 0, 0.5f);
+	m_pPausesMenu->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
+	m_pPausesMenu->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
+	m_pPausesMenu->AddButton(MENU_STATE_EXIT, 3, 0.5f);
+
+	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
+	m_instructions.SetPosition(100, 100);
+	m_instructions.SetSize(800, 800);
+		
 	return true;
 }
 
@@ -312,6 +362,24 @@ bool Game::Process(float _dt)
 	}
 	else // Game Still running
 	{
+		if (m_gameState == GAME_STATE_PAUSED)
+		{
+			m_pPausesMenu->Process(_dt);
+			switch (m_pPausesMenu->GetMenuState())
+			{
+			case MENU_STATE_RESUME:
+				m_gameState = GAME_STATE_PROCESS;
+				m_pPausesMenu->Reset();
+				break;
+			case MENU_STATE_INSTRUCTIONS:
+				break;
+			case MENU_STATE_OPTIONS:
+				break;
+			case MENU_STATE_EXIT:
+				return false;
+				break;
+			}
+		}
 
 		// Process the Orbs
 		for (UINT i = 0; i < m_pOrbs.size(); i++)
@@ -438,34 +506,54 @@ void Game::Render()
 				m_pOrbs[i]->Render();
 			}
 		}
+
+		m_uiPlayers[i].Render();
 	}
+	m_pDX10_Renderer->TurnZBufferOff();
+
 
 	if (m_gameState == GAME_STATE_END) //((m_matchWon) || (m_contollerError))
 	{
-		m_pDX10_Renderer->TurnZBufferOff();
+		//m_pDX10_Renderer->TurnZBufferOff();
 
 		VictroyPlayerOne->Render();
 
-		m_pDX10_Renderer->TurnZBufferOn();
+		//m_pDX10_Renderer->TurnZBufferOn();
 	}
 
 	if (m_gameState == GAME_STATE_PAUSED)
 	{
-		m_pDX10_Renderer->TurnZBufferOff();
+		//m_pDX10_Renderer->TurnZBufferOff();
 
-		TempPause->Render();
+		//TempPause->Render();
 		
-		m_pDX10_Renderer->TurnZBufferOn();
+		if (m_gameState == GAME_STATE_PAUSED)
+		{
+			switch (m_pPausesMenu->GetMenuState())
+			{
+			case MENU_STATE_INSTRUCTIONS:
+				m_instructions.Render();
+				break;
+			case MENU_STATE_OPTIONS:
+				break;
+			default:
+				m_pPausesMenu->Draw();
+				break;
+			}
+		}
+		
+		//m_pDX10_Renderer->TurnZBufferOn();
 	}
 
 	if (m_gameState == GAME_STATE_ERROR)
 	{
-		m_pDX10_Renderer->TurnZBufferOff();
+		//m_pDX10_Renderer->TurnZBufferOff();
 
 		TempError->Render();
 
-		m_pDX10_Renderer->TurnZBufferOn();
+		//m_pDX10_Renderer->TurnZBufferOn();
 	}
+	m_pDX10_Renderer->TurnZBufferOn();
 }
 
 bool Game::HandleInput(int _playerNum)
@@ -494,11 +582,17 @@ bool Game::HandleInput(int _playerNum)
 		{
 			if (m_gameState == GAME_STATE_PAUSED)
 			{
-				m_gameState = GAME_STATE_PROCESS;
+				/*if (_playerNum == m_PausedPlayer)
+				{
+					m_gameState = GAME_STATE_PROCESS;
+					m_pPausesMenu->Reset();
+				}*/
 			}
 			else
 			{
 				m_gameState = GAME_STATE_PAUSED;
+				m_PausedPlayer = _playerNum;
+				m_pPausesMenu->SetController(m_pContollers[_playerNum]);
 			}
 		}
 
@@ -513,15 +607,15 @@ bool Game::HandleInput(int _playerNum)
 
 	if (allConnected)
 	{
-		//if (m_gameState == GAME_STATE_ERROR)
-		//{
-		//	m_gameState = GAME_STATE_PAUSED;
-		//}
+		if (m_gameState == GAME_STATE_ERROR)
+		{
+			m_gameState = GAME_STATE_PAUSED;
+		}
 		return true;
 	}
 	else
 	{
-		//m_gameState = GAME_STATE_ERROR;
+		m_gameState = GAME_STATE_ERROR;
 		return false;
 	}
 

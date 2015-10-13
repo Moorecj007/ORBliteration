@@ -26,6 +26,7 @@
 #include "../../Input/InputGamePad.h"
 #include "../../DX10/DX10.h"
 #include "../../Sound/SoundManager.h"
+#include "../../Menus/Menu.h"
 
 enum eGameState
 {
@@ -63,7 +64,7 @@ public:
 	* @parameter: _AllowVibrate: Allows or dissAllows vibration
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown);
 	
 	/***********************
 	* Process: Process the Game
@@ -125,6 +126,7 @@ private:
 	// Players
 	int m_numPlayers;
 	int m_numAlivePlayers;
+	int m_PausedPlayer;
 
 	// Contollers
 	XButtonIDs m_XButtons;
@@ -152,7 +154,14 @@ private:
 	DXSprite* TempPause;
 	DXSprite* TempError;
 	DX10_Shader_Sprite* m_pSpriteShader;
+	Menu* m_pPausesMenu;
+	DXSprite m_instructions;
 
+	std::vector<DXSprite> m_uiPlayers;
+	//DXSprite m_uiPlayer1;
+	//DXSprite m_uiPlayer2;
+	//DXSprite m_uiPlayer3;
+	//DXSprite m_uiPlayer4;
 };
 #endif	//__GAME_H__
 
