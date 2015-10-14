@@ -46,16 +46,17 @@ public:
 	/***********************
 	* Initialise: Initialise the Player Controlled Orbs
 	* @author: Jc Fowles
+	* @author: Callan Moore
 	* @parameter: _pRenderer: Renderer for the Orb
 	* @parameter: _pMesh: Mesh for the Orb
 	* @parameter: _pShader: The Shader for the Orb
-	* @parameter: _texName: file name of the single texture for the Orb to display
+	* @parameter: _playerNum: The player number that owns this Orb
 	* @parameter: _bounce: The Bounce strength of the Orb 
 	* @parameter: _speed: The speed at which the Orb accelerates 
 	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _bounce, float _Speed, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _Speed, float _maxSpeed);
 
 
 	// TO DO JC:
@@ -123,7 +124,8 @@ private:
 	float m_phaseActiveTime;
 	float m_phaseCoolDownTime;
 
-	
+	Light* m_pGlowLight;
+	std::string m_glowName;
 };
 
 #endif;		// __ORB_H__
