@@ -97,13 +97,6 @@ private:
 	* @return: void
 	********************/
 	void StartTileDeath(UINT _row, UINT _col);
-	
-	/***********************
-	* SpawnPowerUp: Spawn a powerup on a randomly selected still active tile
-	* @author: Callan Moore
-	* @return: void
-	********************/
-	void SpawnPowerUp();
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
@@ -116,11 +109,6 @@ private:
 	float m_destroyOutsideTime;
 	int m_layerCount;
 	int m_destroyedLayers;
-
-	// Power up time Variables
-	float m_powerSpawnTimer;
-	float m_maxPowerSpawnTimer;
-
 };
 #endif	// __ARENAFLOOR_H__
 
