@@ -105,11 +105,11 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 4 };
-	m_areaSize = 15;
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, m_matchTimer));
+	//m_tileScale = { 4, 4, 4 };
+	//m_areaSize = 15;
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, { 4, 4, 4 }, m_matchTimer));
 
-	m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
+	//m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
 
 
 	// Create the Orb Mesh
@@ -189,7 +189,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 2.0f, 5.0f, 1000.0f));
 		
 		// Set the Orbs Positions
-		v3float	OrbPos = (*(*m_pArenaTiles)[row])[col]->GetPosition();
+		v3float	OrbPos = m_pArenaFloor->GetTilePos(row, col);//(*(*m_pArenaTiles)[row])[col]->GetPosition();
 		OrbPos.z = -2.0f;
 		m_pOrbs[i]->SetPosition(OrbPos);
 
@@ -458,53 +458,19 @@ bool Game::Process(float _dt)
 							}
 						}
 
-						// Calculate the tile the Orb is on
 						v3float OrbPos = m_pOrbs[i]->GetPosition();
-						OrbPos += m_tileScale / 2;
-						int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
-						int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
-
-						// Check if the orb is with in the Arena if not Kill it
-
-						// Check if it in the bounds of the Rows
-						if (row < 0)
+						ArenaTile* collidingTile = 0;
+						if (m_pArenaFloor->GetTile(OrbPos, collidingTile))
 						{
-							row = 0;
-							KillOrb(m_pOrbs[i]);
+							m_pOrbs[i]->SetTile(collidingTile);
+							m_pOrbs[i]->Process(_dt);
 						}
-						else if (row > (int)m_pArenaTiles->size() - 1)
-						{
-							row = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-						// Check if it in the bounds of the Columns
-						if (col < 0)
-						{
-							col = 0;
-							KillOrb(m_pOrbs[i]);
-						}
-						else if (col > (int)m_pArenaTiles->size() - 1)
-						{
-							col = m_pArenaTiles->size() - 1;
-							KillOrb(m_pOrbs[i]);
-						}
-
-						// Kill Orb if its on a Dead Tile
-						if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
-						{
-							KillOrb(m_pOrbs[i]);
-						}
-						// Orb is still alive 
 						else
 						{
-							// Set the tile the Orb is On
-							m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
+							KillOrb(m_pOrbs[i]);
 						}
-
-						m_pOrbs[i]->Process(_dt);
 					}
 				}
-
 			}
 
 			if (m_gameState == GAME_STATE_PROCESS)

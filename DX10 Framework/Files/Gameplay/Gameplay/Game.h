@@ -146,15 +146,15 @@ private:
 
 	// Arena
 	ArenaFloor* m_pArenaFloor;
-	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
-	v3float m_tileScale;
-	int m_areaSize;
+	//std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
+	//v3float m_tileScale;
+	//int m_areaSize;
 	
 	SoundManager* m_pSoundManager;
 
 	// TO DO JUR: Temp to be removed
 	bool m_contollerError;
-
+								  
 	DXSprite* VictroyPlayerOne;
 	DXSprite* TempPause;
 	DXSprite* TempError;

@@ -78,7 +78,16 @@ public:
 	std::vector<std::vector<ArenaTile*>*>* GetArenaTiles() { return m_pArenaTiles; };
 
 	// TO DO JC
-	v2float GetTile(v3float _orbPos);
+	/***********************
+	* GetTile: Return tht 
+	* @author: Jc Fowles
+	* @return: 
+	********************/
+	bool GetTile(v3float _orbPos, ArenaTile*& _returnTile);
+
+	// TO DO JC
+	v3float GetTilePos(UINT _row, UINT _col){ return (*(*m_pArenaTiles)[_row])[_col]->GetPosition(); };
+
 	
 private:
 
@@ -102,6 +111,9 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Mesh* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;	
+
+	v3float m_tileScale;
+	UINT m_arenaSize;
 
 	// Destruction variables
 	float m_timeElapsed;

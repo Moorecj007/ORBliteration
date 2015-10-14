@@ -47,6 +47,9 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	m_pDX10_Renderer = _pDX10_Renderer;
 	m_matchLength = _matchLength;
 
+	m_tileScale = _tileScale;
+	m_arenaSize = _arenaSize;
+
 	// Create the Mesh for the Arena Tiles
 	m_pTileMesh = new DX10_Mesh();
 	VALIDATE(m_pTileMesh->Initialise(m_pDX10_Renderer, MT_FINITEPLANE, _tileScale));
@@ -185,5 +188,55 @@ void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
 	modifier = modifier / 100.0f + 1.0f;
 
 	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
+}
+
+bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _returnTile)
+{
+	// Calculate the tile the Orb is on
+	_orbPos += m_tileScale / 2;
+	int row = (int)((_orbPos.x / m_tileScale.x) + ((m_arenaSize - 1) / 2));
+	int col = (int)((_orbPos.y / m_tileScale.y) + ((m_arenaSize - 1) / 2));
+
+	// Check if the orb is with in the Arena if not return false;
+
+	// Check if it in the bounds of the Rows
+	if (row < 0)
+	{
+		row = 0;
+		_returnTile = 0;
+		return false;
+	}
+	else if (row >(int)m_pArenaTiles->size() - 1)
+	{
+		row = m_pArenaTiles->size() - 1;
+		_returnTile = 0;
+		return false;
+	}
+	// Check if it in the bounds of the Columns
+	if (col < 0)
+	{
+		col = 0;
+		_returnTile = 0;
+		return false;
+	}
+	else if (col >(int)m_pArenaTiles->size() - 1)
+	{
+		col = m_pArenaTiles->size() - 1;
+		_returnTile = 0;
+		return false;
+	}
+
+	// Return false if the orb is on a Dead Tile
+	if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+	{
+		_returnTile = 0;
+		return false;
+	}
+	// Orb is still alive return the true and the tile
+	else
+	{
+		_returnTile = (*(*m_pArenaTiles)[row])[col];
+		return true;
+	}
 }
 
