@@ -394,3 +394,8 @@ void Menu::Reset()
 {
 	m_state = MENU_STATE_DEFAULT;
 }
+
+void Menu::SetController(InputGamePad* _pGamepad)
+{
+	m_pGamepad = _pGamepad;
+}
