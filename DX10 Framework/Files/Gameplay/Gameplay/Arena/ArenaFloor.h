@@ -78,7 +78,16 @@ public:
 	std::vector<std::vector<ArenaTile*>*>* GetArenaTiles() { return m_pArenaTiles; };
 
 	// TO DO JC
-	v2float GetTile(v3float _orbPos);
+	/***********************
+	* GetTile: Return tht 
+	* @author: Jc Fowles
+	* @return: 
+	********************/
+	bool GetTile(v3float _orbPos, ArenaTile*& _returnTile);
+
+	// TO DO JC
+	v3float GetTilePos(UINT _row, UINT _col){ return (*(*m_pArenaTiles)[_row])[_col]->GetPosition(); };
+
 	
 private:
 
@@ -97,18 +106,14 @@ private:
 	* @return: void
 	********************/
 	void StartTileDeath(UINT _row, UINT _col);
-	
-	/***********************
-	* SpawnPowerUp: Spawn a powerup on a randomly selected still active tile
-	* @author: Callan Moore
-	* @return: void
-	********************/
-	void SpawnPowerUp();
 
 private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Mesh* m_pTileMesh;
 	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;	
+
+	v3float m_tileScale;
+	UINT m_arenaSize;
 
 	// Destruction variables
 	float m_timeElapsed;
@@ -116,11 +121,6 @@ private:
 	float m_destroyOutsideTime;
 	int m_layerCount;
 	int m_destroyedLayers;
-
-	// Power up time Variables
-	float m_powerSpawnTimer;
-	float m_maxPowerSpawnTimer;
-
 };
 #endif	// __ARENAFLOOR_H__
 

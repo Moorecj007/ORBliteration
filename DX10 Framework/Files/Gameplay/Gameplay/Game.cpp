@@ -38,8 +38,6 @@ Game::~Game()
 	ReleasePtr(m_pPausesMenu);
 	ReleasePtr(TempError);
 
-	// TO DO CAL: To move to a shut down
-
 	while (m_pContollers.empty() == false)
 	{
 		ReleasePtr(m_pContollers.back());
@@ -64,8 +62,13 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		return false;
 	}
 
+	// Set Timers
+	m_matchTimer = 90.0f;
+	m_startCountDown = 3.0f;
+	m_firstProcess = true;
+
 	// JC TO DO: Change to start
-	m_gameState = GAME_STATE_PROCESS;
+	m_gameState = GAME_STATE_START;
 
 	m_numPlayers = _numPlayers;
 	m_numAlivePlayers = _numPlayers;
@@ -89,6 +92,12 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	TempError->SetSize(800, 800);
 	TempError->SetPosition(100, 100);
 
+	m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_number_first.SetSize(106.0f * 0.5f, 106.0f * 0.5f);
+	m_number_first.SetPosition(450, 50);
+	m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	m_number_second.SetSize(106.0f * 0.5f, 106.0f * 0.5f);
+	m_number_second.SetPosition(450, 50);
 	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -96,11 +105,11 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	m_tileScale = { 4, 4, 4 };
-	m_areaSize = 15;
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, m_areaSize, m_tileScale, 90.0f));
+	//m_tileScale = { 4, 4, 4 };
+	//m_areaSize = 15;
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, { 4, 4, 4 }, m_matchTimer));
 
-	m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
+	//m_pArenaTiles = m_pArenaFloor->GetArenaTiles();
 
 
 	// Create the Orb Mesh
@@ -127,9 +136,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 		switch (i)
 		{
-		case 0:
+			case 0:
 			{
-				temp = "pBall.png";
 				row = 1;
 				col = 13;
 
@@ -138,12 +146,10 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				uiPlayer1.SetPosition(10, 10);
 				uiPlayer1.SetSize(width * scale, height * scale);
 				m_uiPlayers.push_back(uiPlayer1);
-	
 			}
 			break;
-		case 1:
+			case 1:
 			{
-				temp = "gBall.png";
 				row = 1;
 				col = 1;
 
@@ -154,9 +160,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				m_uiPlayers.push_back(uiPlayer2);
 			}
 			break;
-		case 2:
+			case 2:
 			{
-				temp = "Tron/Tile/tron_tile_green.png";
 				row = 13;
 				col = 13;
 
@@ -168,9 +173,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 			}
 			break;
-		case 3:
+			case 3:
 			{
-				temp = "Tron/Tile/tron_tile_white.png";
 				row = 13;
 				col = 1;
 
@@ -182,12 +186,14 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 			}
 			break;
 		}
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, temp, 2.0f, 5.0f, 1000.0f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 2.0f, 5.0f, 1000.0f));
 		
-		// Set the Orbs Postions
-		v3float	OrbPos = (*(*m_pArenaTiles)[row])[col]->GetPosition();
+		// Set the Orbs Positions
+		v3float	OrbPos = m_pArenaFloor->GetTilePos(row, col);//(*(*m_pArenaTiles)[row])[col]->GetPosition();
 		OrbPos.z = -2.0f;
 		m_pOrbs[i]->SetPosition(OrbPos);
+
+		m_pOrbs[i]->Process(0.016f);
 
 		//VALIDATE(m_pContollers[i]->Connected());
 	}
@@ -317,163 +323,161 @@ bool Game::Process(float _dt)
 	// Set up the shader
 	m_pShader_LitTex->SetUpPerFrame();
 
-	// Game has Ended
-	if (m_numAlivePlayers <= 1)
+
+	if (m_gameState == GAME_STATE_START)
 	{
-		int Winner = 0;
-		if (m_numAlivePlayers == 1)
+		if (m_firstProcess == false)
 		{
-			// Game has Ended with a Winner 
+			m_startCountDown -= _dt;
+		}
+		else
+		{
+			m_startCountDown -= 0.016f;
+			m_firstProcess = false;
+		}
+
+		m_number_first.SetImageIndex((int)(m_startCountDown + 1) + 10);
+
+		if (m_startCountDown <= 0.0f)
+		{
+			m_gameState = GAME_STATE_PROCESS;
+			m_number_first.SetPosition(420, 50);
+			m_number_second.SetPosition(480, 50);
+		}	
+	}
+	else
+	{
+		// Game has Ended
+		if (m_numAlivePlayers <= 1)
+		{
+			int Winner = 0;
+			if (m_numAlivePlayers == 1)
+			{
+				// Game has Ended with a Winner 
+				for (UINT i = 0; i < m_pOrbs.size(); i++)
+				{
+					if (m_pOrbs[i]->GetAlive())
+					{
+						Winner = i + 1;
+						break;
+					}
+				}
+			}
+
+			if (Winner == 0)
+			{
+				m_gameState = GAME_STATE_END;
+				// No Winner the Game is a Draw
+			}
+			else
+			{
+				m_gameState = GAME_STATE_END;
+				// Player 'Winner' has won
+			}
+			// This Player has won
+			// TO DO JUR: Print Winner and Press A to Continue
+
+			for (UINT i = 0; i < m_pContollers.size(); i++)
+			{
+				m_pContollers[i]->PreProcess();
+				m_pContollers[i]->StopVibrate();
+				if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_A))
+				{
+					// Return the game end
+					return false;
+				}
+				m_pContollers[i]->PostProcess();
+			}
+
+		}
+		else // Game Still running
+		{
+			if (m_gameState == GAME_STATE_PAUSED)
+			{
+				m_pPausesMenu->Process(_dt);
+				switch (m_pPausesMenu->GetMenuState())
+				{
+				case MENU_STATE_RESUME:
+					m_gameState = GAME_STATE_PROCESS;
+					m_pPausesMenu->Reset();
+					break;
+				case MENU_STATE_INSTRUCTIONS:
+					break;
+				case MENU_STATE_OPTIONS:
+					break;
+				case MENU_STATE_EXIT:
+					return false;
+					break;
+				}
+			}
+			else
+			{
+				// Alter the Match Timer
+				m_matchTimer -= _dt;
+				m_number_first.SetImageIndex((int)((m_matchTimer + 1) / 10) + 10);
+				m_number_second.SetImageIndex((int)(m_matchTimer + 1) % 10 + 10);
+			}
+
+			// Process the Orbs
 			for (UINT i = 0; i < m_pOrbs.size(); i++)
 			{
 				if (m_pOrbs[i]->GetAlive())
 				{
-					Winner = i + 1;
-					break;
-				}
-			}
-		}
+					// Process Inputs
+					HandleInput(i);
 
-		if (Winner == 0)
-		{
-			m_gameState = GAME_STATE_END;
-			// No Winner the Game is a Draw
-		}
-		else
-		{
-			m_gameState = GAME_STATE_END;
-			// Player 'Winner' has won
-		}
-		// This Player has won
-		// TO DO JUR: Print Winner and Press A to Continue
-
-		for (UINT i = 0; i < m_pContollers.size(); i++)
-		{
-			m_pContollers[i]->PreProcess();
-			m_pContollers[i]->StopVibrate();
-			if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_A))
-			{
-				// Return the game end
-				return false;
-			}
-			m_pContollers[i]->PostProcess();
-		}
-		
-	}
-	else // Game Still running
-	{
-		if (m_gameState == GAME_STATE_PAUSED)
-		{
-			m_pPausesMenu->Process(_dt);
-			switch (m_pPausesMenu->GetMenuState())
-			{
-			case MENU_STATE_RESUME:
-				m_gameState = GAME_STATE_PROCESS;
-				m_pPausesMenu->Reset();
-				break;
-			case MENU_STATE_INSTRUCTIONS:
-				break;
-			case MENU_STATE_OPTIONS:
-				break;
-			case MENU_STATE_EXIT:
-				return false;
-				break;
-			}
-		}
-
-		// Process the Orbs
-		for (UINT i = 0; i < m_pOrbs.size(); i++)
-		{
-			if (m_pOrbs[i]->GetAlive())
-			{
-				// Process Inputs
-				HandleInput(i);
-				
-				if (m_gameState == GAME_STATE_PROCESS)
-				{
-					// Check Collisions
-					for (UINT j = 0; j < m_pOrbs.size(); j++)
+					if (m_gameState == GAME_STATE_PROCESS)
 					{
-						if ((i != j))
+						// Check Collisions
+						for (UINT j = 0; j < m_pOrbs.size(); j++)
 						{
-							if (m_pOrbs[j]->GetAlive())
+							if ((i != j))
 							{
-								if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
+								if (m_pOrbs[j]->GetAlive())
 								{
-									m_pContollers[i]->Vibrate(1.0f, 1.0f);
-									m_pContollers[j]->Vibrate(1.0f, 1.0f);
-									HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
+									if (IsOrbsColliding(m_pOrbs[i], m_pOrbs[j]))
+									{
+										m_pContollers[i]->Vibrate(1.0f, 1.0f);
+										m_pContollers[j]->Vibrate(1.0f, 1.0f);
+										HandleCollisions(m_pOrbs[i], m_pOrbs[j]);
 
-									m_pSoundManager->PlayPlayerHit();
+										m_pSoundManager->PlayPlayerHit();
+									}
 								}
 							}
 						}
-					}
 
-					// Stop the Vibrations after half a second
-					if (m_pContollers[i]->GetVibrate())
-					{
-						m_vibrateTimers[i] += _dt;
-						if (m_vibrateTimers[i] >= 0.5f)
+						// Stop the Vibrations after half a second
+						if (m_pContollers[i]->GetVibrate())
 						{
-							m_pContollers[i]->StopVibrate();
-							m_vibrateTimers[i] = 0.0f;
+							m_vibrateTimers[i] += _dt;
+							if (m_vibrateTimers[i] >= 0.5f)
+							{
+								m_pContollers[i]->StopVibrate();
+								m_vibrateTimers[i] = 0.0f;
+							}
+						}
+
+						v3float OrbPos = m_pOrbs[i]->GetPosition();
+						ArenaTile* collidingTile = 0;
+						if (m_pArenaFloor->GetTile(OrbPos, collidingTile))
+						{
+							m_pOrbs[i]->SetTile(collidingTile);
+							m_pOrbs[i]->Process(_dt);
+						}
+						else
+						{
+							KillOrb(m_pOrbs[i]);
 						}
 					}
-
-					// Calculate the tile the Orb is on
-					v3float OrbPos = m_pOrbs[i]->GetPosition();
-					OrbPos += m_tileScale / 2;
-					int row = (int)((OrbPos.x / m_tileScale.x) + ((m_areaSize - 1) / 2));
-					int col = (int)((OrbPos.y / m_tileScale.y) + ((m_areaSize - 1) / 2));
-
-					// Check if the orb is with in the Arena if not Kill it
-
-					// Check if it in the bounds of the Rows
-					if (row < 0)
-					{
-						row = 0;
-						KillOrb(m_pOrbs[i]);
-					}
-					else if (row > (int)m_pArenaTiles->size() - 1)
-					{
-						row = m_pArenaTiles->size() - 1;
-						KillOrb(m_pOrbs[i]);
-					}
-					// Check if it in the bounds of the Columns
-					if (col < 0)
-					{
-						col = 0;
-						KillOrb(m_pOrbs[i]);
-					}
-					else if (col > (int)m_pArenaTiles->size() - 1)
-					{
-						col = m_pArenaTiles->size() - 1;
-						KillOrb(m_pOrbs[i]);
-					}
-
-					// Kill Orb if its on a Dead Tile
-					if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
-					{
-						KillOrb(m_pOrbs[i]);
-					}
-					// Orb is still alive 
-					else
-					{
-						// Set the tile the Orb is On
-						m_pOrbs[i]->SetTile((*(*m_pArenaTiles)[row])[col]);
-					}
-
-					m_pOrbs[i]->Process(_dt);
 				}
 			}
 
-		}
-
-		if (m_gameState == GAME_STATE_PROCESS)
-		{
-			// Process the arena Floor
-			m_pArenaFloor->Process(_dt);
+			if (m_gameState == GAME_STATE_PROCESS)
+			{
+				// Process the arena Floor
+				m_pArenaFloor->Process(_dt);
+			}
 		}
 	}
 
@@ -552,6 +556,15 @@ void Game::Render()
 		TempError->Render();
 
 		//m_pDX10_Renderer->TurnZBufferOn();
+	}
+	if (m_gameState == GAME_STATE_START)
+	{
+		m_number_first.Render();
+	}
+	else
+	{
+		m_number_first.Render();
+		m_number_second.Render();
 	}
 	m_pDX10_Renderer->TurnZBufferOn();
 }

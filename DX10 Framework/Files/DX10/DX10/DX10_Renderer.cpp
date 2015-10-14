@@ -40,12 +40,6 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	m_nextInputLayoutID = 0;
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
-	
-	//Light* pLight = new Light();
-	//pLight->type = LT_GLOW;
-	//pLight->diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	//pLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, -1.0f, 3.5f);
-	//AddLight("zGlowTest1", pLight);
 
 	Light* pLight = new Light();
 	pLight->type = LT_DIRECTIONAL;
@@ -55,13 +49,6 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	pLight->specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	AddLight("Main", pLight);
 	
-	
-	
-
-	
-	
-	
-
 	return true;
 }
 

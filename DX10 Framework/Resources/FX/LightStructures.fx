@@ -20,7 +20,9 @@ struct Light
 	float4 att;
 
 	int type;
-	float3 pad;
+	bool active;
+	float pad1;
+	float pad2;
 };
 
 struct SurfaceInfo
@@ -126,10 +128,10 @@ float GlowLight(SurfaceInfo _surface, Light _light)
 	// The distance from surface to light.
 	float dist = length(lightVec);
 
-	if (dist > _light.pos_range.w)
+	if (dist > _light.pos_range.w || dist < 2.0f)
 	{
 		// Outside Glow Light range
-		return 0.0f;
+		return 0.0f;	
 	}
 
 	float ratio = 1 - (dist / _light.pos_range.w);

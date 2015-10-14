@@ -46,8 +46,9 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 {
 	m_pDX10_Renderer = _pDX10_Renderer;
 	m_matchLength = _matchLength;
-	m_maxPowerSpawnTimer = 2.0f;
-	m_powerSpawnTimer = 2.0f;
+
+	m_tileScale = _tileScale;
+	m_arenaSize = _arenaSize;
 
 	// Create the Mesh for the Arena Tiles
 	m_pTileMesh = new DX10_Mesh();
@@ -126,13 +127,6 @@ void ArenaFloor::Process(float _dt)
 		m_timeElapsed = 0.0f;
 	}
 
-	m_powerSpawnTimer -= _dt;
-	if (m_powerSpawnTimer <= 0.0f)
-	{
-		//SpawnPowerUp();
-		m_powerSpawnTimer = m_maxPowerSpawnTimer;
-	}
-
 	// Process all the Tiles in the 2D vector
 	// Cycle through all rows
 	for (UINT row = 0; row < m_pArenaTiles->size(); row++)
@@ -196,21 +190,53 @@ void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
 	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
 }
 
-void ArenaFloor::SpawnPowerUp()
+bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _returnTile)
 {
-	// TO DO CAL - BROKEN
+	// Calculate the tile the Orb is on
+	_orbPos += m_tileScale / 2;
+	int row = (int)((_orbPos.x / m_tileScale.x) + ((m_arenaSize - 1) / 2));
+	int col = (int)((_orbPos.y / m_tileScale.y) + ((m_arenaSize - 1) / 2));
 
-	if (m_destroyedLayers == m_layerCount)
+	// Check if the orb is with in the Arena if not return false;
+
+	// Check if it in the bounds of the Rows
+	if (row < 0)
 	{
-		// Last tile left and on destruction sequence, spawn no more power ups
-		return;
+		row = 0;
+		_returnTile = 0;
+		return false;
 	}
-	int layersLeft = (m_layerCount * 2 - 2) - (m_destroyedLayers * 2);
+	else if (row >(int)m_pArenaTiles->size() - 1)
+	{
+		row = m_pArenaTiles->size() - 1;
+		_returnTile = 0;
+		return false;
+	}
+	// Check if it in the bounds of the Columns
+	if (col < 0)
+	{
+		col = 0;
+		_returnTile = 0;
+		return false;
+	}
+	else if (col >(int)m_pArenaTiles->size() - 1)
+	{
+		col = m_pArenaTiles->size() - 1;
+		_returnTile = 0;
+		return false;
+	}
 
-	int randomRow = ((rand() % layersLeft) + (m_destroyedLayers * 2));
-	int randomCol = ((rand() % layersLeft) + (m_destroyedLayers * 2));
-
-	eOverlayTileImages powerImage = (eOverlayTileImages)(rand() % 3 + 1);
-
-	(*(*m_pArenaTiles)[randomRow])[randomCol]->SetOverlayImage(powerImage);
+	// Return false if the orb is on a Dead Tile
+	if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+	{
+		_returnTile = 0;
+		return false;
+	}
+	// Orb is still alive return the true and the tile
+	else
+	{
+		_returnTile = (*(*m_pArenaTiles)[row])[col];
+		return true;
+	}
 }
+

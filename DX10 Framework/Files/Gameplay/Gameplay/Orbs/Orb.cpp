@@ -30,10 +30,65 @@ Orb::~Orb()
 {
 }
 
-bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, std::string _texName, float _bounce, float _speed, float _maxSpeed)
+bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _speed, float _maxSpeed)
 {	
+	std::string texName;
+	switch (_playerNum)
+	{
+		case 1:
+		{
+			texName = "Tron/Orb/tron_orb_player1.png";
+			m_glowName = "zOrbGlow1";
+
+			m_pGlowLight = new Light();
+			m_pGlowLight->type = LT_GLOW;
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, (108.0f / 255.0f), 0.0f, 1.0f);
+			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
+		}
+		break;
+		case 2:
+		{
+			texName = "Tron/Orb/tron_orb_player2.png";
+			m_glowName = "zOrbGlow2";
+
+			m_pGlowLight = new Light();
+			m_pGlowLight->type = LT_GLOW;
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
+			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
+		}
+		break;
+		case 3:
+		{
+			texName = "Tron/Orb/tron_orb_player3.png";
+			m_glowName = "zOrbGlow3";
+
+			m_pGlowLight = new Light();
+			m_pGlowLight->type = LT_GLOW;
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
+			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
+		}
+		break;
+		case 4:
+		{
+			texName = "Tron/Orb/tron_orb_player4.png";
+			m_glowName = "zOrbGlow4";
+
+			m_pGlowLight = new Light();
+			m_pGlowLight->type = LT_GLOW;
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR((230.0f / 255.0f), (46.0f / 255.0f), (241.0f / 255.0f), 1.0f);
+			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
+		}
+		break;
+	}
+
+
+
  	// Initialise the object this is derived from
-	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, _texName));
+	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, texName));
 
 	// Check the passed in parameters
 	if ((_bounce < 0.0f) || (_maxSpeed < 0.0f))
@@ -177,6 +232,12 @@ void Orb::Process(float _dt)
 	//SetRotPerSecondPitch(m_pos.y);
 	//SetRotPerSecondYaw(-m_pos.x);
 
+	// Update the Glow lights position
+	m_pGlowLight->pos_range.x = m_pos.x;
+	m_pGlowLight->pos_range.y = m_pos.y;
+	m_pGlowLight->pos_range.z = m_pos.z;
+
+
 	DX10_Obj_LitTex::Process(_dt);
 }
 
@@ -189,11 +250,13 @@ void Orb::Render()
 	
 	if (m_phase)
 	{
+		m_pGlowLight->active = false;
 		_litTex.reduceAlpha = 0.5f;
 		m_pShader->Render(_litTex, TECH_LITTEX_FADE);
 	}
 	else
 	{
+		m_pGlowLight->active = true;
 		_litTex.reduceAlpha = 0.0f;
 		m_pShader->Render(_litTex, TECH_LITTEX_STANDARD);
 	}
