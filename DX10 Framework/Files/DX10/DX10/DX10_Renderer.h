@@ -240,10 +240,23 @@ public:
 	* @return: bool: Successful or not
 	********************/
 	bool LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVertexBuffer, DWORD*& _prIndexBuffer, int* _pVertexCount, int* _pIndexCount, v3float _scale);
-
-	// TO DO CAL
+	
+	/***********************
+	* AddLight: Add a new light to the Renderer
+	* @author: Callan Moore
+	* @parameter: _lightName: Name of the light for referencing and updating
+	* @parameter: _light: The light structure
+	* @return: bool: Successful or not
+	********************/
 	bool AddLight(std::string _lightName, Light* _light);
-	void RemoveLight(std::string);
+	
+	/***********************
+	* RemoveLight: Remove a light from the Renderer
+	* @author: Callan Moore
+	* @parameter: _lightName: Name of the light to remove
+	* @return: void
+	********************/
+	void RemoveLight(std::string _lightName);
 
 	/***********************
 	* GetActiveLights: Retrieve the current active light in the scene

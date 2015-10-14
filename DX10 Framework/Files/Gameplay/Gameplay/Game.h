@@ -128,6 +128,11 @@ private:
 	int m_numAlivePlayers;
 	int m_PausedPlayer;
 
+	// Timers
+	bool m_firstProcess;
+	float m_startCountDown;
+	float m_matchTimer;
+
 	// Contollers
 	XButtonIDs m_XButtons;
 	XStickDirectionIDs m_XStickDirections;
@@ -162,6 +167,7 @@ private:
 	//DXSprite m_uiPlayer2;
 	//DXSprite m_uiPlayer3;
 	//DXSprite m_uiPlayer4;
+	DXSprite m_number_first, m_number_second;
 };
 #endif	//__GAME_H__
 
