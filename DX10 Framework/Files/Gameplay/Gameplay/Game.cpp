@@ -184,7 +184,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 		// Set the Orbs Positions
 		v3float	OrbPos = m_pArenaFloor->GetTilePos(row, col);
-		OrbPos.z = -2.0f;
+		OrbPos.z = -OrbRadius;
 		m_pOrbs[i]->SetPosition(OrbPos);
 
 		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 1.0f, 0.2f));

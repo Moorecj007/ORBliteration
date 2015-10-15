@@ -111,7 +111,7 @@ public:
 	* @parameter: _alive: Value to set Alive state too
 	* @return: void
 	********************/
-	void SetAlive(bool _alive){ m_isAlive = _alive; };
+	void SetAlive(bool _alive){ m_isAlive = _alive; m_pGlowLight->active = false; };
 
 	/***********************
 	* GetTile: Returns the tile the Orb is on

@@ -51,7 +51,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, (108.0f / 255.0f), 0.0f, 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -63,7 +63,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -75,7 +75,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -87,7 +87,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((230.0f / 255.0f), (46.0f / 255.0f), (241.0f / 255.0f), 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -113,7 +113,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 	m_boostAmount = 6.0f;
 	m_boostCooldown = 1.0f;
-	m_boostLimit = 0.05f;
+	m_boostLimit = 0.1f;
 	m_boostActiveTime = 0.0f;
 	m_boostCoolDownTime = 0.0f;
 	m_AllowBoost = true;
@@ -184,6 +184,7 @@ void Orb::Process(float _dt)
 	if (m_boost)
 	{
 		m_boostActiveTime += _dt;
+		m_pGlowLight->pos_range.w = 10.0f;
 
 		if (m_boostActiveTime < m_boostLimit)
 		{
@@ -200,7 +201,7 @@ void Orb::Process(float _dt)
 	}
 	else
 	{
-
+		m_pGlowLight->pos_range.w = 6.0f;
 		if (m_AllowBoost == false)
 		{
 			m_boostCoolDownTime += _dt;
