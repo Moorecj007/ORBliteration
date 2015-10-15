@@ -176,7 +176,7 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_state = APP_STATE_MAIN_MENU;
+	m_state = APP_STATE_SPLASH;
 	m_isFullscreen = false;
 	m_isSoundOn = true;
 	m_isRumbleOn = false;

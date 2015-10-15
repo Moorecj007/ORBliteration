@@ -174,6 +174,10 @@ protected:
 private:
 	// Member Variables
 public:
+	bool m_collidable;
+	float m_collideCountdown;
+	float m_collideStartTime;
+
 protected:
 private:
 

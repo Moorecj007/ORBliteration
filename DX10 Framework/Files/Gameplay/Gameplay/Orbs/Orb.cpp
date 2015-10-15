@@ -28,6 +28,9 @@ Orb::Orb()
 	m_bounce = 0.0f;
 	m_isAlive = true;
 
+	m_collidable = true;
+	m_collideCountdown = 0.0f;
+	m_collideStartTime = 0.05f;
 }
 
 Orb::~Orb()
@@ -108,9 +111,9 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	m_speed = _speed;
 	m_isAlive = true;
 
-	m_boostAmount = 5.0f;
-	m_boostCooldown = 3.0f;
-	m_boostLimit = 1.0f;
+	m_boostAmount = 6.0f;
+	m_boostCooldown = 1.0f;
+	m_boostLimit = 0.05f;
 	m_boostActiveTime = 0.0f;
 	m_boostCoolDownTime = 0.0f;
 	m_AllowBoost = true;
@@ -141,7 +144,7 @@ void Orb::ProcessFriction()
 			break;
 		case BTI_ROUGH:
 		{
-			m_surfaceFriction = 0.05f;
+			m_surfaceFriction = 0.01f;
 		}
 			break;
 		case BTI_STANDARD:
@@ -162,6 +165,16 @@ void Orb::ProcessFriction()
 
 void Orb::Process(float _dt)
 {
+	if (m_collidable == false)
+	{
+		m_collideCountdown -= _dt;
+
+		if (m_collideCountdown <= 0.0f)
+		{
+			m_collidable = true;
+		}
+	}
+
 
 	ProcessFriction();
 
@@ -175,14 +188,14 @@ void Orb::Process(float _dt)
 		if (m_boostActiveTime < m_boostLimit)
 		{
 			m_acceleration = m_acceleration * m_boostAmount;
-			speedLimit = 1.0f;
+			speedLimit = 0.6f;
 
 		}
 		else
 		{
 			m_boostActiveTime = 0.0f;
 			m_boost = false;
-			speedLimit = 0.5f;
+			speedLimit = 0.4f;
 		}
 	}
 	else
