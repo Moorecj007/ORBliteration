@@ -56,7 +56,7 @@ public:
 	* @parameter: _maxSpeed: The max speed the Orb is allowed to travel at
 	* @return: bool : Successful initialization
 	********************/
-	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _Speed, float _maxSpeed);
+	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _Speed);
 
 
 	/***********************
@@ -111,7 +111,7 @@ public:
 	* @parameter: _alive: Value to set Alive state too
 	* @return: void
 	********************/
-	void SetAlive(bool _alive){ m_isAlive = _alive; };
+	void SetAlive(bool _alive){ m_isAlive = _alive; m_pGlowLight->active = false; };
 
 	/***********************
 	* GetTile: Returns the tile the Orb is on
@@ -158,10 +158,9 @@ public:
 	/***********************
 	* Boost: Activate the Orbs Boost ablility 
 	* @author: Jc Fowles
-	* @parmeter: _boost: Whether to boost or stop Boosting
 	* @return: void:
 	********************/
-	void Boost(bool _boost);
+	void Boost();
 
 	/***********************
 	* Phase: Activate the Orbs Phase ablility
@@ -169,12 +168,16 @@ public:
 	* @parmeter: _phase: Whether to enter or exit Phase
 	* @return: void:
 	********************/
-	void Phase(bool _phase);
+	void Phase();
 
 protected:
 private:
 	// Member Variables
 public:
+	bool m_collidable;
+	float m_collideCountdown;
+	float m_collideStartTime;
+
 protected:
 private:
 
@@ -182,9 +185,9 @@ private:
 
 	v3float m_acceleration;
 	v3float m_velocity;
+	
 	float m_surfaceFriction;
 	float m_speed;
-	float m_maxSpeed;
 
 	float m_bounce;
 	

@@ -130,7 +130,12 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
+	// TO DO JC:   Match Start
+	eGameState m_PreviousState;
 	eGameState m_gameState;
+
+
+	bool m_allConnected;
 
 	// Players
 	int m_numPlayers;

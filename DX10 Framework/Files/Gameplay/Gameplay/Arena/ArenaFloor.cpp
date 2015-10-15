@@ -194,10 +194,11 @@ bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _pReturnTile)
 {
 	// Calculate the tile the Orb is on
 	_orbPos += m_tileScale / 2;
-	int row = (int)((_orbPos.x / m_tileScale.x) + ((m_arenaSize - 1) / 2));
-	int col = (int)((_orbPos.y / m_tileScale.y) + ((m_arenaSize - 1) / 2));
+	float row = (float)((_orbPos.x / m_tileScale.x) + ((m_arenaSize - 1) / 2));
+	float col = (float)((_orbPos.y / m_tileScale.y) + ((m_arenaSize - 1) / 2));
 
 	// Check if the orb is with in the Arena if not return false;
+	bool result;
 
 	// Check if it in the bounds of the Rows
 	if (row < 0)
@@ -206,7 +207,7 @@ bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _pReturnTile)
 		_pReturnTile = 0;
 		return false;
 	}
-	else if (row >(int)m_pArenaTiles->size() - 1)
+	else if (row >= m_pArenaTiles->size())
 	{
 		row = m_pArenaTiles->size() - 1;
 		_pReturnTile = 0;
@@ -219,15 +220,18 @@ bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _pReturnTile)
 		_pReturnTile = 0;
 		return false;
 	}
-	else if (col >(int)m_pArenaTiles->size() - 1)
+	else if (col >= m_pArenaTiles->size())
 	{
 		col = m_pArenaTiles->size() - 1;
 		_pReturnTile = 0;
 		return false;
 	}
 
+	int iRow = (int)row;
+	int iCol = (int)col;
+
 	// Return false if the orb is on a Dead Tile
-	if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
+	if ((*(*m_pArenaTiles)[iRow])[iCol]->GetActive() == false)
 	{
 		_pReturnTile = 0;
 		return false;
