@@ -77,15 +77,22 @@ public:
 	********************/
 	std::vector<std::vector<ArenaTile*>*>* GetArenaTiles() { return m_pArenaTiles; };
 
-	// TO DO JC
 	/***********************
-	* GetTile: Return tht 
+	* GetTile: Gets the a Tile that a Orb is on based on the Orbs Position 
 	* @author: Jc Fowles
-	* @return: 
+	* @parameter: _orbPos : The position Vector of the Orb
+	* @parameter: _returnTile : The pointer to the Tile that the Orb is on
+	* @return: Bool: Whether the Orb is Colliding with a Tile that is alive
 	********************/
-	bool GetTile(v3float _orbPos, ArenaTile*& _returnTile);
+	bool GetTile(v3float _orbPos, ArenaTile*& _pReturnTile);
 
-	// TO DO JC
+	/***********************
+	* GetTilePos: Gets the position of a specific Tile
+	* @author: Jc Fowles
+	* @parameter: _row : Row number of which tile you want
+	* @parameter: _col : Column number of which tile you want
+	* @return: v3float: Position vector of the selected Tile
+	********************/
 	v3float GetTilePos(UINT _row, UINT _col){ return (*(*m_pArenaTiles)[_row])[_col]->GetPosition(); };
 
 	
