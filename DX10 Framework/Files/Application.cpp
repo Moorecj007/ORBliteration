@@ -179,7 +179,7 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_state = APP_STATE_MAIN_MENU;
 	m_isFullscreen = false;
 	m_isSoundOn = true;
-	m_isRumbleOn = false;
+	m_isRumbleOn = true;
 
 	// Save the client window sizes
 	m_clientWidth = _clientWidth;
@@ -769,5 +769,25 @@ bool Application::UpdateState(MENU_STATE _state)
 
 void Application::UpdateClientSize()
 {
+	int width = m_pDX10_Renderer->GetWidth();
+	int height = m_pDX10_Renderer->GetHeight();
 
+	if (m_pGame != 0)
+	{
+		m_pGame->UpdateClientSize();
+	}
+
+	// TO DO JURAN: Update client size on UI stuff
+	float diff = max(width, height) - min(width, height);
+	if (min(width, height) == width)
+	{
+		m_instructions.SetPosition(0, 0);
+	}
+	else
+	{
+		m_instructions.SetPosition(0, 0);
+	}
+
+
+	m_instructions.SetSize(1050, 1050);
 }

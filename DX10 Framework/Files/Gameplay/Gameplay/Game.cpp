@@ -205,8 +205,24 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_pPausesMenu->AddButton(MENU_STATE_EXIT, 3, 0.5f);
 
 	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
-	m_instructions.SetPosition(100, 100);
-	m_instructions.SetSize(800, 800);
+	//m_instructions.SetPosition(100, 100);
+	//m_instructions.SetSize(800, 800);
+
+	int width = m_pDX10_Renderer->GetWidth();
+	int height = m_pDX10_Renderer->GetHeight();
+
+	float diff = max(width, height) - min(width, height);
+	if (min(width, height) == width)
+	{
+		m_instructions.SetPosition(0, diff / 2.0f);
+	}
+	else
+	{
+		m_instructions.SetPosition(diff / 2.0f, 0);
+	}
+
+	
+	m_instructions.SetSize(min(width, height), min(width, height));
 		
 	return true;
 }
@@ -622,4 +638,14 @@ bool Game::HandleInput(int _playerNum)
 		return false;
 	}
 
+}
+
+void Game::UpdateClientSize()
+{
+	int width = m_pDX10_Renderer->GetWidth();
+	int height = m_pDX10_Renderer->GetHeight();
+
+
+
+	// TO DO JURAN: Update client size on UI stuff
 }
