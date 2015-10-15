@@ -121,6 +121,9 @@ public:
 	********************/
 	void WinCheck();
 
+	// TO DO CAL
+	void UpdateClientSize();
+
 
 private:
 

@@ -72,7 +72,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 			{
 				eBaseImage = BTI_ROUGH;
 			}
-			else if (randomChance < 4)
+			else if (randomChance < 3)
 			{
 				eBaseImage = BTI_SLIPPERY;
 			}
