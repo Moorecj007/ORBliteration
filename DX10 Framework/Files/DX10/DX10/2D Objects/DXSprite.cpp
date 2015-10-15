@@ -21,6 +21,8 @@ DXSprite::DXSprite():
 	m_pDX10_Renderer(0),
 	m_pTex(0)
 {
+	m_offsetScreenWidthPrev = 0.0f;
+	m_offsetScreenHeightPrev = 0.0f;
 }
 
 DXSprite::~DXSprite()
@@ -67,16 +69,16 @@ bool DXSprite::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _p
 	//m_offsetImageHeight = m_imageHeight;
 
 	// Save the screen size.
-	RECT rect;
+	/*RECT rect;
 	if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
 	{
 		m_screenWidth = rect.right - rect.left;
 		m_screenHeight = rect.bottom - rect.top;
-	}
+	}*/
 
 	// Calculate offsets to reduce the amount of divides in the update call.
-	m_offsetScreenWidth = (static_cast<float>(m_screenWidth) / 2.0f) * -1.0f;
-	m_offsetScreenHeight = (static_cast<float>(m_screenHeight) / 2.0f);
+	//m_offsetScreenWidth = (static_cast<float>(m_screenWidth) / 2.0f) * -1.0f;
+	//m_offsetScreenHeight = (static_cast<float>(m_screenHeight) / 2.0f);
 
 	m_offsetImageWidth = static_cast<float>(_imageWidth) / static_cast<float>(m_sliceWidth);
 	m_offsetImageHeight = static_cast<float>(_imageHeight) / static_cast<float>(m_sliceHeight);
@@ -241,8 +243,15 @@ bool DXSprite::InitialiseBuffers()
 bool DXSprite::UpdateBuffers()
 {
 	// If the position has not changed then don't update the vertex buffer
-	if ((m_position == m_previousPosition) && (m_indexPrev == m_index))
+	if ((m_position == m_previousPosition) && (m_indexPrev == m_index) && (m_offsetScreenWidthPrev == m_offsetScreenWidth) && (m_offsetScreenHeightPrev == m_offsetScreenHeight))
 		return true;
+
+	// Calculate offsets
+	m_offsetScreenWidth = (static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f) * -1.0f;
+	m_offsetScreenHeight = (static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f);
+
+	m_offsetScreenWidthPrev = m_offsetScreenWidth;
+	m_offsetScreenHeightPrev = m_offsetScreenHeight;
 
 	float left, right, top, bottom;
 	TVertexUV* vertices;

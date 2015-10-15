@@ -319,6 +319,13 @@ public:
 	D3DXMATRIX* GetProjMatrix() { return &m_matProj; };
 
 	/***********************
+	* GetOrthographicMatrix: Retrieve the Orthographic Matrix for 2D rendering
+	* @author: Juran Griffith
+	* @return: D3DXMATRIX*: The Orthographic Matrix
+	********************/
+	D3DXMATRIX* GetOrthographicMatrix() { return &m_matOrtho; };
+
+	/***********************
 	* GetFullScreenState: Retrieve the state of full screen
 	* @author: Callan Moore
 	* @return: bool: True if full screen is active, false otherwise
@@ -342,6 +349,13 @@ public:
 	// TO DO CAL
 	int GetWidth() { return m_clientWidth; };
 	int GetHeight() { return m_clientHeight; };
+
+	/***********************
+	* IsFullscreen: Retrieve the current full screen state
+	* @author: Juran Griffith
+	* @return: bool: true when fullscreen is set otherwise false.
+	********************/
+	bool IsFullscreen() { return m_fullScreen; };
 
 private:
 	// Window Variables

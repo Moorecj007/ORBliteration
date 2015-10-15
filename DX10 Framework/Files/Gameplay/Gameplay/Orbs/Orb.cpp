@@ -300,6 +300,7 @@ void Orb::SetAcceleration(v3float _acceleration)
 		{
 			// Only Set the Acceleration if the Orb is not on a Slippery tile
 			m_acceleration += _acceleration * 5.0f;
+
 		}
 	}
 };

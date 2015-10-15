@@ -177,7 +177,8 @@ Application* Application::GetInstance()
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
 	m_state = APP_STATE_SPLASH;
-	m_isFullscreen = false;
+
+	m_isFullscreen = true;
 	m_isSoundOn = true;
 	m_isRumbleOn = true;
 
@@ -221,6 +222,10 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	// Initialise the Renderer
 	m_pDX10_Renderer = new DX10_Renderer();
 	VALIDATE(m_pDX10_Renderer->Initialise(m_clientWidth, m_clientHeight, m_hWnd));
+	if (m_pDX10_Renderer->IsFullscreen() != m_isFullscreen)
+	{
+		m_pDX10_Renderer->ToggleFullscreen();
+	}
 
 	// Initialise the Objects
 	m_pCamera = new DX10_Camera_Debug();
@@ -271,11 +276,11 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_sound_fill.png", 481, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_rumble_fill.png", 575, 424, 1, 4);
-	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.25f);
-	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen, 0.75f);
-	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.25f);
+	m_menus.back()->AddButton(MENU_STATE_FULL_SCREEN, 1, 0.5f);
+	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(0), 0, m_isFullscreen);
+	m_menus.back()->AddButton(MENU_STATE_SOUND, 2, 0.5f);
 	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(1), 0, m_isSoundOn);
-	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 3, 0.25f);
+	m_menus.back()->AddButton(MENU_STATE_RUMBLE, 3, 0.5f);
 	m_menus.back()->AddToggleButton(m_menus.back()->GetButton(2), 0, m_isRumbleOn);
 
 	// Initialise Pause Menu
@@ -291,20 +296,29 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_EXIT, 3, 0.5f);
 
-	VALIDATE(m_splash_ps.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Phenomena/phenomena_splash.png", 4000, 2400, 5, 4));
-	m_splash_ps.SetPosition(100,50);
-	m_splash_ps.SetSize(800, 600);
+	float min = static_cast<float>(min(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
+	float max = static_cast<float>(max(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
+	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f;
+	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f;
+
+	VALIDATE(m_splash_ps.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Phenomena/phenomena_splash.png", 3504, 2173, 6, 5));
+	m_splash_ps.SetSize(max - 300.0f, (max - 300.0f) * (434.6f / 584.0f));
+	m_splash_ps.SetPosition(0.0f, 0.0f);
 	m_splash_ps.SetImageIndex(0);
 
 	VALIDATE(m_splash_orb.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_splash.png", 4000, 1200, 5, 3));
-	m_splash_orb.SetPosition(100, 150);
-	m_splash_orb.SetSize(800, 400);
+	m_splash_orb.SetPosition(0, 0);
+	m_splash_orb.SetSize(max, max * 0.5f);
 	m_splash_orb.SetImageIndex(0);
 
 	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
-	m_instructions.SetSize((float)m_clientWidth, (float)m_clientHeight);
-
-	m_pSoundManager->PlayPhenomenaSplash();
+	m_instructions.SetPosition(xoffset, 0.0f);
+	m_instructions.SetSize(min, min);
+	
+	if (m_state == APP_STATE_MAIN_MENU)
+	{
+		m_pSoundManager->PlayPhenomenaSplash();
+	}
 
 	return true;
 }
@@ -459,7 +473,6 @@ bool Application::Process(float _dt)
 			if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN])
 			{
 				m_pKeyDown[VK_RETURN] = false;
-				//VALIDATE(UpdateState(MENU_STATE_INSTRUCTIONS));
 				m_state = APP_STATE_MAIN_MENU;
 			}
 			m_pGamepadPlayerOne->PostProcess();
@@ -708,51 +721,26 @@ bool Application::UpdateState(MENU_STATE _state)
 		break;
 		
 		// Match menu states
-	case MENU_STATE_PLAYERS_2:
+	case MENU_STATE_PLAYERS_2: // Fall through
+	case MENU_STATE_PLAYERS_3: // Fall through
+	case MENU_STATE_PLAYERS_4:
 		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn, m_pKeyDown));
+		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, (MENU_STATE_PLAYERS_2 - 6), m_isRumbleOn, m_pKeyDown));
+		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
 		m_state = APP_STATE_GAME;
-		//if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn, m_pKeyDown))
-		//{
-		//	m_state = APP_STATE_GAME;
-		//}
-		//else
-		//{
-		//	ReleasePtr(m_pGame);
-		//	m_state = APP_STATE_MATCH_MENU;
-		//	m_menus[1]->Reset();
-		//}
 		break;
-	case MENU_STATE_PLAYERS_3:
+	/*case MENU_STATE_PLAYERS_3:
 		m_pGame = new Game();
 		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn, m_pKeyDown));
+		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
 		m_state = APP_STATE_GAME;
-		//if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn, m_pKeyDown))
-		//{
-		//	m_state = APP_STATE_GAME;
-		//}
-		//else
-		//{
-		//	ReleasePtr(m_pGame);
-		//	m_state = APP_STATE_MATCH_MENU;
-		//	m_menus[1]->Reset();
-		//}
 		break;
 	case MENU_STATE_PLAYERS_4:
 		m_pGame = new Game();
 		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn, m_pKeyDown));
+		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
 		m_state = APP_STATE_GAME;
-		//if (m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn, m_pKeyDown))
-		//{
-		//	m_state = APP_STATE_GAME;
-		//}
-		//else
-		//{
-		//	ReleasePtr(m_pGame);
-		//	m_state = APP_STATE_MATCH_MENU;
-		//	m_menus[1]->Reset();
-		//}
-		break;
+		break;*/
 
 		// Pause menu states (reuses the main menu states)
 	case MENU_STATE_RESUME:
@@ -769,25 +757,30 @@ bool Application::UpdateState(MENU_STATE _state)
 
 void Application::UpdateClientSize()
 {
-	int width = m_pDX10_Renderer->GetWidth();
-	int height = m_pDX10_Renderer->GetHeight();
+	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
+	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
 
 	if (m_pGame != 0)
 	{
 		m_pGame->UpdateClientSize();
 	}
 
-	// TO DO JURAN: Update client size on UI stuff
 	float diff = max(width, height) - min(width, height);
-	if (min(width, height) == width)
+
+	if (max(width, height) == width)
 	{
-		m_instructions.SetPosition(0, 0);
+		m_instructions.SetPosition((diff / 2.0f), 0.0f);
 	}
 	else
 	{
-		m_instructions.SetPosition(0, 0);
+		m_instructions.SetPosition(0.0f, (diff / 2.0f));
 	}
 
+	m_instructions.SetSize(min(width, height), min(width, height));
+	//m_instructions.SetSize(600, 600);
 
-	m_instructions.SetSize(1050, 1050);
+	for (auto it = m_menus.begin(); it != m_menus.end(); ++it)
+	{
+		(*it)->OnResize();
+	}
 }

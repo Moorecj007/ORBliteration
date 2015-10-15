@@ -92,12 +92,12 @@ class DX10_Shader_Sprite
 			m_pDX10_Renderer->CreateVertexLayout(layout, layoutElements, m_pTech, m_pVertexLayout);
 
 			// Save the screen size.
-			RECT rect;
+			/*RECT rect;
 			if (GetClientRect(*_pHWnd, &rect))
 			{
 				// Create an orthographic projection matrix for 2D rendering.
 				D3DXMatrixOrthoLH(&m_matOrtho, static_cast<float>(rect.right - rect.left), static_cast<float>(rect.bottom - rect.top), 0.1f, 100.0f);
-			}
+			}*/
 
 			// Set the view matrix. No need for a camera.
 			D3DXMatrixLookAtLH(&m_matView, &D3DXVECTOR3(0.0f, 0.0f, -1.0f), &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3(0.0f, 1.0f, 0.0f));
@@ -115,7 +115,8 @@ class DX10_Shader_Sprite
 		{
 			// Update the constant buffer variables on the shader
 			m_pEmvView->SetMatrix((float*)&m_matView);
-			m_pEmvProjection->SetMatrix((float*)&m_matOrtho);
+			//m_pEmvProjection->SetMatrix((float*)&m_matOrtho);
+			m_pEmvProjection->SetMatrix((float*)m_pDX10_Renderer->GetOrthographicMatrix());
 			m_pEmvWorld->SetMatrix((float*)&m_matWorld);
 			m_pEvDeltaTime->SetRawValue(&_deltaTime, 0, sizeof(float));
 		}

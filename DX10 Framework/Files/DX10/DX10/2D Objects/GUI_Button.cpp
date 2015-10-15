@@ -23,6 +23,7 @@ GUI_Button::GUI_Button()
 	m_boundsOffset = 0;
 	m_col = 0;
 	m_row = 0; 
+	m_scale = 1.0;
 }
 
 GUI_Button::~GUI_Button()
@@ -84,6 +85,11 @@ float GUI_Button::GetHeight()
 	return m_height;
 }
 
+float GUI_Button::GetScale()
+{
+	return m_scale;
+}
+
 void GUI_Button::SetPosition(v2float _position)
 {
 	m_position = _position;
@@ -116,6 +122,11 @@ void GUI_Button::SetColumnIndex(UINT _index)
 void GUI_Button::SetRowIndex(UINT _index)
 {
 	m_row = _index;
+}
+
+void GUI_Button::SetScale(float _scale)
+{
+	m_scale = _scale;
 }
 
 void GUI_Button::Draw()
