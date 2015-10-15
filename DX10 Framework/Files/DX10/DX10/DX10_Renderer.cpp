@@ -29,8 +29,8 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 
 	// Save Window Variables
 	m_hWnd = _hWND;
-	m_clientWidth = _clientWidth;
-	m_clientHeight = _clientHeight;
+	m_windowedWidth = _clientWidth;
+	m_windowedHeight = _clientHeight;
 
 	VALIDATE(InitialiseDeviceAndSwapChain());
 
@@ -187,6 +187,19 @@ bool DX10_Renderer::onResize()
 	ReleaseCOM(m_pRenderTargetView);
 	ReleaseCOM(m_pDepthStencilView);
 	ReleaseCOM(m_pDepthStencilBuffer);
+	ReleaseCOM(m_pDepthStencilStateNormal);
+	ReleaseCOM(m_pDepthStencilStateZDisabled);
+
+	if (m_fullScreen == true)
+	{
+		m_clientWidth = GetSystemMetrics(SM_CXSCREEN);
+		m_clientHeight = GetSystemMetrics(SM_CYSCREEN);
+	}
+	else
+	{
+		m_clientWidth = m_windowedWidth;
+		m_clientHeight = m_windowedHeight;
+	}
 
 	// Resize the buffers of the Swap Chain and create the new render target view
 	VALIDATEHR(m_pDX10SwapChain->ResizeBuffers(1, m_clientWidth, m_clientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
@@ -788,6 +801,12 @@ bool DX10_Renderer::AddLight(std::string _lightName, Light* _light)
 	m_lightCount = index;
 
 	return true;
+}
+
+void DX10_Renderer::RemoveLight(std::string _lightName)
+{
+	ReleasePtr(m_mapLights.find(_lightName)->second);
+	m_mapLights.erase(_lightName);
 }
 
 Light* DX10_Renderer::GetActiveLights()

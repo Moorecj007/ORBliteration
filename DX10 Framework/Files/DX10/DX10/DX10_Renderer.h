@@ -339,9 +339,15 @@ public:
 	********************/
 	int GetLightCount() { return m_lightCount; };
 
+	// TO DO CAL
+	int GetWidth() { return m_clientWidth; };
+	int GetHeight() { return m_clientHeight; };
+
 private:
 	// Window Variables
 	HWND m_hWnd;
+	int m_windowedWidth;
+	int m_windowedHeight;
 	int m_clientWidth;
 	int m_clientHeight;
 	bool m_fullScreen;
