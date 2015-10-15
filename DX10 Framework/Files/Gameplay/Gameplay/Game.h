@@ -33,6 +33,7 @@ enum eGameState
 	GAME_STATE_START,
 	GAME_STATE_PROCESS,
 	GAME_STATE_PAUSED,
+	GAME_STATE_OPTIONS,
 	GAME_STATE_ERROR,
 	GAME_STATE_END
 };
@@ -124,6 +125,8 @@ public:
 	// TO DO CAL
 	void UpdateClientSize();
 
+	// TO DO - Juran
+	bool AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructions);
 
 private:
 
@@ -159,15 +162,25 @@ private:
 	
 	SoundManager* m_pSoundManager;
 
-	// TO DO JUR: Temp to be removed
-	DXSprite* VictroyPlayerOne;
-	DXSprite* TempPause;
-	DXSprite* TempError;
+	// TO DO JUR: below code to be removed when UI manager is implemented
 	DX10_Shader_Sprite* m_pSpriteShader;
-	Menu* m_pPausesMenu;
-	DXSprite m_instructions;
+
+	// Menu Components
+	Menu* m_pPauseMenu;
+	Menu* m_pOptionsMenu;
+	DXSprite* m_pInstructions;
+
+	// UI Components
 	std::vector<DXSprite> m_uiPlayers;
-	DXSprite m_number_first, m_number_second;
+	std::vector<DXSprite> m_uiVictory;
+	DXSprite m_uiControllerMissing;
+	DXSprite m_number_first;
+	DXSprite m_number_second;
+	float m_uiScale = 0.5f;
+	float m_uiWidth = 671.0f;
+	float m_uiHeight = 365.0f;
+	float m_uiSpace = 10.0f;
+	bool* m_isConnected;
 };
 #endif	//__GAME_H__
 

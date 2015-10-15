@@ -105,7 +105,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;
 
-	m_boostAmount = 5.0f;
+	m_boostAmount = 2.0f;
 	m_boostCooldown = 5.0f;
 	m_boostLimit = 1.0f;
 	m_boostActiveTime = 0.0f;
@@ -264,12 +264,12 @@ void Orb::SetAcceleration(v3float _acceleration)
 		if (m_pTile->GetBaseImageEnum() != BTI_SLIPPERY)
 		{
 			// Only Set the Acceleration if the Orb is not on a Slippery tile
-			m_acceleration = _acceleration;
+			m_acceleration += _acceleration;
 		}
 		else if (m_velocity.Magnitude() == 0)
 		{
 			// Only Set the Acceleration if the Orb is not on a Slippery tile
-			m_acceleration = _acceleration * 2.0f;
+			m_acceleration += _acceleration * 2.0f;
 		}
 	}
 };
