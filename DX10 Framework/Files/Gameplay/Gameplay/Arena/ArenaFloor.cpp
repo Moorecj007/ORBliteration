@@ -190,7 +190,7 @@ void ArenaFloor::StartTileDeath(UINT _row, UINT _col)
 	(*(*m_pArenaTiles)[_row])[_col]->SetDeathTimer(m_destroyOutsideTime / 2 * modifier);
 }
 
-bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _returnTile)
+bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _pReturnTile)
 {
 	// Calculate the tile the Orb is on
 	_orbPos += m_tileScale / 2;
@@ -203,39 +203,39 @@ bool ArenaFloor::GetTile(v3float _orbPos, ArenaTile*& _returnTile)
 	if (row < 0)
 	{
 		row = 0;
-		_returnTile = 0;
+		_pReturnTile = 0;
 		return false;
 	}
 	else if (row >(int)m_pArenaTiles->size() - 1)
 	{
 		row = m_pArenaTiles->size() - 1;
-		_returnTile = 0;
+		_pReturnTile = 0;
 		return false;
 	}
 	// Check if it in the bounds of the Columns
 	if (col < 0)
 	{
 		col = 0;
-		_returnTile = 0;
+		_pReturnTile = 0;
 		return false;
 	}
 	else if (col >(int)m_pArenaTiles->size() - 1)
 	{
 		col = m_pArenaTiles->size() - 1;
-		_returnTile = 0;
+		_pReturnTile = 0;
 		return false;
 	}
 
 	// Return false if the orb is on a Dead Tile
 	if ((*(*m_pArenaTiles)[row])[col]->GetActive() == false)
 	{
-		_returnTile = 0;
+		_pReturnTile = 0;
 		return false;
 	}
 	// Orb is still alive return the true and the tile
 	else
 	{
-		_returnTile = (*(*m_pArenaTiles)[row])[col];
+		_pReturnTile = (*(*m_pArenaTiles)[row])[col];
 		return true;
 	}
 }

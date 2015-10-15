@@ -109,11 +109,17 @@ public:
 	/***********************
 	* KillOrb: Kills a Orb
 	* @author: Jc Fowles
-	* @parameter: _pOrb:
+	* @parameter: _pOrb: The Orb to kill
 	* @return: void
 	********************/
 	void KillOrb(Orb* _pOrb);
 
+	/***********************
+	* WinCheck: Checks the win condition of the game
+	* @author: Jc Fowles
+	* @return: void
+	********************/
+	void WinCheck();
 
 
 private:
@@ -127,6 +133,7 @@ private:
 	int m_numPlayers;
 	int m_numAlivePlayers;
 	int m_PausedPlayer;
+	int m_winner;
 
 	// Timers
 	bool m_firstProcess;
@@ -146,27 +153,17 @@ private:
 
 	// Arena
 	ArenaFloor* m_pArenaFloor;
-	//std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
-	//v3float m_tileScale;
-	//int m_areaSize;
 	
 	SoundManager* m_pSoundManager;
 
 	// TO DO JUR: Temp to be removed
-	bool m_contollerError;
-								  
 	DXSprite* VictroyPlayerOne;
 	DXSprite* TempPause;
 	DXSprite* TempError;
 	DX10_Shader_Sprite* m_pSpriteShader;
 	Menu* m_pPausesMenu;
 	DXSprite m_instructions;
-
 	std::vector<DXSprite> m_uiPlayers;
-	//DXSprite m_uiPlayer1;
-	//DXSprite m_uiPlayer2;
-	//DXSprite m_uiPlayer3;
-	//DXSprite m_uiPlayer4;
 	DXSprite m_number_first, m_number_second;
 };
 #endif	//__GAME_H__
