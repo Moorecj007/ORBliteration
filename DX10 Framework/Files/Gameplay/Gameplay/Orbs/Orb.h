@@ -59,35 +59,117 @@ public:
 	bool Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _Speed, float _maxSpeed);
 
 
-	// TO DO JC:
-	void ProcessFrcition();
+	/***********************
+	* ProcessFriction: Process the friction of the Orb based on the tile its on
+	* @author: Jc Fowles
+	* @return: void 
+	********************/
+	void ProcessFriction();
+
+	/***********************
+	* Process: Process the Orb
+	* @author: Jc Fowles
+	* @parameter: _dt: The delta tick - time since last frame
+	* @return: void
+	********************/
 	void Process(float _dt);
+
+	/***********************
+	* Render: Draw the Orb
+	* @author: Jc Fowles
+	* @return: void
+	********************/
 	void Render();
 
-   	//void SetSurfaceFriction(float _surfaceFriction){ m_surfaceFriction = _surfaceFriction; };
-	
+	/***********************
+	* SetAcceleration: Sets the Orbs Acceleration
+	* @author: Jc Fowles
+	* @parameter: _acceleration: Value to set acceleration too
+	* @return: void
+	********************/
 	void SetAcceleration(v3float _acceleration);
-	void SetTile(ArenaTile* _pTile){ m_pTile = _pTile; };
-	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
-	void SetAlive(bool _alive){ m_isAlive = _alive; };
-	void SetBounce(float _bounce){ m_bounce = _bounce; };
 
+	/***********************
+	* SetTile: Sets the tile the Orb is on
+	* @author: Jc Fowles
+	* @parameter: _pTile: The Tile the Orb is on
+	* @return: void
+	********************/
+	void SetTile(ArenaTile* _pTile){ m_pTile = _pTile; };
+	
+	/***********************
+	* SetVelocity: Sets the Orbs Velocity
+	* @author: Jc Fowles
+	* @parameter: _velocity: Value to set Velocity too
+	* @return: void
+	********************/
+	void SetVelocity(v3float _velocity){ m_velocity = _velocity; };
+
+	/***********************
+	* SetAlive: Sets the Orbs Alive state
+	* @author: Jc Fowles
+	* @parameter: _alive: Value to set Alive state too
+	* @return: void
+	********************/
+	void SetAlive(bool _alive){ m_isAlive = _alive; };
+
+	/***********************
+	* GetTile: Returns the tile the Orb is on
+	* @author: Jc Fowles
+	* @return: ArenaTile* : The Tile the Orb is On
+	********************/
 	ArenaTile* GetTile(){ return m_pTile; };
+
+	/***********************
+	* GetAlive: Returns the Orbs Alive State
+	* @author: Jc Fowles
+	* @return: bool* : The Orbs Alive State
+	********************/
 	bool GetAlive(){ return m_isAlive; };
+	
+	/***********************
+	* GetRadius: Returns the Orbs Radius
+	* @author: Jc Fowles
+	* @return: float : The Orbs Radius
+	********************/
 	float GetRadius(){ return m_radius; };
+
+	/***********************
+	* GetVelocity: Returns the Orbs Velocity
+	* @author: Jc Fowles
+	* @return: v3float : The Orbs Velocity
+	********************/
 	v3float GetVelocity(){ return m_velocity; };
+	
+	/***********************
+	* GetBounce: Returns the Orbs Bounce Value
+	* @author: Jc Fowles
+	* @return: float : The Orbs Bounce Value
+	********************/
 	float GetBounce(){ return m_bounce; };
+
+	/***********************
+	* GetPhase: Returns the Orbs Phase state
+	* @author: Jc Fowles
+	* @return: bool : The Orbs Phase state
+	********************/
 	bool GetPhase(){ return m_phase; };
 
-
-
+	/***********************
+	* Boost: Activate the Orbs Boost ablility 
+	* @author: Jc Fowles
+	* @parmeter: _boost: Whether to boost or stop Boosting
+	* @return: void:
+	********************/
 	void Boost(bool _boost);
+
+	/***********************
+	* Phase: Activate the Orbs Phase ablility
+	* @author: Jc Fowles
+	* @parmeter: _phase: Whether to enter or exit Phase
+	* @return: void:
+	********************/
 	void Phase(bool _phase);
-
-	
-
-	
-
 
 protected:
 private:

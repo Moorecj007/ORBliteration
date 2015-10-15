@@ -258,8 +258,8 @@ class Menu
 		GUI_Button*					m_title;
 
 		// Input
-		XButtonIDs					m_XButtons;	//TO DO Jc - Maybe use enums
-		XStickDirectionIDs			m_XStickDirections; //TO DO Jc - Maybe use enums
+		XButtonIDs					m_XButtons;
+		XStickDirectionIDs			m_XStickDirections;
 		InputGamePad*				m_pGamepad;
 
 		// State

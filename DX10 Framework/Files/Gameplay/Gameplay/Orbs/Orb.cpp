@@ -105,7 +105,6 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;
 
-	// TO DO JC
 	m_boostAmount = 5.0f;
 	m_boostCooldown = 5.0f;
 	m_boostLimit = 1.0f;
@@ -125,7 +124,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	return true;
 }
   
-void Orb::ProcessFrcition()
+void Orb::ProcessFriction()
 {
 	if (m_pTile != 0)
 	{
@@ -159,7 +158,7 @@ void Orb::ProcessFrcition()
 void Orb::Process(float _dt)
 {
 
-	ProcessFrcition();
+	ProcessFriction();
 	
 	m_velocity += ((m_acceleration* _dt)* m_speed);
 	m_acceleration *= 0.0f;
@@ -227,12 +226,6 @@ void Orb::Process(float _dt)
 			}
 		}
 	}
-
-
-	// Yaw 
-	// Pitch
-	//SetRotPerSecondPitch(m_pos.y);
-	//SetRotPerSecondYaw(-m_pos.x);
 
 	// Update the Glow lights position
 	m_pGlowLight->pos_range.x = m_pos.x;

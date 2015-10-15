@@ -28,9 +28,6 @@
 
 // Local Includes
 
-
-// TO DO JC: Move to a input utils
-
 // Constants
 
 // XInput Button values
