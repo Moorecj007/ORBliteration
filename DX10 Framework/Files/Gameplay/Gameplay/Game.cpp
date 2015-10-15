@@ -60,8 +60,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_startCountDown = 3.0f;
 	m_firstProcess = true;
 
-	// JC TO DO: Change to start
-	m_gameState = GAME_STATE_PROCESS;
+	m_gameState = GAME_STATE_START;
 
 	m_numPlayers = _numPlayers;
 	m_numAlivePlayers = _numPlayers;
