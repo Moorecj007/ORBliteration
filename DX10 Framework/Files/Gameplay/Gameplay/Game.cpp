@@ -19,14 +19,7 @@
 
 Game::Game()
 {
-	//m_pOrbs.reserve(4);
-	//m_pContollers.reserve(4);
-	//
-	//for (UINT i = 0; i < 4; i++)
-	//{
-	//	m_pOrbs[i] = 0;
-	//	m_pContollers[i] = 0;
-	//}
+
 }
 
 Game::~Game()
@@ -68,7 +61,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_firstProcess = true;
 
 	// JC TO DO: Change to start
-	m_gameState = GAME_STATE_START;
+	m_gameState = GAME_STATE_PROCESS;
 
 	m_numPlayers = _numPlayers;
 	m_numAlivePlayers = _numPlayers;
@@ -105,7 +98,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	// Create and Initialise the Arena Floor
 	m_pArenaFloor = new ArenaFloor();
-	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, { 4, 4, 4 }, m_matchTimer));
+	VALIDATE(m_pArenaFloor->Initialise(m_pDX10_Renderer, m_pShader_LitTex, 15, { 4.8f, 4.8f, 4.8f }, m_matchTimer));
 
 	// Create the Orb Mesh
 	float OrbRadius = 2.0f;
@@ -181,12 +174,15 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 			}
 			break;
 		}
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 2.0f, 5.0f, 1000.0f));
-		
+
 		// Set the Orbs Positions
 		v3float	OrbPos = m_pArenaFloor->GetTilePos(row, col);
 		OrbPos.z = -2.0f;
 		m_pOrbs[i]->SetPosition(OrbPos);
+
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 1.0f, 0.5f));
+		
+		
 		m_pOrbs[i]->Process(0.016f);
 
 	}
@@ -227,7 +223,7 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 			{
 				
 				// Move objects out of colliding with each other
-				while (distance < combinedRadius)
+				//while (distance < combinedRadius)
 				{
 					// Calculate Peirce
 					float peirce = combinedRadius - distance;
@@ -237,6 +233,7 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 			
 					_pOrbA->SetPosition(_pOrbA->GetPosition() + (Direction *  peirce));
 					_pOrbB->SetPosition(_pOrbB->GetPosition() + (Direction *  -peirce));
+
 					
 					// Calculate the distance between the two orbs
 					distance = (_pOrbA->GetPosition() - _pOrbB->GetPosition()).Magnitude();
@@ -267,38 +264,93 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 
 void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 {
+	// TO DO CAL: COMMENT and clean
+	// 2 functions 
+	// CalcNewVelocity()
+	// RotateRoundZAxis()
+
 	if ((_pOrbA != 0) && (_pOrbB != 0))
 	{
-		v3float orbVelocity_A, orbVelocity_B;
 
-		orbVelocity_A = _pOrbA->GetVelocity();
-		orbVelocity_B = _pOrbB->GetVelocity();
+		v3float orbPosA = _pOrbA->GetPosition();
+		v3float orbPosB = _pOrbB->GetPosition();
+
+		v3float dir = orbPosB - orbPosA;
+		v3float impactPoint = orbPosA + (dir / 2.0f);
 
 
-		if (orbVelocity_A.Magnitude() < orbVelocity_B.Magnitude())
+		// ORB A
+		v3float lineVecTemp = orbPosA - impactPoint;
+		v3float lineVec;
+		lineVec.x = lineVecTemp.x * cos(DegreesToRadians(90)) - lineVecTemp.y * sin(DegreesToRadians(90));
+		lineVec.y = lineVecTemp.x * sin(DegreesToRadians(90)) + lineVecTemp.y * cos(DegreesToRadians(90));
+		lineVec = lineVec.Normalise();
+
+		v3float orbVelNormA = _pOrbA->GetVelocity().Normalise();
+		float orbVelMagA = _pOrbA->GetVelocity().Magnitude();
+		float orbImpactAngleA = RadiansToDegrees(acos(orbVelNormA.x * lineVec.x + orbVelNormA.y * lineVec.y + orbVelNormA.z * lineVec.z));
+
+		v3float orbNewVelA;
+		if (orbImpactAngleA > 90.0f)
 		{
-			// Orb B has the Higher Velocity
+			orbNewVelA.x = lineVec.x * cos(DegreesToRadians(orbImpactAngleA)) - lineVec.y * sin(DegreesToRadians(orbImpactAngleA));
+			orbNewVelA.y = lineVec.x * sin(DegreesToRadians(orbImpactAngleA)) + lineVec.y * cos(DegreesToRadians(orbImpactAngleA));
 
-			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-			// TO DO JC: Take a small multiple of of the other orbs velocity 
-			_pOrbB->SetVelocity(orbVelocity_A * 0.0f);
-		}
-		else if (orbVelocity_A.Magnitude() > orbVelocity_B.Magnitude())
-		{
-			// Orb A has the Higher Velocity
-
-			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
-			// TO DO JC: Take a small multiple of of the other orbs velocity 
-			_pOrbA->SetVelocity(orbVelocity_B * 0.0f);
+			if (orbNewVelA.Normalise().ApproxEqual(orbVelNormA.Normalise(), 0.0001f))
+			{
+				orbNewVelA.x = lineVec.x * cos(DegreesToRadians(-orbImpactAngleA)) - lineVec.y * sin(DegreesToRadians(-orbImpactAngleA));
+				orbNewVelA.y = lineVec.x * sin(DegreesToRadians(-orbImpactAngleA)) + lineVec.y * cos(DegreesToRadians(-orbImpactAngleA));
+			}
 		}
 		else
 		{
-			// Velocities are the same
-			_pOrbA->SetVelocity((orbVelocity_B * _pOrbB->GetBounce()));
-			_pOrbB->SetVelocity((orbVelocity_A * _pOrbA->GetBounce()));
-		}
-	}
+			orbNewVelA.x = lineVec.x * cos(DegreesToRadians(-orbImpactAngleA)) - lineVec.y * sin(DegreesToRadians(-orbImpactAngleA));
+			orbNewVelA.y = lineVec.x * sin(DegreesToRadians(-orbImpactAngleA)) + lineVec.y * cos(DegreesToRadians(-orbImpactAngleA));
 
+			if (orbNewVelA.Normalise().ApproxEqual(orbVelNormA.Normalise(), 0.0001f))
+			{
+				orbNewVelA.x = lineVec.x * cos(DegreesToRadians(orbImpactAngleA)) - lineVec.y * sin(DegreesToRadians(orbImpactAngleA));
+				orbNewVelA.y = lineVec.x * sin(DegreesToRadians(orbImpactAngleA)) + lineVec.y * cos(DegreesToRadians(orbImpactAngleA));
+			}
+		}
+
+		// ORB B
+		lineVecTemp = orbPosB - impactPoint;
+		lineVec.x = lineVecTemp.x * cos(DegreesToRadians(90)) - lineVecTemp.y * sin(DegreesToRadians(90));
+		lineVec.y = lineVecTemp.x * sin(DegreesToRadians(90)) + lineVecTemp.y * cos(DegreesToRadians(90));
+		lineVec = lineVec.Normalise();
+
+		v3float orbVelNormB = _pOrbB->GetVelocity().Normalise();
+		float orbVelMagB = _pOrbB->GetVelocity().Magnitude();
+		float orbImpactAngleB = RadiansToDegrees(acos(orbVelNormB.x * lineVec.x + orbVelNormB.y * lineVec.y + orbVelNormB.z * lineVec.z));
+
+		v3float orbNewVelB;
+		if (orbImpactAngleB > 90.0f)
+		{
+			orbNewVelB.x = lineVec.x * cos(DegreesToRadians(orbImpactAngleB)) - lineVec.y * sin(DegreesToRadians(orbImpactAngleB));
+			orbNewVelB.y = lineVec.x * sin(DegreesToRadians(orbImpactAngleB)) + lineVec.y * cos(DegreesToRadians(orbImpactAngleB));
+
+			if (orbNewVelB.Normalise().ApproxEqual(orbVelNormB.Normalise(), 0.0001f))
+			{
+				orbNewVelB.x = lineVec.x * cos(DegreesToRadians(-orbImpactAngleB)) - lineVec.y * sin(DegreesToRadians(-orbImpactAngleB));
+				orbNewVelB.y = lineVec.x * sin(DegreesToRadians(-orbImpactAngleB)) + lineVec.y * cos(DegreesToRadians(-orbImpactAngleB));
+			}
+		}
+		else
+		{
+			orbNewVelB.x = lineVec.x * cos(DegreesToRadians(-orbImpactAngleB)) - lineVec.y * sin(DegreesToRadians(-orbImpactAngleB));
+			orbNewVelB.y = lineVec.x * sin(DegreesToRadians(-orbImpactAngleB)) + lineVec.y * cos(DegreesToRadians(-orbImpactAngleB));
+
+			if (orbNewVelB.Normalise().ApproxEqual(orbVelNormB.Normalise(), 0.0001f))
+			{
+				orbNewVelB.x = lineVec.x * cos(DegreesToRadians(orbImpactAngleB)) - lineVec.y * sin(DegreesToRadians(orbImpactAngleB));
+				orbNewVelB.y = lineVec.x * sin(DegreesToRadians(orbImpactAngleB)) + lineVec.y * cos(DegreesToRadians(orbImpactAngleB));
+			}
+		}
+
+		_pOrbA->SetVelocity(orbNewVelA * orbVelMagB * 2.0f);
+		_pOrbB->SetVelocity(orbNewVelB * orbVelMagA * 2.0f);
+	}
 }
 
 void Game::KillOrb(Orb* _pOrb)
@@ -417,6 +469,7 @@ bool Game::Process(float _dt)
 					{
 						m_pOrbs[i]->SetTile(collidingTile);
 						m_pOrbs[i]->Process(_dt);
+
 					}
 					else
 					{
@@ -576,20 +629,25 @@ bool Game::HandleInput(int _playerNum)
 		}
 		
 		// Boost
-		m_pOrbs[_playerNum]->Boost(m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_R));
-				
-		m_pOrbs[_playerNum]->Phase(m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_L));
+		if (m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_R))
+		{
+			m_pOrbs[_playerNum]->Boost();
+		}
+		
+		
+		if (m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_L))
+		{
+			m_pOrbs[_playerNum]->Phase();
+		}
+
+		//m_pOrbs[_playerNum]->Phase(m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_L));
 
 		// Return false if start has been pressed
 		if (m_pContollers[_playerNum]->GetButtonDown(m_XButtons.Start))
 		{
 			if (m_gameState == GAME_STATE_PAUSED)
 			{
-				/*if (_playerNum == m_PausedPlayer)
-				{
-					m_gameState = GAME_STATE_PROCESS;
-					m_pPausesMenu->Reset();
-				}*/
+	
 			}
 			else
 			{
