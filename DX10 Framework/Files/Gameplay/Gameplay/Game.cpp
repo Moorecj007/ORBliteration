@@ -548,13 +548,15 @@ bool Game::Process(float _dt)
 			break;
 			case MENU_STATE_OPTIONS:
 			{
-				/*m_pPauseMenu->GetController()->PreProcess();
-				if (m_pPauseMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_A))
+				m_pOptionsMenu->Process(_dt);
+				m_pOptionsMenu->GetController()->PreProcess();
+				if (m_pOptionsMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_B))
 				{
 					m_pPauseMenu->Reset();
 				}
-				m_pPauseMenu->GetController()->PostProcess();*/
-				m_pOptionsMenu->Process(_dt);
+				m_pOptionsMenu->GetController()->PostProcess();
+				//m_pOptionsMenu->Process(_dt);
+				
 			}
 			break;
 			case MENU_STATE_EXIT:
@@ -587,7 +589,8 @@ bool Game::Process(float _dt)
 				if (m_gameState == GAME_STATE_ERROR)
 				{
 					m_gameState = GAME_STATE_PAUSED;
-					m_pPausesMenu->SetController(m_pContollers[m_PausedPlayer]);
+					m_pPauseMenu->SetController(m_pContollers[m_PausedPlayer]);
+					m_pOptionsMenu->SetController(m_pContollers[m_PausedPlayer]);
 				}
 			}
 			else
@@ -730,7 +733,6 @@ void Game::Render()
 
 bool Game::HandleInput(int _playerNum)
 {
-	//bool allConnected = true;
 
 	if (m_pContollers[_playerNum]->Connected())
 	{
@@ -775,40 +777,18 @@ bool Game::HandleInput(int _playerNum)
 				m_gameState = GAME_STATE_PAUSED;
 				m_PausedPlayer = _playerNum;
 				m_pPauseMenu->SetController(m_pContollers[_playerNum]);
+				m_pOptionsMenu->SetController(m_pContollers[_playerNum]);
 			}
 		}
 
-		/*if (m_gameState == GAME_STATE_PAUSED)
-		{
-			switch (m_pPauseMenu->GetMenuState())
-			{
-			case MENU_STATE_RESUME:
-				//m_gameState = GAME_STATE_PROCESS;
-				//m_pPauseMenu->Reset();
-				break;
-			case MENU_STATE_INSTRUCTIONS:
-				m_pPauseMenu->Reset();
-				break;
-			case MENU_STATE_OPTIONS:
-				break;
-			case MENU_STATE_EXIT:
-				return false;
-				//break;
-			}
-		}*/
-
 		m_pContollers[_playerNum]->PostProcess();
 
-		//return true;
+		return true;
 	}
 	else
 	{
-		//m_allConnected = false;
 		return false;
 	}
-
-	
-
 }
 
 void Game::UpdateClientSize()

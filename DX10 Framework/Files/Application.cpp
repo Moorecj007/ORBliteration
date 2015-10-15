@@ -312,8 +312,8 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_splash_orb.SetImageIndex(0);
 
 	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
-	m_instructions.SetPosition(xoffset, 0.0f);
 	m_instructions.SetSize(min, min);
+	m_instructions.SetPosition(xoffset - m_instructions.GetWidth() * 0.5f, 0.0f);
 	
 	if (m_state == APP_STATE_MAIN_MENU)
 	{
@@ -722,14 +722,14 @@ bool Application::UpdateState(MENU_STATE _state)
 		
 		// Match menu states
 	case MENU_STATE_PLAYERS_2: // Fall through
-	case MENU_STATE_PLAYERS_3: // Fall through
-	case MENU_STATE_PLAYERS_4:
+	//case MENU_STATE_PLAYERS_3: // Fall through
+	//case MENU_STATE_PLAYERS_4:
 		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, (MENU_STATE_PLAYERS_2 - 6), m_isRumbleOn, m_pKeyDown));
+		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn, m_pKeyDown));
 		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
 		m_state = APP_STATE_GAME;
 		break;
-	/*case MENU_STATE_PLAYERS_3:
+	case MENU_STATE_PLAYERS_3:
 		m_pGame = new Game();
 		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn, m_pKeyDown));
 		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
@@ -740,7 +740,7 @@ bool Application::UpdateState(MENU_STATE _state)
 		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn, m_pKeyDown));
 		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
 		m_state = APP_STATE_GAME;
-		break;*/
+		break;
 
 		// Pause menu states (reuses the main menu states)
 	case MENU_STATE_RESUME:
