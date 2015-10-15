@@ -28,6 +28,8 @@ Orb::Orb()
 
 Orb::~Orb()
 {
+	// Delete the Glow Light from the Renderer
+	m_pRenderer->RemoveLight(m_glowName);
 }
 
 bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _speed, float _maxSpeed)
