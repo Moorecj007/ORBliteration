@@ -7,9 +7,13 @@
 // Local Includes
 #include "LightStructures.fx"
 
+// Defines
+#define MAX_LIGHTS 5
+
 cbuffer cbPerFrame
 {
-	Light g_light;
+	Light g_light[MAX_LIGHTS];
+	int g_lightCount;
 	float3 g_eyePosW;
 
 	float4x4 g_matView;
@@ -98,8 +102,36 @@ float4 PS_Standard(VS_OUT _inputPS) : SV_Target
     
 	// Compute the lit color for this pixel.
 	SurfaceInfo surface = { _inputPS.position, normal, diffuse, spec };
-	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
-    
+
+	float3 litColor = float3(0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < g_lightCount; i++)
+	{
+		if (g_light[i].active == true)
+		{
+			if (g_light[i].type == 0)
+			{
+				litColor += ParallelLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 1)
+			{
+				litColor += PointLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 2)
+			{
+				litColor += SpotLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 3)
+			{
+				float glowLerp = GlowLight(surface, g_light[i]);
+
+				if (glowLerp > 0.0f)
+				{
+					litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				}
+			}
+		}
+	}
+
 	return float4(litColor, diffuse.a);
 }
 
@@ -144,7 +176,7 @@ float4 PS_Fade(VS_OUT _inputPS) : SV_Target
 
 	// Compute the lit color for this pixel.
 	SurfaceInfo surface = { _inputPS.position, normal, diffuse, spec };
-	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
+	float3 litColor = ParallelLight(surface, g_light[0], g_eyePosW);
 
 	return float4(litColor, diffuse.a);
 }
@@ -170,10 +202,7 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 {
 	// Get materials from texture maps.
 	float4 diffuse = g_mapDiffuse.Sample(g_triLinearSam, _inputPS.texCoord);
-	//float4 diffuse2 = g_mapDiffuse2.Sample(g_triLinearSam, _inputPS.texCoord);
 	float4 spec = g_mapSpec.Sample(g_triLinearSam, _inputPS.texCoord);
-
-	//diffuse = diffuse + diffuse2;
 
 	diffuse.a = diffuse.a - g_reduceAlpha;
 
@@ -185,7 +214,36 @@ float4 PS_BlendTex2(VS_OUT _inputPS) : SV_Target
 
 	// Compute the lit color for this pixel.
 	SurfaceInfo surface = { _inputPS.position, normal, diffuse, spec };
-	float3 litColor = ParallelLight(surface, g_light, g_eyePosW);
+
+	float3 litColor = float3(0.0f, 0.0f, 0.0f);
+
+	for (int i = 0; i < g_lightCount; i++)
+	{
+		if (g_light[i].active == true)
+		{
+			if (g_light[i].type == 0)
+			{
+				litColor += ParallelLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 1)
+			{
+				litColor += PointLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 2)
+			{
+				litColor += SpotLight(surface, g_light[i], g_eyePosW);
+			}
+			else if (g_light[i].type == 3)
+			{
+				float glowLerp = GlowLight(surface, g_light[i]);
+
+				if (glowLerp > 0.0f)
+				{
+					litColor = lerp(litColor, g_light[i].diffuse.xyz, glowLerp);
+				}
+			}
+		}
+	}
 
 	return float4(litColor, diffuse.a);
 }

@@ -217,6 +217,15 @@ namespace d3dxColors
 	const D3DXCOLOR YellowGreen = 0xFF9ACD32;
 }
 
+// Enums
+enum LightType
+{
+	LT_DIRECTIONAL,
+	LT_POINT,
+	LT_SPOT,
+	LT_GLOW
+};
+
 // Structs
 struct Light
 {
@@ -224,17 +233,19 @@ struct Light
 	{
 		// Ensure the Memory is zeroed on creation
 		ZeroMemory(this, sizeof(Light));
+		active = true;
 	}
 
-	D3DXVECTOR3 pos;
-	float pad1;      // not used
-	D3DXVECTOR3 dir;
-	float pad2;      // not used
+	D3DXVECTOR4 pos_range;
+	D3DXVECTOR4 dir_spotPow;
 	D3DXCOLOR ambient;
 	D3DXCOLOR diffuse;
 	D3DXCOLOR specular;
-	D3DXVECTOR3 attenuation;
-	float spotPower;
+	D3DXVECTOR4 att;
+	int type;
+	bool active;
+	float pad1;
+	float pad2;
 };
 
 

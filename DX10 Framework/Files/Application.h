@@ -199,9 +199,12 @@ private:
 	/*******************
 	* UpdateState: Updates the application based on the menu item selected
 	* @author:	Juran Griffith.
-	* @return:	void.
+	* @return:	bool: Successful or not
 	********************/
-	void UpdateState(MENU_STATE _state);
+	bool UpdateState(MENU_STATE _state);
+
+	// TO DO CAL
+	void UpdateClientSize();
 
 private:
 	// Singleton Instance
@@ -230,8 +233,8 @@ private:
 	DX10_Camera_Debug* m_pCamera;
 
 	// Game Pad Input
-	XButtonIDs m_XButtons;	//TO DO Jc - Maybe use enums
-	XStickDirectionIDs m_XStickDirections; //TO DO Jc - Maybe use enums
+	XButtonIDs m_XButtons;	
+	XStickDirectionIDs m_XStickDirections;
 	InputGamePad* m_pGamepadPlayerOne;
 
 	// Game play Objects

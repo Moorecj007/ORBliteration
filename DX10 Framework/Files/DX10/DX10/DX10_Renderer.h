@@ -240,6 +240,30 @@ public:
 	* @return: bool: Successful or not
 	********************/
 	bool LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVertexBuffer, DWORD*& _prIndexBuffer, int* _pVertexCount, int* _pIndexCount, v3float _scale);
+	
+	/***********************
+	* AddLight: Add a new light to the Renderer
+	* @author: Callan Moore
+	* @parameter: _lightName: Name of the light for referencing and updating
+	* @parameter: _light: The light structure
+	* @return: bool: Successful or not
+	********************/
+	bool AddLight(std::string _lightName, Light* _light);
+	
+	/***********************
+	* RemoveLight: Remove a light from the Renderer
+	* @author: Callan Moore
+	* @parameter: _lightName: Name of the light to remove
+	* @return: void
+	********************/
+	void RemoveLight(std::string _lightName);
+
+	/***********************
+	* GetActiveLights: Retrieve the current active light in the scene
+	* @author: Callan Moore
+	* @return: Light*: The current active lights
+	********************/
+	Light* GetActiveLights();
 
 	/***********************
 	* SetPrimitiveTopology: Sets the primitive topology for a Mesh before drawing
@@ -307,19 +331,23 @@ public:
 	* @return: D3DXVECTOR3; The Eye Position
 	********************/
 	D3DXVECTOR3 GetEyePos() { return m_eyePos; };
-	
-	/***********************
-	* GetActiveLight: Retrieve the current active light in the scene
-	* @author: Callan Moore
-	* @return: Light*: The current active light
-	********************/
-	Light* GetActiveLight() { return &m_activeLight; };
 
-	
+	/***********************
+	* GetLightCount: Retrieve the current amount of active lights
+	* @author: Callan Moore
+	* @return: int: Light count
+	********************/
+	int GetLightCount() { return m_lightCount; };
+
+	// TO DO CAL
+	int GetWidth() { return m_clientWidth; };
+	int GetHeight() { return m_clientHeight; };
 
 private:
 	// Window Variables
 	HWND m_hWnd;
+	int m_windowedWidth;
+	int m_windowedHeight;
 	int m_clientWidth;
 	int m_clientHeight;
 	bool m_fullScreen;
@@ -363,8 +391,9 @@ private:
 
 	// Lighting
 	Light m_activeLight;
-
-
+	std::map<std::string, Light*> m_mapLights;
+	Light* m_pArrLights;
+	int m_lightCount;
 };
 
 #endif // __DX10_RENDERER_H__

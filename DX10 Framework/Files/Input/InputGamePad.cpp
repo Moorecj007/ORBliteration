@@ -26,9 +26,10 @@ InputGamePad::InputGamePad()
 
 InputGamePad::~InputGamePad()
 {
+	StopVibrate();
 }
 
-bool InputGamePad::Initialise(int _gamepadIndex)
+bool InputGamePad::Initialise(int _gamepadIndex, bool _allowVibrate)
 {
 	if ((_gamepadIndex >= 0) &&
 		(_gamepadIndex <= 4))
@@ -39,6 +40,10 @@ bool InputGamePad::Initialise(int _gamepadIndex)
 	{
 		return false;
 	}
+
+	// Set the allow vibrate
+	m_allowVibrate = _allowVibrate;
+	m_vibrating = false;
 
 	// Initialise the Button Arrays
 	for (int i = 0; i < ButtonCount; i++)
@@ -376,30 +381,45 @@ bool InputGamePad::GetButtonDown(int _button)
 
 void InputGamePad::Vibrate(float _LMotorSpeed, float _RMotorSpeed)
 {
-	// Vibration State
-	XINPUT_VIBRATION VibrationState;
+	// Check if the controler allows vibrate
+	if (m_allowVibrate)
+	{
+		if ((_LMotorSpeed > 0.0f) || (_RMotorSpeed > 0.0f))
+		{
+			m_vibrating = true;
+		}
+		else
+		{
+			m_vibrating = false;
+		}
 
-	// Clear the memory of the vibration state
-	ZeroMemory(&VibrationState, sizeof(XINPUT_VIBRATION));
+		// Vibration State
+		XINPUT_VIBRATION VibrationState;
 
-	// Calculate the vibration values 
-	// XInput’s default vibration values range from 0 to 65535
-	// So convert the passed in 0.0f to 1.0f values to that
-	int LMotorSpeed = int(_LMotorSpeed * 65535.0f);
-	int RMotorSpeed = int(_RMotorSpeed * 65535.0f);
+		// Clear the memory of the vibration state
+		ZeroMemory(&VibrationState, sizeof(XINPUT_VIBRATION));
 
-	// Set the vibrations
-	VibrationState.wLeftMotorSpeed = LMotorSpeed;
-	VibrationState.wRightMotorSpeed = RMotorSpeed;
+		// Calculate the vibration values 
+		// XInput’s default vibration values range from 0 to 65535
+		// So convert the passed in 0.0f to 1.0f values to that
+		int LMotorSpeed = int(_LMotorSpeed * 65535.0f);
+		int RMotorSpeed = int(_RMotorSpeed * 65535.0f);
 
-	// Set the Vibration state
-	XInputSetState(m_gamepadIndex, &VibrationState);
+		// Set the vibrations
+		VibrationState.wLeftMotorSpeed = LMotorSpeed;
+		VibrationState.wRightMotorSpeed = RMotorSpeed;
+
+		// Set the Vibration state
+		XInputSetState(m_gamepadIndex, &VibrationState);
+	}
 }
 
 void InputGamePad::StopVibrate()
 {
 	// Call the vibrate function with no vibrations on each motor
 	Vibrate(0.0f, 0.0f);
+
+	m_vibrating = false;
 }
 
 // Utility Functions

@@ -28,9 +28,6 @@
 
 // Local Includes
 
-
-// TO DO JC: Move to a input utils
-
 // Constants
 
 // XInput Button values
@@ -186,9 +183,10 @@ public:
 	* Initialise: Initialise the Game Pad Input
 	* @author: Jc Fowles
 	* @parameter: _gamepadIndex: Index to which of the four controllers you are wanting to read input from 
+	* @parameter: _allowVibrate: Allows the gamepad to vibrate or not, defaults to true
 	* @return: succesfull Initialisation
 	********************/
-	bool Initialise(int _gamepadIndex);
+	bool Initialise(int _gamepadIndex, bool _allowVibrate = true);
 
 	/***********************
 	* Update: Update the the State of the Gamepad
@@ -302,6 +300,21 @@ public:
 	********************/
 	void StopVibrate();
 
+	/***********************
+	* GetVibrate: Return whether the Gamepad is vibrating
+	* @author: Jc Fowles
+	* @return: bool: whether the Gamepad is vibrating
+	********************/
+	bool GetVibrate(){ return m_vibrating; };
+
+	/***********************
+	* SetAllowVibrate: Set whether the Gamepad is allowed to vibrate
+	* @author: Jc Fowles
+	* @paramter: _allowVibrate: The value to set to the allow vibrate
+	* @return: void;
+	********************/
+	void SetAllowVibrate(bool _allowVibrate){ m_allowVibrate = _allowVibrate; };
+
 	// Utility Functions 
 	/***********************
 	* GetIndex: Return the Gamepad Index (which of the four connected contollers)
@@ -316,6 +329,8 @@ public:
 	* @return: bool: The Conected State of the Gamepad (True if the Gamepad is Connected)
 	********************/
 	bool Connected();   
+
+
 
 protected:
 private:
@@ -356,6 +371,9 @@ private:
 	bool StickStates[ButtonCount];
 	// Stick pressed on current frame
 	bool Gamepad_StickDown[ButtonCount];
+
+	bool m_allowVibrate;
+	bool m_vibrating;
 
 };
 

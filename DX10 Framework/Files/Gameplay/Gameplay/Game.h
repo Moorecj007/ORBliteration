@@ -26,6 +26,16 @@
 #include "../../Input/InputGamePad.h"
 #include "../../DX10/DX10.h"
 #include "../../Sound/SoundManager.h"
+#include "../../Menus/Menu.h"
+
+enum eGameState
+{
+	GAME_STATE_START,
+	GAME_STATE_PROCESS,
+	GAME_STATE_PAUSED,
+	GAME_STATE_ERROR,
+	GAME_STATE_END
+};
 
 class Game
 {
@@ -51,9 +61,10 @@ public:
 	* @parameter: _pSoundManager: The Sound manager for the Game
 	* @parameter: TO DO JUR: UI Manager
 	* @parameter: _numPlayers: Number of players to play this match
+	* @parameter: _AllowVibrate: Allows or dissAllows vibration
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown);
 	
 	/***********************
 	* Process: Process the Game
@@ -73,9 +84,9 @@ public:
 	/***********************
 	* HandleInput: Handle the input for the given Orb
 	* @author: Jc Fowles
-	* @return: void
+	* @return: bool: Whether the contoler passed in is connected
 	********************/
-	void HandleInput(int _playerNum);
+	bool HandleInput(int _playerNum);
 
 	/***********************
 	* IsOrbsColliding: Checks to see if the two Orbs collide
@@ -98,11 +109,20 @@ public:
 	/***********************
 	* KillOrb: Kills a Orb
 	* @author: Jc Fowles
-	* @parameter: _pOrb:
+	* @parameter: _pOrb: The Orb to kill
 	* @return: void
 	********************/
 	void KillOrb(Orb* _pOrb);
 
+	/***********************
+	* WinCheck: Checks the win condition of the game
+	* @author: Jc Fowles
+	* @return: void
+	********************/
+	void WinCheck();
+
+	// TO DO CAL
+	void UpdateClientSize();
 
 
 private:
@@ -110,16 +130,25 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
-	bool m_matchWon;
+	eGameState m_gameState;
 
 	// Players
 	int m_numPlayers;
 	int m_numAlivePlayers;
+	int m_PausedPlayer;
+	int m_winner;
+
+	// Timers
+	bool m_firstProcess;
+	float m_startCountDown;
+	float m_matchTimer;
 
 	// Contollers
 	XButtonIDs m_XButtons;
 	XStickDirectionIDs m_XStickDirections;
 	std::vector<InputGamePad*> m_pContollers;
+
+	float m_vibrateTimers[4];
 
 	// Player Controller Orbs
 	std::vector<Orb*> m_pOrbs;
@@ -127,16 +156,18 @@ private:
 
 	// Arena
 	ArenaFloor* m_pArenaFloor;
-	std::vector<std::vector<ArenaTile*>*>* m_pArenaTiles;
-	v3float m_tileScale;
-	int m_areaSize;
 	
 	SoundManager* m_pSoundManager;
 
 	// TO DO JUR: Temp to be removed
 	DXSprite* VictroyPlayerOne;
+	DXSprite* TempPause;
+	DXSprite* TempError;
 	DX10_Shader_Sprite* m_pSpriteShader;
-
+	Menu* m_pPausesMenu;
+	DXSprite m_instructions;
+	std::vector<DXSprite> m_uiPlayers;
+	DXSprite m_number_first, m_number_second;
 };
 #endif	//__GAME_H__
 

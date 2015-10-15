@@ -223,10 +223,19 @@ class Menu
 		/***********************
 		* ToggleButton: Toggles the button at the given index
 		* @author:	Juran Griffith.
-		* @parameter: _index		- The toggle button index.
+		* @parameter: _index: The toggle button index.
 		* @return:	void.
 		********************/
 		void ToggleButton(UINT _index);
+
+		/***********************
+		* SetController: Sets the menus xbox controller
+		* @author:	Juran Griffith.
+		* @parameter: 
+		* @return:	void.
+		********************/
+		void SetController(InputGamePad* _pGamepad);
+
 	protected:
 	private:
 
@@ -249,8 +258,8 @@ class Menu
 		GUI_Button*					m_title;
 
 		// Input
-		XButtonIDs					m_XButtons;	//TO DO Jc - Maybe use enums
-		XStickDirectionIDs			m_XStickDirections; //TO DO Jc - Maybe use enums
+		XButtonIDs					m_XButtons;
+		XStickDirectionIDs			m_XStickDirections;
 		InputGamePad*				m_pGamepad;
 
 		// State
