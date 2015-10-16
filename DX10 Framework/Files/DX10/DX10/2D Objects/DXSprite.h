@@ -209,8 +209,10 @@ class DXSprite
 		v2float					m_position;
 		v2float					m_previousPosition;
 
-		int						m_screenWidth;
-		int						m_screenHeight;
+		//int						m_screenWidth;
+		//int						m_screenHeight;
+		float					m_offsetScreenWidthPrev;
+		float					m_offsetScreenHeightPrev;
 		UINT					m_imageWidth;
 		UINT					m_imageHeight;
 

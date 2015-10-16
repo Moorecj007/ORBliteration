@@ -43,8 +43,8 @@ bool SoundManager::Intialise()
 	// Initialize our sound system
 	m_pSoundSystem = new SoundSystem();
 	VALIDATE(m_pSoundSystem->Initialise());
-	m_pSoundSystem->SetVolumeMusic(0.03f);
-	m_pSoundSystem->SetVolumeEffects(0.06f);
+	m_pSoundSystem->SetVolumeMusic(0.5f);
+	m_pSoundSystem->SetVolumeEffects(1.0f);
 
 	// Create the music
 	m_pMusic_DNB = new TSound(); // TO DO - Juran (put in a vector)

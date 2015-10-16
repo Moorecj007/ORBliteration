@@ -125,11 +125,6 @@
     <ClCompile Include="Files\Gameplay\Gameplay\Orbs\Orb.cpp" />
     <ClCompile Include="Files\Input\InputGamePad.cpp" />
     <ClCompile Include="Files\Menus\Menu.cpp" />
-    <ClCompile Include="Files\Physics\2D Physics\Physics_World_2D.cpp" />
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Body_2D.cpp" />
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Collision_Listener.cpp" />
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Rope_2D.cpp" />
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Pulley_2D.cpp" />
     <ClCompile Include="Files\Sound\SoundManager.cpp" />
     <ClCompile Include="Files\Sound\SoundSystem.cpp" />
     <ClCompile Include="Files\Utility\DirectInput.cpp" />
@@ -159,13 +154,6 @@
     <ClInclude Include="Files\Gameplay\Gameplay\Orbs\Orb.h" />
     <ClInclude Include="Files\Input\InputGamePad.h" />
     <ClInclude Include="Files\Menus\Menu.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_World_2D.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Body_2D.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Collision_Listener.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Rope_2D.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Pulley_2D.h" />
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Utilities.h" />
-    <ClInclude Include="Files\Physics\Physics_2D.h" />
     <ClInclude Include="Files\Sound\SoundManager.h" />
     <ClInclude Include="Files\Sound\SoundSystem.h" />
     <ClInclude Include="Files\Utility\DirectInput.h" />
