@@ -128,7 +128,7 @@ float GlowLight(SurfaceInfo _surface, Light _light)
 	// The distance from surface to light.
 	float dist = length(lightVec);
 
-	if (dist > _light.pos_range.w || dist < 2.0f)
+	if (dist > _light.pos_range.w || dist < 3.0f)
 	{
 		// Outside Glow Light range
 		return 0.0f;	

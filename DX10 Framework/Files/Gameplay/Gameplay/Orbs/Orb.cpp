@@ -14,6 +14,10 @@
 
 // This Include
 #include "Orb.h"
+
+
+//REMOVE
+#include <iostream>
  
 Orb::Orb()
 {
@@ -22,8 +26,11 @@ Orb::Orb()
 	m_acceleration = {0.0f,0.0f,0.0f};
 	m_velocity = { 0.0f, 0.0f, 0.0f };
 	m_bounce = 0.0f;
-	m_maxSpeed = 0.0f;
 	m_isAlive = true;
+
+	m_collidable = true;
+	m_collideCountdown = 0.0f;
+	m_collideStartTime = 0.05f;
 }
 
 Orb::~Orb()
@@ -32,7 +39,7 @@ Orb::~Orb()
 	m_pRenderer->RemoveLight(m_glowName);
 }
 
-bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _speed, float _maxSpeed)
+bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_LitTex* _pShader, int _playerNum, float _bounce, float _speed)
 {	
 	std::string texName;
 	switch (_playerNum)
@@ -44,7 +51,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, (108.0f / 255.0f), 0.0f, 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -56,7 +63,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -68,7 +75,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -80,7 +87,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 
 			m_pGlowLight = new Light();
 			m_pGlowLight->type = LT_GLOW;
-			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 4.0f);
+			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((230.0f / 255.0f), (46.0f / 255.0f), (241.0f / 255.0f), 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
@@ -93,7 +100,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	VALIDATE(DX10_Obj_LitTex::Initialise(_pRenderer, _pMesh, _pShader, texName));
 
 	// Check the passed in parameters
-	if ((_bounce < 0.0f) || (_maxSpeed < 0.0f))
+	if ((_bounce < 0.0f) )
 	{
 		return false;
 	}
@@ -102,19 +109,18 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 	m_bounce = _bounce;
 	m_radius = _pMesh->GetScale().x / 2 ;
 	m_speed = _speed;
-	m_maxSpeed = _maxSpeed;
 	m_isAlive = true;
 
-	m_boostAmount = 2.0f;
-	m_boostCooldown = 5.0f;
-	m_boostLimit = 1.0f;
+	m_boostAmount = 6.0f;
+	m_boostCooldown = 1.0f;
+	m_boostLimit = 0.1f;
 	m_boostActiveTime = 0.0f;
 	m_boostCoolDownTime = 0.0f;
 	m_AllowBoost = true;
 	m_boost = false;
 	   
 	m_phaseCooldown = 2.0f;
-	m_phaseMaxTime = 5.0f;
+	m_phaseMaxTime = 3.0f;
 	m_phaseActiveTime = 0.0f;
 	m_phaseCoolDownTime = 0.0f;
 	m_AllowPhase = true;
@@ -138,70 +144,94 @@ void Orb::ProcessFriction()
 			break;
 		case BTI_ROUGH:
 		{
-			m_surfaceFriction = 0.15f;
+			m_surfaceFriction = 0.01f;
 		}
 			break;
 		case BTI_STANDARD:
 		{
-			m_surfaceFriction = 0.05f;
+			m_surfaceFriction = 0.005f;
 		}
 			break;
 		default:
 		{
-			m_surfaceFriction = 0.05f;
+			m_surfaceFriction = 0.005f;
 		}
 			break;
 		}
+
+		
 	}
 }
 
 void Orb::Process(float _dt)
 {
+	if (m_collidable == false)
+	{
+		m_collideCountdown -= _dt;
+
+		if (m_collideCountdown <= 0.0f)
+		{
+			m_collidable = true;
+		}
+	}
+
 
 	ProcessFriction();
-	
-	m_velocity += ((m_acceleration* _dt)* m_speed);
-	m_acceleration *= 0.0f;
-	m_velocity = m_velocity - (m_velocity* (m_surfaceFriction / _dt)  * _dt);
-	m_velocity.Limit(m_maxSpeed);
-		
 
+	float speedLimit = 0.5f;
+
+	// Boost 
 	if (m_boost)
 	{
 		m_boostActiveTime += _dt;
+		m_pGlowLight->pos_range.w = 10.0f;
 
 		if (m_boostActiveTime < m_boostLimit)
 		{
-			m_pos += m_velocity * m_boostAmount;
+			m_acceleration = m_acceleration * m_boostAmount;
+			speedLimit = 0.6f;
+
 		}
 		else
 		{
 			m_boostActiveTime = 0.0f;
 			m_boost = false;
-			m_pos += m_velocity;
-			m_AllowBoost = false;
+			speedLimit = 0.4f;
 		}
 	}
 	else
 	{
+		m_pGlowLight->pos_range.w = 6.0f;
 		if (m_AllowBoost == false)
 		{
 			m_boostCoolDownTime += _dt;
-
+	
 			if (m_boostCoolDownTime > m_boostCooldown)
 			{
 				m_boostCoolDownTime = 0.0f;
 				m_AllowBoost = true;
 			}
 		}
-
-		m_pos += m_velocity;
 	}
 
+	m_velocity += ((m_acceleration * _dt)* m_speed);
+	m_acceleration *= 0.0f;
+	m_velocity = m_velocity - (m_velocity * m_surfaceFriction);
+
+	if (m_velocity.Magnitude() < 0.0001f)
+	{
+		m_velocity = { 0.0f, 0.0f, 0.0f };
+	}
+
+	m_velocity = m_velocity.Limit(speedLimit);
+
+	m_pos += m_velocity;
+
+	// Phase 
 	if (m_phase)
 	{
 		m_phaseActiveTime += _dt;
-
+	
 		if (m_phaseActiveTime < m_phaseMaxTime)
 		{			
 			
@@ -218,7 +248,7 @@ void Orb::Process(float _dt)
 		if (m_AllowPhase == false)
 		{
 			m_phaseCoolDownTime += _dt;
-
+	
 			if (m_phaseCoolDownTime > m_phaseCooldown)
 			{
 				m_phaseCoolDownTime = 0.0f;
@@ -269,48 +299,32 @@ void Orb::SetAcceleration(v3float _acceleration)
 		else if (m_velocity.Magnitude() == 0)
 		{
 			// Only Set the Acceleration if the Orb is not on a Slippery tile
-			m_acceleration += _acceleration * 2.0f;
+			m_acceleration += _acceleration * 5.0f;
+
 		}
 	}
 };
 
-void Orb::Boost(bool _boost)
+void Orb::Boost()
 {
-	if (_boost == true)
+	if (m_AllowBoost == true)
 	{
-		if (m_AllowBoost == true)
-		{
-			// Boost
-			m_boost = true;
-		}
+		// Boost
+		m_boost = true;	
+		m_AllowBoost = false;
+
 	}
-	else
-	{
-		// Stop boosting and start recharge
-		m_boost = false;
-	}
+
 }
 
-void Orb::Phase(bool _phase)
+void Orb::Phase()
 {
-	if (_phase == true)
+	if (m_AllowPhase == true)
 	{
-		if (m_AllowPhase == true)
-		{
-			// Boost
-			m_phase = true;
-		}
-	}
-	else
-	{
-		// Stop boosting and start recharge
-		m_phase = false;
-		
-		if (m_phaseActiveTime > 0.0f)
-		{
-			m_AllowPhase = false;
-		}
-		m_phaseActiveTime = 0.0f;
+		// Phase
+		m_phase = true;
+		m_AllowPhase = false;
+
 	}
 }
 
