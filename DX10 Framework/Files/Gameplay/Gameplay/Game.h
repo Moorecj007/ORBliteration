@@ -31,6 +31,7 @@
 enum eGameState
 {
 	GAME_STATE_START,
+	GAME_STATE_RESTART,
 	GAME_STATE_PROCESS,
 	GAME_STATE_PAUSED,
 	GAME_STATE_OPTIONS,
@@ -67,6 +68,10 @@ public:
 	********************/
 	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown);
 	
+	// TO DO JC:
+	bool Reset();
+
+
 	/***********************
 	* Process: Process the Game
 	* @author: Jc Fowles
@@ -133,10 +138,10 @@ private:
 	DX10_Renderer* m_pDX10_Renderer;
 	DX10_Shader_LitTex* m_pShader_LitTex;
 
-	// TO DO JC:   Match Start
+	// Gmae States
 	eGameState m_PreviousState;
 	eGameState m_gameState;
-
+	int m_roundNumber;
 
 	bool m_allConnected;
 
@@ -145,6 +150,7 @@ private:
 	int m_numAlivePlayers;
 	int m_PausedPlayer;
 	int m_winner;
+	int m_winningScore;
 
 	// Timers
 	bool m_firstProcess;

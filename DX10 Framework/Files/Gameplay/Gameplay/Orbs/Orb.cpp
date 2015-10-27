@@ -197,7 +197,7 @@ void Orb::Process(float _dt)
 		{
 			m_boostActiveTime = 0.0f;
 			m_boost = false;
-			speedLimit = 0.4f;
+			speedLimit = 0.5f;
 		}
 	}
 	else
