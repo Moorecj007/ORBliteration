@@ -358,7 +358,7 @@ void Application::ShutDown()
 		ReleasePtr(m_pCamera);
 		
 		// Gamepad input memory release
-		while (m_pContollers.empty())
+		while (!m_pContollers.empty())
 		{
 			ReleasePtr(m_pContollers.back());
 			m_pContollers.pop_back();
