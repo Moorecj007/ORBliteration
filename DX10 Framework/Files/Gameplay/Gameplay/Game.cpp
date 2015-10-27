@@ -19,17 +19,17 @@
 
 Game::Game()
 {
-
+	m_uiScale = 0.5f;
+	m_uiWidth = 671.0f;
+	m_uiHeight = 365.0f;
+	m_uiSpace = 10.0f;
 }
 
 Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
-	ReleasePtr(VictroyPlayerOne);
-	ReleasePtr(TempPause);
-	ReleasePtr(m_pPausesMenu);
-	ReleasePtr(TempError);
+	ReleasePtr(m_isConnected);
 
 	while (m_pContollers.empty() == false)
 	{
@@ -70,29 +70,25 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_pSoundManager = _pSoundManager;
 
 	// TO DO JUR: Temp all to be Remove
+	m_isConnected = new bool[_numPlayers];
+
 	m_pSpriteShader = _pSpriteShader;
-	VictroyPlayerOne = new DXSprite();
-	VictroyPlayerOne->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P1.png", 760, 601);
-	VictroyPlayerOne->SetSize(800, 800);
-	VictroyPlayerOne->SetPosition(100, 100);
 
-	TempPause = new DXSprite();
-	TempPause->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P2.png", 760, 601);
-	TempPause->SetSize(800, 800);
-	TempPause->SetPosition(100, 100);
+	UINT victoryWidth = 760;
+	UINT victoryHeight = 601;
+	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f;
+	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f;
 
-	TempError = new DXSprite();
-	TempError->Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/Tron_Victory_P3.png", 760, 601);
-	TempError->SetSize(800, 800);
-	TempError->SetPosition(100, 100);
+	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
+	m_number_first.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	//m_number_first.SetScale(m_uiScale);
+	m_number_first.SetPosition(xoffset - 25.0f, 50.0f);
 
-	m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
-	m_number_first.SetSize(106.0f * 0.5f, 106.0f * 0.5f);
-	m_number_first.SetPosition(450, 50);
-	m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
-	m_number_second.SetSize(106.0f * 0.5f, 106.0f * 0.5f);
-	m_number_second.SetPosition(450, 50);
-
+	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
+	m_number_second.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	//m_number_second.SetScale(m_uiScale);
+	m_number_second.SetPosition(xoffset + 25.0f, 50.0f);
+	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
@@ -106,7 +102,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_pOrbMesh = new DX10_Mesh;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
-
 
 	// Create the Controllers and the player orbs
 	std::string temp;
@@ -124,10 +119,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 		m_pOrbs.push_back(new Orb());
 		int row, col;
-		
-		float scale = 0.5f;
-		float width = 671.0f;
-		float height = 457.0f;
 
 		switch (i)
 		{
@@ -137,22 +128,39 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				col = 13;
 
 				DXSprite uiPlayer1;
-				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p1.png", (UINT)width, (UINT)height));
-				uiPlayer1.SetPosition(10, 10);
-				uiPlayer1.SetSize(width * scale, height * scale);
+
+				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p1.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
+				uiPlayer1.SetPosition(m_uiSpace, m_uiSpace);
+				uiPlayer1.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
 				m_uiPlayers.push_back(uiPlayer1);
+
+				DXSprite uiVictory;
+
+				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p1.png", victoryWidth, victoryHeight));
+				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
+				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
+
+				m_uiVictory.push_back(uiVictory);
 			}
 			break;
 			case 1:
 			{
-				row = 1;
+				row = 13;
 				col = 1;
 
 				DXSprite uiPlayer2;
-				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p2.png", (UINT)width, (UINT)height));
-				uiPlayer2.SetPosition(990 - (width*scale), 10);
-				uiPlayer2.SetSize(width * scale, height * scale);
+				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p2.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
+				uiPlayer2.SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
+				uiPlayer2.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
 				m_uiPlayers.push_back(uiPlayer2);
+
+				DXSprite uiVictory;
+
+				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p2.png", victoryWidth, victoryHeight));
+				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
+				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
+
+				m_uiVictory.push_back(uiVictory);
 			}
 			break;
 			case 2:
@@ -161,23 +169,38 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 				col = 13;
 
 				DXSprite uiPlayer3;
-				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p3.png", (UINT)width, (UINT)height));
-				uiPlayer3.SetPosition(10, 990 - (height*scale));
-				uiPlayer3.SetSize(width * scale, height * scale);
+				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p3.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
+				uiPlayer3.SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
+				uiPlayer3.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
 				m_uiPlayers.push_back(uiPlayer3);
 
+				DXSprite uiVictory;
+
+				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p3.png", victoryWidth, victoryHeight));
+				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
+				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
+
+				m_uiVictory.push_back(uiVictory);
 			}
 			break;
 			case 3:
 			{
-				row = 13;
+				row = 1;
 				col = 1;
 
 				DXSprite uiPlayer4;
-				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p4.png", (UINT)width, (UINT)height));
-				uiPlayer4.SetPosition(990 - (width*scale), 990 - (height*scale));
-				uiPlayer4.SetSize(width * scale, height * scale);
+				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p4.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
+				uiPlayer4.SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
+				uiPlayer4.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
 				m_uiPlayers.push_back(uiPlayer4);
+
+				DXSprite uiVictory;
+
+				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p4.png", victoryWidth, victoryHeight));
+				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
+				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
+
+				m_uiVictory.push_back(uiVictory);
 			}
 			break;
 		}
@@ -194,23 +217,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	
 
 	}
-   
-
-	m_pPausesMenu = new Menu();
-	VALIDATE(m_pPausesMenu->Initialise(m_pDX10_Renderer, m_pSpriteShader, m_pSoundManager, m_pContollers[0], _pKeyDown));
-
-	m_pPausesMenu->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
-	m_pPausesMenu->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_pPausesMenu->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_pPausesMenu->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
-	m_pPausesMenu->AddButton(MENU_STATE_RESUME, 0, 0.5f);
-	m_pPausesMenu->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
-	m_pPausesMenu->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
-	m_pPausesMenu->AddButton(MENU_STATE_EXIT, 3, 0.5f);
-
-	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
-	m_instructions.SetPosition(100, 100);
-	m_instructions.SetSize(800, 800);
 		
 	return true;
 }
@@ -425,8 +431,8 @@ bool Game::Process(float _dt)
 			if (m_startCountDown <= 0.0f)
 			{
 				m_gameState = GAME_STATE_PROCESS;
-				m_number_first.SetPosition(420, 50);
-				m_number_second.SetPosition(480, 50);
+				//m_number_first.SetPosition(420, 50);
+				//m_number_second.SetPosition(480, 50);
 			}
 		}
 		break;
@@ -449,7 +455,9 @@ bool Game::Process(float _dt)
 				if (m_pOrbs[i]->GetAlive())
 				{
 					// Process Inputs
-					if (HandleInput(i) == false)
+					m_isConnected[i] = HandleInput(i);
+
+					if (m_isConnected[i] == false)
 					{
 						m_allConnected = false;
 					};
@@ -466,6 +474,7 @@ bool Game::Process(float _dt)
 					{
 						m_gameState = GAME_STATE_ERROR;
 					}
+
 
 
 					// Check Collisions
@@ -520,23 +529,47 @@ bool Game::Process(float _dt)
 		break;
 		case GAME_STATE_PAUSED:
 		{
-			m_pPausesMenu->Process(_dt);
-			switch (m_pPausesMenu->GetMenuState())
+			m_pPauseMenu->Process(_dt);
+			switch (m_pPauseMenu->GetMenuState())
 			{
 			case MENU_STATE_RESUME:
 				m_gameState = GAME_STATE_PROCESS;
-				m_pPausesMenu->Reset();
+				m_pPauseMenu->Reset();
 				break;
 			case MENU_STATE_INSTRUCTIONS:
-				break;
+			{
+				m_pPauseMenu->GetController()->PreProcess();
+				if (m_pPauseMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_B))
+				{
+					m_pPauseMenu->Reset();
+				}
+				m_pPauseMenu->GetController()->PostProcess();
+			}
+			break;
 			case MENU_STATE_OPTIONS:
-				break;
+			{
+				m_pOptionsMenu->Process(_dt);
+				m_pOptionsMenu->GetController()->PreProcess();
+				if (m_pOptionsMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_B))
+				{
+					m_pPauseMenu->Reset();
+				}
+				m_pOptionsMenu->GetController()->PostProcess();
+				//m_pOptionsMenu->Process(_dt);
+				
+			}
+			break;
 			case MENU_STATE_EXIT:
 				return false;
 				break;
 			}
 		}
 		break;
+		/*case GAME_STATE_OPTIONS:
+		{
+
+		}
+		break;*/
 		case GAME_STATE_ERROR:
 		{
 			m_allConnected = true;
@@ -556,7 +589,8 @@ bool Game::Process(float _dt)
 				if (m_gameState == GAME_STATE_ERROR)
 				{
 					m_gameState = GAME_STATE_PAUSED;
-					m_pPausesMenu->SetController(m_pContollers[m_PausedPlayer]);
+					m_pPauseMenu->SetController(m_pContollers[m_PausedPlayer]);
+					m_pOptionsMenu->SetController(m_pContollers[m_PausedPlayer]);
 				}
 			}
 			else
@@ -640,30 +674,79 @@ void Game::Render()
 		break;
 		case GAME_STATE_PAUSED:
 		{
-			switch (m_pPausesMenu->GetMenuState())
+			switch (m_pPauseMenu->GetMenuState())
 			{
 			case MENU_STATE_INSTRUCTIONS:
-				m_instructions.Render();
+				{
+					m_pInstructions->Render();
+				}
 				break;
 			case MENU_STATE_OPTIONS:
+				{
+					m_pOptionsMenu->Draw();
+				}
 				break;
 			default:
-				m_pPausesMenu->Draw();
+				{
+					m_pPauseMenu->Draw();
+				}
 				break;
 			}
 		}
 		break;
+		/*case GAME_STATE_OPTIONS:
+		{
+
+		}
+		break;*/
 		case GAME_STATE_ERROR:
 		{
-			TempError->Render();
+			/*for (int i = 0; i < m_numPlayers; ++i)
+			{
+				if (!m_isConnected[i])
+				{
+					if (i == 0 || i == 2)
+					{
+						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
+					}
+					else if (i == 1 || i == 3)
+					{
+						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiPlayers[i].GetHeight() - m_uiControllerMissing.GetHeight());
+					}
+					m_uiControllerMissing->Render();
+				}
+			}*/
 		}
 		break;
 		case GAME_STATE_END:
 		{
-			VictroyPlayerOne->Render();
+			for (UINT i = 0; i < m_pOrbs.size(); ++i)
+			{
+				if (m_pOrbs[i]->GetAlive())
+				{
+					m_uiVictory[i].Render();
+					break;
+				}
+			}
 		}
 		break;
 		default:break;
+	}
+
+	for (int i = 0; i < m_numPlayers; ++i)
+	{
+		if (!m_pContollers[i]->Connected())
+		{
+			if (i == 0 || i == 2)
+			{
+				m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
+			}
+			else if (i == 1 || i == 3)
+			{
+				m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiControllerMissing->GetHeight() - m_uiSpace);
+			}
+			m_uiControllerMissing->Render();
+		}
 	}
 
 	m_pDX10_Renderer->TurnZBufferOn();
@@ -672,7 +755,6 @@ void Game::Render()
 
 bool Game::HandleInput(int _playerNum)
 {
-	//bool allConnected = true;
 
 	if (m_pContollers[_playerNum]->Connected())
 	{
@@ -716,20 +798,44 @@ bool Game::HandleInput(int _playerNum)
 			{
 				m_gameState = GAME_STATE_PAUSED;
 				m_PausedPlayer = _playerNum;
-				m_pPausesMenu->SetController(m_pContollers[_playerNum]);
+				m_pPauseMenu->SetController(m_pContollers[_playerNum]);
+				m_pOptionsMenu->SetController(m_pContollers[_playerNum]);
 			}
 		}
 
 		m_pContollers[_playerNum]->PostProcess();
 
-		//return true;
+		return true;
 	}
 	else
 	{
-		//m_allConnected = false;
 		return false;
 	}
-
-	
-
 }
+
+void Game::UpdateClientSize()
+{
+	int width = m_pDX10_Renderer->GetWidth();
+	int height = m_pDX10_Renderer->GetHeight();
+
+	m_uiPlayers[1].SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
+	m_uiPlayers[2].SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
+	m_uiPlayers[3].SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
+	// TO DO JURAN: Update client size on UI stuff
+}
+
+bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
+{
+	if (_pPauseMenu && _pOptionsMenu && _pInstructionsUI && _pControllerUI)
+	{
+		m_pPauseMenu = _pPauseMenu;
+		m_pOptionsMenu = _pOptionsMenu;
+		m_pInstructions = _pInstructionsUI;
+		m_uiControllerMissing = _pControllerUI;
+
+		return true;
+	}
+	
+	return false;
+}
+

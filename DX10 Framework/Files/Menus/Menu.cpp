@@ -180,7 +180,7 @@ void Menu::Draw()
 	if (m_state == MENU_STATE_DEFAULT)
 	{
 		// Turn the z buffer off
-		m_pDX10_Renderer->TurnZBufferOff();
+		//m_pDX10_Renderer->TurnZBufferOff();
 
 		// Draw Title
 		if (m_title)
@@ -207,7 +207,7 @@ void Menu::Draw()
 		}
 
 		// Turn the z buffer on
-		m_pDX10_Renderer->TurnZBufferOn();
+		//m_pDX10_Renderer->TurnZBufferOn();
 	}
 }
 
@@ -238,15 +238,15 @@ bool Menu::AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale, UINT _
 		{
 		case MENU_LAYOUT_CENTRE:
 		{
-			float m_screenWidth = 0.0f;
-			float m_screenHeight = 0.0f;
+			float m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth());
+			float m_screenHeight = static_cast<float>(m_pDX10_Renderer->GetHeight());
 
-			RECT rect;
+			/*RECT rect;
 			if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left);
 				m_screenHeight = static_cast<float>(rect.bottom - rect.top);
-			}
+			}*/
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
 			m_screenHeight = m_screenHeight * 0.5f;
@@ -291,6 +291,8 @@ bool Menu::AddToggleButton(TButton* _button, UINT _spriteIndex, bool _toggled, f
 			_button->m_pButton->GetPosition().y,
 			m_sprites[_spriteIndex]->GetWidth() * _scale,
 			m_sprites[_spriteIndex]->GetHeight() * _scale));
+
+		m_toggleButtons.back()->SetScale(_scale);
 	}
 	return true;
 }
@@ -304,22 +306,22 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 		{
 		case MENU_LAYOUT_CENTRE:
 		{
-			float m_screenWidth = 0.0f;
-			float m_screenHeight = 0.0f;
+			float m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth());
+			float m_screenHeight = static_cast<float>(m_pDX10_Renderer->GetHeight());
 
-			RECT rect;
+			/*RECT rect;
 			if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
 			{
 				m_screenWidth = static_cast<float>(rect.right - rect.left);
 				m_screenHeight = static_cast<float>(rect.bottom - rect.top);
-			}
+			}*/
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
 			m_screenHeight = m_screenHeight * 0.125f; // TO DO - Juran (work on a better system)
 
-			if (m_position.x + m_screenWidth + m_sprites[_spriteIndex]->GetWidth() * _scale > static_cast<float>(rect.right - rect.left))
+			if (m_position.x + m_screenWidth + m_sprites[_spriteIndex]->GetWidth() * _scale > static_cast<float>(m_pDX10_Renderer->GetWidth()))
 			{
-				m_screenWidth = static_cast<float>(rect.right - rect.left) * 0.125f * 0.125f;
+				m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.125f * 0.125f;
 			}
 
 			VALIDATE(m_title->Initialise(m_pDX10_Renderer, m_sprites[_spriteIndex],
@@ -338,7 +340,7 @@ bool Menu::AddTitle(UINT _spriteIndex, float _scale, v2float _position)
 				m_sprites[_spriteIndex]->GetHeight() * _scale));
 			break;
 		}
-		
+		m_title->SetScale(_scale);
 	}
 
 	return true;
@@ -398,4 +400,63 @@ void Menu::Reset()
 void Menu::SetController(InputGamePad* _pGamepad)
 {
 	m_pGamepad = _pGamepad;
+}
+
+void Menu::OnResize()
+{
+	if (m_title)
+	{
+		switch (m_layout)
+		{
+			case MENU_LAYOUT_CENTRE:
+			{
+				float m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth());
+				float m_screenHeight = static_cast<float>(m_pDX10_Renderer->GetHeight());
+
+				m_screenWidth = m_screenWidth * 0.5f - (m_title->GetSprite()->GetWidth() * 0.5f);
+				m_screenHeight = m_screenHeight * 0.125f; // TO DO - Juran (work on a better system)
+
+				if (m_position.x + m_screenWidth + m_title->GetSprite()->GetWidth() * m_title->GetScale() > static_cast<float>(m_pDX10_Renderer->GetWidth()))
+				{
+					m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.125f * 0.125f;
+				}
+
+				m_title->SetPosition(v2float(m_position.x + m_screenWidth, m_position.y + m_screenHeight));
+			}
+			break;
+			case MENU_LAYOUT_CUSTOM:
+				
+			break;
+		}
+	}
+
+	for (UINT i = 0; i < m_buttons.size(); ++i)
+	{
+		float offsety = m_buttons[i]->m_pButton->GetHeight();
+
+		switch (m_layout)
+		{
+			case MENU_LAYOUT_CENTRE:
+			{
+				float m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth());
+				float m_screenHeight = static_cast<float>(m_pDX10_Renderer->GetHeight());
+
+				m_screenWidth = m_screenWidth * 0.5f - (m_buttons[i]->m_pButton->GetSprite()->GetWidth() * 0.5f);
+				m_screenHeight = m_screenHeight * 0.5f;
+
+				m_buttons[i]->m_pButton->SetPosition(v2float(m_position.x + m_screenWidth, m_position.y + m_screenHeight + (m_space + offsety) * i));
+			}
+			break;
+			case MENU_LAYOUT_CUSTOM:
+				
+			break;
+		}
+
+	}
+
+	for (UINT i = 0; i < m_toggleButtons.size(); ++i)
+	{
+		// TO DO - Juran (this assumes the toggle buttons are index the same as the normal buttons)
+		m_toggleButtons[i]->SetPosition(v2float(m_buttons[i]->m_pButton->GetPosition().x + m_buttons[i]->m_pButton->GetWidth() + m_space, m_buttons[i]->m_pButton->GetPosition().y));
+	}
 }

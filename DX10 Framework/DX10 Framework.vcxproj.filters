@@ -141,27 +141,6 @@
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_LitTex.h">
       <Filter>Header Files\DX10\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Body_2D.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Utilities.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\Physics_2D.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Pulley_2D.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Rope_2D.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_World_2D.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\Physics\2D Physics\Physics_Collision_Listener.h">
-      <Filter>Header Files\Physics\2D Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Files\Utility\Utility_Math.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
@@ -235,21 +214,6 @@
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.cpp">
       <Filter>Source Files\DX10\Cameras</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Body_2D.cpp">
-      <Filter>Source Files\Physics\2D Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Pulley_2D.cpp">
-      <Filter>Source Files\Physics\2D Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Rope_2D.cpp">
-      <Filter>Source Files\Physics\2D Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Physics\2D Physics\Physics_World_2D.cpp">
-      <Filter>Source Files\Physics\2D Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Physics\2D Physics\Physics_Collision_Listener.cpp">
-      <Filter>Source Files\Physics\2D Physics</Filter>
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\3D Objects\DX10_Obj_LitTex.cpp">
       <Filter>Source Files\DX10\3D Objects</Filter>

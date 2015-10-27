@@ -93,6 +93,13 @@ class GUI_Button
 		float GetHeight();
 
 		/*******************
+		* GetScale: Gets the scale.
+		* @author: Juran Griffith.
+		* @return: float: The scale of the image.
+		********************/
+		float GetScale();
+
+		/*******************
 		* SetPosition: Sets the objects new position.
 		* @author: Juran Griffith.
 		* @parameter: _position	:The new position to set
@@ -133,6 +140,14 @@ class GUI_Button
 		virtual void SetRowIndex(UINT _index);
 
 		/*******************
+		* SetScale: Set the scale for this button
+		* @author: Juran Griffith.
+		* @parameter: _scale: The scale to change to.
+		* @return: void.
+		********************/
+		void SetScale(float _scale);
+
+		/*******************
 		* Draw: Draws the object.
 		* @author:	Juran Griffith.
 		* @return:	void.
@@ -157,11 +172,13 @@ class GUI_Button
 
 		shape::Rectangle	m_bounds;
 		v2float				m_position;
+		//v2float				m_parentPosition;
 		float				m_boundsOffset;
 		BUTTON_STATE		m_state;
 
 		float				m_width;
 		float				m_height;
+		float				m_scale;
 
 		bool				m_horizontal;
 

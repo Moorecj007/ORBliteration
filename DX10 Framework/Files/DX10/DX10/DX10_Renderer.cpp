@@ -190,7 +190,7 @@ bool DX10_Renderer::onResize()
 	ReleaseCOM(m_pDepthStencilStateNormal);
 	ReleaseCOM(m_pDepthStencilStateZDisabled);
 
-	if (m_fullScreen == true)
+	/*if (m_fullScreen == true)
 	{
 		m_clientWidth = GetSystemMetrics(SM_CXSCREEN);
 		m_clientHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -199,8 +199,15 @@ bool DX10_Renderer::onResize()
 	{
 		m_clientWidth = m_windowedWidth;
 		m_clientHeight = m_windowedHeight;
-	}
+	}*/
 
+	RECT rect;
+	if (GetClientRect(m_hWnd, &rect))
+	{
+		m_clientWidth = rect.right - rect.left;
+		m_clientHeight = rect.bottom - rect.top;
+	}
+	
 	// Resize the buffers of the Swap Chain and create the new render target view
 	VALIDATEHR(m_pDX10SwapChain->ResizeBuffers(1, m_clientWidth, m_clientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 

@@ -229,12 +229,22 @@ class Menu
 		void ToggleButton(UINT _index);
 
 		/***********************
-		* SetController: Sets the menus xbox controller
+		* SetController: Sets which controller has control of this menu
 		* @author:	Juran Griffith.
-		* @parameter: 
+		* @parameter: _pGamepad: Changes who has control over the menu.
 		* @return:	void.
 		********************/
 		void SetController(InputGamePad* _pGamepad);
+
+		/***********************
+		* OnResize: This updates the menu items position when the application has been resized.
+		* @author:	Juran Griffith.
+		* @return:	void.
+		********************/
+		void OnResize();
+
+		// TO DO Juran
+		InputGamePad* GetController() { return m_pGamepad; }
 
 	protected:
 	private:
