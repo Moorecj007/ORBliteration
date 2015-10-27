@@ -33,6 +33,11 @@ Menu::~Menu()
 	// Release all sprite related resources
 	ReleasePtr(m_title);
 
+	while (!m_pContollers.empty())
+	{
+		m_pContollers.pop_back();
+	}
+
 	while (!m_sprites.empty())
 	{
 		ReleasePtr(m_sprites.back());
@@ -52,14 +57,13 @@ Menu::~Menu()
 	}
 }
 
-bool Menu::Initialise(DX10_Renderer*_pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager* _pSoundManager, InputGamePad* _pGamepad, bool* _pKeyDown, MENU_LAYOUT _layout)
+bool Menu::Initialise(DX10_Renderer*_pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager* _pSoundManager, bool* _pKeyDown, MENU_LAYOUT _layout)
 {
-	if (_pDX10_Renderer && _pShader && _pSoundManager && _pGamepad && _pKeyDown)
+	if (_pDX10_Renderer && _pShader && _pSoundManager && _pKeyDown)
 	{
 		m_pDX10_Renderer = _pDX10_Renderer;
 		m_pShader_Sprite = _pShader;
 		m_pSoundManager = _pSoundManager;
-		m_pGamepad = _pGamepad;
 		m_pKeyDown = _pKeyDown;
 		m_layout = _layout;
 
@@ -102,54 +106,56 @@ void Menu::Process(float _deltaTime)
 		}
 
 		// Handle Controller Input
-		m_pGamepad->PreProcess();
-
-		// Menu Item Navigation
-		if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Down) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Down) || m_pKeyDown[VK_DOWN])
+		for (UINT i = 0; i < m_pContollers.size(); ++i)
 		{
-			m_pKeyDown[VK_DOWN] = false;
-			if (m_menuItem < m_buttons.size() - 1)
-			{
-				m_pSoundManager->PlayMenuNavigate();
-				if (m_menuItem >= 0)
-				{
-					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
-				}
+			m_pContollers[i]->PreProcess();
 
-				m_menuItem++;
-				if (m_menuItem >= 0)
+			// Menu Item Navigation
+			if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Down) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Down) || m_pKeyDown[VK_DOWN])
+			{
+				m_pKeyDown[VK_DOWN] = false;
+				if (m_menuItem < m_buttons.size() - 1)
 				{
-					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+					m_pSoundManager->PlayMenuNavigate();
+					if (m_menuItem >= 0)
+					{
+						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
+					}
+
+					m_menuItem++;
+					if (m_menuItem >= 0)
+					{
+						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+					}
 				}
 			}
-		}
-		else if (m_pGamepad->GetButtonDown(m_XButtons.DPad_Up) || m_pGamepad->GetStickDirectionDown(m_XStickDirections.LStick_Up) || m_pKeyDown[VK_UP])
-		{
-			m_pKeyDown[VK_UP] = false;
-			if (m_menuItem > 0)
+			else if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Up) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Up) || m_pKeyDown[VK_UP])
 			{
-				m_pSoundManager->PlayMenuNavigate();
-				if (m_menuItem >= 0)
+				m_pKeyDown[VK_UP] = false;
+				if (m_menuItem > 0)
 				{
-					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
-				}
+					m_pSoundManager->PlayMenuNavigate();
+					if (m_menuItem >= 0)
+					{
+						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
+					}
 
-				m_menuItem--;
-				if (m_menuItem >= 0)
-				{
-					m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+					m_menuItem--;
+					if (m_menuItem >= 0)
+					{
+						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+					}
 				}
 			}
-		}
 
-		// Menu Item Selected
-		if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN]) // Confirm Selection
-		{
-			m_pKeyDown[VK_RETURN] = false;
-			m_state = m_buttons[m_menuItem]->m_option;
-
-			switch (m_state)
+			// Menu Item Selected
+			if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN]) // Confirm Selection
 			{
+				m_pKeyDown[VK_RETURN] = false;
+				m_state = m_buttons[m_menuItem]->m_option;
+
+				switch (m_state)
+				{
 				case MENU_STATE_FULL_SCREEN: // Fall through
 				case MENU_STATE_SOUND: // Fall through
 				case MENU_STATE_RUMBLE: // Fall Through
@@ -158,20 +164,21 @@ void Menu::Process(float _deltaTime)
 				default:
 					m_pSoundManager->PlayMenuAccept();
 					break;
+				}
 			}
-		}
-		else if (m_pGamepad->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
-		{
-			m_pSoundManager->PlayMenuBack();
-			m_pKeyDown[VK_BACK] = false;
-			if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
+			else if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
 			{
-				m_state = MENU_STATE_EXIT;
+				m_pSoundManager->PlayMenuBack();
+				m_pKeyDown[VK_BACK] = false;
+				if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
+				{
+					m_state = MENU_STATE_EXIT;
+				}
+				m_state = MENU_STATE_BACK;
 			}
-			m_state = MENU_STATE_BACK;
-		}
 
-		m_pGamepad->PostProcess();
+			m_pContollers[i]->PostProcess();
+		}
 	}
 }
 
@@ -401,9 +408,24 @@ void Menu::Reset()
 	m_state = MENU_STATE_DEFAULT;
 }
 
-void Menu::SetController(InputGamePad* _pGamepad)
+/*void Menu::SetController(InputGamePad* _pGamepad)
 {
 	m_pGamepad = _pGamepad;
+}*/
+
+void Menu::AddController(InputGamePad* _controller)
+{
+	if (m_pContollers.size() != 4)
+	{ 
+		for (UINT i = 0; i < m_pContollers.size(); ++i)
+		{
+			if (m_pContollers[i] == _controller)
+			{
+				return;
+			}
+		}
+		m_pContollers.push_back(_controller);
+	}
 }
 
 void Menu::OnResize()
