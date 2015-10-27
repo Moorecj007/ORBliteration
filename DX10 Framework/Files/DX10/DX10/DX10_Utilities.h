@@ -16,7 +16,7 @@
 #pragma once
 #ifndef __DX10_UTILITIES_H__
 #define __DX10_UTILITIES_H__
-#pragma message("Included DX10_Utilities.h")
+//#pragma message("Included DX10_Utilities.h")
 
 // Library Includes
 #include <d3d10.h>
