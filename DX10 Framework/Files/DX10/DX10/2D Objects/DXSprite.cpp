@@ -63,8 +63,8 @@ bool DXSprite::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _p
 	m_realImageHeight = _imageHeight;
 
 	// Set the size to the same size of the actual image
-	m_imageWidth = _imageWidth;
-	m_imageHeight = _imageHeight;
+	//m_imageWidth = _imageWidth;
+	//m_imageHeight = _imageHeight;
 
 	//m_offsetImageWidth = m_imageWidth;
 	//m_offsetImageHeight = m_imageHeight;
@@ -83,6 +83,9 @@ bool DXSprite::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _p
 
 	m_offsetImageWidth = static_cast<float>(_imageWidth) / static_cast<float>(m_sliceWidth);
 	m_offsetImageHeight = static_cast<float>(_imageHeight) / static_cast<float>(m_sliceHeight);
+
+	m_imageWidth = (UINT)m_offsetImageWidth;
+	m_imageHeight = (UINT)m_offsetImageHeight;
 
 	m_offsetU = 1.0f / static_cast<float>(m_sliceWidth);
 	m_offsetV = 1.0f / static_cast<float>(m_sliceHeight);

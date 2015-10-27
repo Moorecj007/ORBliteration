@@ -76,18 +76,18 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	UINT victoryWidth = 760;
 	UINT victoryHeight = 601;
-	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f;
-	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f;
+	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
+	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
-	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
-	m_number_first.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
-	//m_number_first.SetScale(m_uiScale);
-	m_number_first.SetPosition(xoffset - 25.0f, 50.0f);
+	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
+	//m_number_first.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	//m_number_first.SetScale(2.0f);
+	m_number_first.SetPosition(xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f));
 
-	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
-	m_number_second.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
+	//m_number_second.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
 	//m_number_second.SetScale(m_uiScale);
-	m_number_second.SetPosition(xoffset + 25.0f, 50.0f);
+	m_number_second.SetPosition(xoffset, 50.0f);
 	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -114,7 +114,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		if(m_pContollers[i]->Connected() == false)
 		{
 			m_allConnected = false;
-			m_gameState = GAME_STATE_ERROR;
+			m_gameState = GAME_STATE_ERROR; // REMOVE - (comments)
 		}
 
 		m_pOrbs.push_back(new Orb());
@@ -430,9 +430,11 @@ bool Game::Process(float _dt)
 
 			if (m_startCountDown <= 0.0f)
 			{
+				float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
+				float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 				m_gameState = GAME_STATE_PROCESS;
-				//m_number_first.SetPosition(420, 50);
-				//m_number_second.SetPosition(480, 50);
+				//m_number_first.SetScale(0.5f);
+				m_number_first.SetPosition(xoffset - m_number_first.GetWidth(), 50.0f);
 			}
 		}
 		break;
@@ -463,7 +465,7 @@ bool Game::Process(float _dt)
 					};
 
 
-					if (m_allConnected)
+					if (m_allConnected) // REMOVE - (comments)
 					{
 						if (m_gameState == GAME_STATE_ERROR)
 						{
@@ -533,9 +535,11 @@ bool Game::Process(float _dt)
 			switch (m_pPauseMenu->GetMenuState())
 			{
 			case MENU_STATE_RESUME:
+			{
 				m_gameState = GAME_STATE_PROCESS;
 				m_pPauseMenu->Reset();
-				break;
+			}
+			break;
 			case MENU_STATE_INSTRUCTIONS:
 			{
 				m_pPauseMenu->GetController()->PreProcess();
@@ -584,7 +588,7 @@ bool Game::Process(float _dt)
 				};
 			}
 
-			if (m_allConnected)
+			if (m_allConnected) // REMOVE - (comments)
 			{
 				if (m_gameState == GAME_STATE_ERROR)
 				{
@@ -701,21 +705,7 @@ void Game::Render()
 		break;*/
 		case GAME_STATE_ERROR:
 		{
-			/*for (int i = 0; i < m_numPlayers; ++i)
-			{
-				if (!m_isConnected[i])
-				{
-					if (i == 0 || i == 2)
-					{
-						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
-					}
-					else if (i == 1 || i == 3)
-					{
-						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiPlayers[i].GetHeight() - m_uiControllerMissing.GetHeight());
-					}
-					m_uiControllerMissing->Render();
-				}
-			}*/
+			
 		}
 		break;
 		case GAME_STATE_END:
@@ -743,6 +733,7 @@ void Game::Render()
 			}
 			else if (i == 1 || i == 3)
 			{
+				// static_cast<float>(m_pDX10_Renderer->GetWidth()) - m_uiControllerMissing->GetWidth() - m_uiSpace
 				m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiControllerMissing->GetHeight() - m_uiSpace);
 			}
 			m_uiControllerMissing->Render();
@@ -763,8 +754,6 @@ bool Game::HandleInput(int _playerNum)
 
 		if (m_gameState != GAME_STATE_ERROR)
 		{
-
-
 			// Movement
 			v2float LeftAxis;
 			if (!m_pContollers[_playerNum]->LStick_InDeadZone())
@@ -815,13 +804,17 @@ bool Game::HandleInput(int _playerNum)
 
 void Game::UpdateClientSize()
 {
-	int width = m_pDX10_Renderer->GetWidth();
-	int height = m_pDX10_Renderer->GetHeight();
+	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
+	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
+	//float xoffset = width * 0.5f;
+	//float yoffset = height * 0.5f;
 
-	m_uiPlayers[1].SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
-	m_uiPlayers[2].SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
-	m_uiPlayers[3].SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
-	// TO DO JURAN: Update client size on UI stuff
+	m_uiPlayers[1].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
+	m_uiPlayers[2].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
+	m_uiPlayers[3].SetPosition(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
+
+	//m_number_first.SetPosition(xoffset - m_number_first.GetWidth(), 50.0f);
+	//m_number_second.SetPosition(xoffset, 50.0f);
 }
 
 bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
