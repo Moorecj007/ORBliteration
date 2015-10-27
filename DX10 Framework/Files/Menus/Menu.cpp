@@ -180,7 +180,7 @@ void Menu::Draw()
 	if (m_state == MENU_STATE_DEFAULT)
 	{
 		// Turn the z buffer off
-		m_pDX10_Renderer->TurnZBufferOff();
+		//m_pDX10_Renderer->TurnZBufferOff();
 
 		// Draw Title
 		if (m_title)
@@ -207,7 +207,7 @@ void Menu::Draw()
 		}
 
 		// Turn the z buffer on
-		m_pDX10_Renderer->TurnZBufferOn();
+		//m_pDX10_Renderer->TurnZBufferOn();
 	}
 }
 

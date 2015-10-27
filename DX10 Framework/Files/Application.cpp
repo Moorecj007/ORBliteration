@@ -190,9 +190,15 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_pKeyDown = new bool[255];
 	memset(m_pKeyDown, false, 255);
 
-	// Create the Player One Pad controller
-	m_pGamepadPlayerOne = new InputGamePad();
-	VALIDATE(m_pGamepadPlayerOne->Initialise(1));
+	// Create the controllers
+	for (int i = 0; i < 4; i++)
+	{
+		m_pContollers.push_back(new InputGamePad());
+		VALIDATE(m_pContollers[i]->Initialise((i + 1), m_isRumbleOn));
+		//m_vibrateTimers[i] = 0.0f;
+	}
+	//m_pGamepadPlayerOne = new InputGamePad();
+	//VALIDATE(m_pGamepadPlayerOne->Initialise(1));
 
 	VALIDATE(Initialise_DX10(_hInstance));
 
@@ -244,7 +250,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Main Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration_title.png", 1600, 800);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4); 
@@ -259,7 +265,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Match Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
 	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
@@ -270,7 +276,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Options Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
@@ -285,7 +291,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Pause Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pGamepadPlayerOne, m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
 
 	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
@@ -298,8 +304,8 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	float min = static_cast<float>(min(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
 	float max = static_cast<float>(max(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
-	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f;
-	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f;
+	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
+	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
 	VALIDATE(m_splash_ps.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Phenomena/phenomena_splash.png", 3504, 2173, 6, 5));
 	m_splash_ps.SetSize(max - 300.0f, (max - 300.0f) * (434.6f / 584.0f));
@@ -311,9 +317,13 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_splash_orb.SetSize(max, max * 0.5f);
 	m_splash_orb.SetImageIndex(0);
 
-	VALIDATE(m_instructions.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
-	m_instructions.SetSize(min, min);
-	m_instructions.SetPosition(xoffset - m_instructions.GetWidth() * 0.5f, 0.0f);
+	VALIDATE(m_uiInstructions.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_orbliteration_instructions.png", 3000, 3000));
+	m_uiInstructions.SetSize(min, min);
+	m_uiInstructions.SetPosition(xoffset - m_uiInstructions.GetWidth() * 0.5f, 0.0f);
+
+	m_uiControllerMissing.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_connect_an_xbox_controller.png", 625, 96);
+	m_uiControllerMissing.SetScale(0.5f);
+	m_uiControllerMissing.SetPosition(xoffset - m_uiControllerMissing.GetWidth() * 0.5f, static_cast<float>(m_pDX10_Renderer->GetHeight()) - m_uiControllerMissing.GetHeight());
 	
 	if (m_state == APP_STATE_MAIN_MENU)
 	{
@@ -348,7 +358,12 @@ void Application::ShutDown()
 		ReleasePtr(m_pCamera);
 		
 		// Gamepad input memory release
-		ReleasePtr(m_pGamepadPlayerOne);
+		while (m_pContollers.empty())
+		{
+			ReleasePtr(m_pContollers.back());
+			m_pContollers.pop_back();
+		}
+		//ReleasePtr(m_pGamepadPlayerOne);
 
 		// Menu memory release
 		while (!m_menus.empty())
@@ -461,29 +476,39 @@ bool Application::Process(float _dt)
 			}
 			break;
 		case APP_STATE_MAIN_MENU:
-			m_menus[0]->Process(_dt);
-			VALIDATE(UpdateState(m_menus[0]->GetMenuState()));
+			{
+				m_menus[0]->Process(_dt);
+				VALIDATE(UpdateState(m_menus[0]->GetMenuState()));
+			}
 			break;
 		case APP_STATE_MATCH_MENU:
-			m_menus[1]->Process(_dt);
-			VALIDATE(UpdateState(m_menus[1]->GetMenuState()));
+			{
+				m_menus[1]->Process(_dt);
+				VALIDATE(UpdateState(m_menus[1]->GetMenuState()));
+			}
 			break;
 		case APP_STATE_INSTRUCTIONS_MENU:
-			m_pGamepadPlayerOne->PreProcess();
-			if (m_pGamepadPlayerOne->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN])
 			{
-				m_pKeyDown[VK_RETURN] = false;
-				m_state = APP_STATE_MAIN_MENU;
+				m_pContollers[0]->PreProcess();
+				if (m_pContollers[0]->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
+				{
+					m_pKeyDown[VK_BACK] = false;
+					m_state = APP_STATE_MAIN_MENU;
+				}
+				m_pContollers[0]->PostProcess();
 			}
-			m_pGamepadPlayerOne->PostProcess();
 			break;
 		case APP_STATE_OPTION_MENU:
-			m_menus[2]->Process(_dt);
-			VALIDATE(UpdateState(m_menus[2]->GetMenuState()));
+			{
+				m_menus[2]->Process(_dt);
+				VALIDATE(UpdateState(m_menus[2]->GetMenuState()));
+			}
 			break;
 		case APP_STATE_PAUSE_MENU:
-			m_menus[3]->Process(_dt);
-			VALIDATE(UpdateState(m_menus[3]->GetMenuState()));
+			{
+				m_menus[3]->Process(_dt);
+				VALIDATE(UpdateState(m_menus[3]->GetMenuState()));
+			}
 			break;
 		case APP_STATE_GAME:
 			{
@@ -493,6 +518,7 @@ bool Application::Process(float _dt)
 					ReleasePtr(m_pGame);
 					m_state = APP_STATE_MAIN_MENU;
 					m_menus[0]->Reset();
+					ResetControllerUI();
 				}
 			}
 			break;
@@ -517,34 +543,91 @@ void Application::Render()
 		// Get the Renderer Ready to receive new data
 		m_pDX10_Renderer->StartRender();
 
-		switch (m_state)
+		if (m_state == APP_STATE_GAME)
 		{
-		case APP_STATE_SPLASH:
-			m_splash_ps.Render();
-			break;
-		case APP_STATE_TITLE:
-			m_splash_orb.Render();
-			break;
-		case APP_STATE_MAIN_MENU:
-			m_menus[0]->Draw();
-			break;
-		case APP_STATE_MATCH_MENU:
-			m_menus[1]->Draw();
-			break;
-		case APP_STATE_INSTRUCTIONS_MENU:
-			m_instructions.Render();
-			break;
-		case APP_STATE_OPTION_MENU:
-			m_menus[2]->Draw();
-			break;
-		case APP_STATE_PAUSE_MENU:
-			m_menus[3]->Draw();
-			break;
-		case APP_STATE_GAME:
 			m_pGame->Render();
-			break;
-		default:
-			break;
+		}
+		else
+		{
+			m_pDX10_Renderer->TurnZBufferOff();
+			switch (m_state)
+			{
+			case APP_STATE_SPLASH:
+				{
+					m_splash_ps.Render();
+				}
+				break;
+			case APP_STATE_TITLE:
+				{
+					m_splash_orb.Render();
+				}
+				break;
+			case APP_STATE_MAIN_MENU:
+				{
+					m_menus[0]->Draw();
+				}
+				break;
+			case APP_STATE_MATCH_MENU:
+				{
+					m_menus[1]->Draw();
+
+					float m_uiSpace = 10.0f;
+					float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
+					float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
+					for (int i = 0; i < 4; ++i)
+					{
+						if (!m_pContollers[i]->Connected())
+						{
+							switch (i)
+							{
+							case 0:
+								m_uiControllerMissing.SetPosition(m_uiSpace, m_uiSpace);
+								break;
+							case 1:
+								m_uiControllerMissing.SetPosition(width - m_uiControllerMissing.GetWidth() - m_uiSpace, height - m_uiControllerMissing.GetHeight() - m_uiSpace);
+								break;
+							case 2:
+								m_uiControllerMissing.SetPosition(width - m_uiControllerMissing.GetWidth() - m_uiSpace, m_uiSpace);
+								break;
+							case 3:
+								m_uiControllerMissing.SetPosition(m_uiSpace, height - m_uiControllerMissing.GetHeight() - m_uiSpace);
+								break;
+							}
+							m_uiControllerMissing.Render();
+						}
+					}
+				}
+				break;
+			case APP_STATE_INSTRUCTIONS_MENU:
+				{
+					m_uiInstructions.Render();
+				}
+				break;
+			case APP_STATE_OPTION_MENU:
+				{
+					m_menus[2]->Draw();
+				}
+				break;
+			case APP_STATE_PAUSE_MENU:
+				{
+					m_menus[3]->Draw();
+				}
+				break;
+			/*case APP_STATE_GAME:
+			{
+
+			}
+			break;*/
+			default:
+				break;
+			}
+
+			if (!m_pContollers[0]->Connected() && (m_state != APP_STATE_MATCH_MENU && m_state != APP_STATE_GAME))
+			{
+				m_uiControllerMissing.Render();
+			}
+
+			m_pDX10_Renderer->TurnZBufferOn();
 		}
 
 		// Tell the Renderer the data input is over and present the outcome
@@ -646,109 +729,159 @@ bool Application::UpdateState(MENU_STATE _state)
 	{
 		// Main menu
 	case MENU_STATE_START:
-		m_state = APP_STATE_MATCH_MENU;
-		m_menus[1]->Reset();
+		{
+			m_state = APP_STATE_MATCH_MENU;
+			m_menus[1]->Reset();
+		}
 		break;
 	case MENU_STATE_INSTRUCTIONS:
-		m_state = APP_STATE_INSTRUCTIONS_MENU;
-		m_menus[0]->Reset();
+		{
+			m_state = APP_STATE_INSTRUCTIONS_MENU;
+			m_menus[0]->Reset();
+		}
 		break;
 	case MENU_STATE_OPTIONS:
-		m_state = APP_STATE_OPTION_MENU;
-		m_menus[2]->Reset();
+		{
+			m_state = APP_STATE_OPTION_MENU;
+			m_menus[2]->Reset();
+		}
 		break;
 	case MENU_STATE_EXIT:
-		ExitApp();
+		{
+			ExitApp();
+		}
 		break;
 	case MENU_STATE_BACK:
-		switch (m_state)
 		{
+			switch (m_state)
+			{
 			case APP_STATE_MATCH_MENU:			// Fall through
 			case APP_STATE_INSTRUCTIONS_MENU:	// Fall through
 			case APP_STATE_OPTION_MENU:			// Fall through
-				m_state = APP_STATE_MAIN_MENU;
-				m_menus[0]->Reset();
+				{
+					if (m_state == APP_STATE_MATCH_MENU)
+					{
+						ResetControllerUI();
+					}
+					m_state = APP_STATE_MAIN_MENU;
+					m_menus[0]->Reset();
+				}
 				break;
 			case APP_STATE_PAUSE_MENU:
-				m_state = APP_STATE_GAME;
+				{
+					m_state = APP_STATE_GAME;
+				}
 				break;
 			default:
-				m_menus[0]->Reset();
+				{
+					m_menus[0]->Reset();
+				}
 				break;
+			}
 		}
 		break;
 		// Options menu
 	case MENU_STATE_FULL_SCREEN:
-	{
-		// Set the menu state
-		m_state = APP_STATE_OPTION_MENU;
+		{
+			// Set the menu state
+			m_state = APP_STATE_OPTION_MENU;
 
-		// Toggle
-		m_isFullscreen = !m_isFullscreen;
-		m_pDX10_Renderer->ToggleFullscreen();
-		UpdateClientSize();
+			// Toggle
+			m_isFullscreen = !m_isFullscreen;
+			m_pDX10_Renderer->ToggleFullscreen();
+			UpdateClientSize();
 
-		// Update button
-		m_menus[2]->ToggleButton(0);
-		m_menus[2]->Reset();
-	}
+			// Update button
+			m_menus[2]->ToggleButton(0);
+			m_menus[2]->Reset();
+		}
 		break;
 	case MENU_STATE_SOUND:
-	{
-		m_state = APP_STATE_OPTION_MENU;
-		
-		// Toggle
-		m_isSoundOn = !m_isSoundOn;
-		m_pSoundManager->Mute(!m_isSoundOn);
+		{
+			m_state = APP_STATE_OPTION_MENU;
+			
+			// Toggle
+			m_isSoundOn = !m_isSoundOn;
+			m_pSoundManager->Mute(!m_isSoundOn);
 
-		// Update button
-		m_menus[2]->ToggleButton(1);
-		m_menus[2]->Reset();
-	}
+			// Update button
+			m_menus[2]->ToggleButton(1);
+			m_menus[2]->Reset();
+		}
 		break;
 	case MENU_STATE_RUMBLE:
-	{
-		// Set the menu state
-		m_state = APP_STATE_OPTION_MENU;
-		
-		// Toggle
-		m_isRumbleOn = !m_isRumbleOn;
+		{
+			// Set the menu state
+			m_state = APP_STATE_OPTION_MENU;
+			
+			// Toggle
+			m_isRumbleOn = !m_isRumbleOn;
 
-		// Update button
-		m_menus[2]->ToggleButton(2);
-		m_menus[2]->Reset();
-	}
+			// Update button
+			m_menus[2]->ToggleButton(2);
+			m_menus[2]->Reset();
+		}
 		break;
 		
 		// Match menu states
-	case MENU_STATE_PLAYERS_2: // Fall through
-	//case MENU_STATE_PLAYERS_3: // Fall through
-	//case MENU_STATE_PLAYERS_4:
-		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn, m_pKeyDown));
-		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
-		m_state = APP_STATE_GAME;
+	case MENU_STATE_PLAYERS_2:
+		{
+			if (GetNumberOfConnectedControllers() == 2)
+			{
+				m_pGame = new Game();
+				VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 2, m_isRumbleOn, m_pKeyDown));
+				VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_uiInstructions, &m_uiControllerMissing));
+				m_state = APP_STATE_GAME;
+			}
+			else
+			{
+				m_state = APP_STATE_MATCH_MENU;
+				m_menus[1]->Reset();
+			}
+		}
 		break;
 	case MENU_STATE_PLAYERS_3:
-		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn, m_pKeyDown));
-		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
-		m_state = APP_STATE_GAME;
+		{
+			if (GetNumberOfConnectedControllers() == 3)
+			{
+				m_pGame = new Game();
+				VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 3, m_isRumbleOn, m_pKeyDown));
+				VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_uiInstructions, &m_uiControllerMissing));
+				m_state = APP_STATE_GAME;
+			}
+			else
+			{
+				m_state = APP_STATE_MATCH_MENU;
+				m_menus[1]->Reset();
+			}
+		}
 		break;
 	case MENU_STATE_PLAYERS_4:
-		m_pGame = new Game();
-		VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn, m_pKeyDown));
-		VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_instructions));
-		m_state = APP_STATE_GAME;
+		{
+			if (GetNumberOfConnectedControllers() == 4)
+			{
+				m_pGame = new Game();
+				VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, 4, m_isRumbleOn, m_pKeyDown));
+				VALIDATE(m_pGame->AttachMenuComponents(m_menus[3], m_menus[2], &m_uiInstructions, &m_uiControllerMissing));
+				m_state = APP_STATE_GAME;
+			}
+			else
+			{
+				m_state = APP_STATE_MATCH_MENU;
+				m_menus[1]->Reset();
+			}
+		}
 		break;
-
-		// Pause menu states (reuses the main menu states)
-	case MENU_STATE_RESUME:
-		m_state = APP_STATE_GAME;
+	case MENU_STATE_RESUME: // Pause menu states (reuses the main menu states)
+		{
+			m_state = APP_STATE_GAME;
+		}
 		break;
 
 	default:
-		
+		{
+
+		}
 		break;
 	}
 
@@ -769,18 +902,37 @@ void Application::UpdateClientSize()
 
 	if (max(width, height) == width)
 	{
-		m_instructions.SetPosition((diff / 2.0f), 0.0f);
+		m_uiInstructions.SetPosition((diff / 2.0f), 0.0f);
 	}
 	else
 	{
-		m_instructions.SetPosition(0.0f, (diff / 2.0f));
+		m_uiInstructions.SetPosition(0.0f, (diff / 2.0f));
 	}
 
-	m_instructions.SetSize(min(width, height), min(width, height));
+	m_uiInstructions.SetSize(min(width, height), min(width, height));
 	//m_instructions.SetSize(600, 600);
 
 	for (auto it = m_menus.begin(); it != m_menus.end(); ++it)
 	{
 		(*it)->OnResize();
 	}
+	ResetControllerUI();
+}
+
+void Application::ResetControllerUI()
+{
+	m_uiControllerMissing.SetPosition((static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f) - m_uiControllerMissing.GetWidth() * 0.5f, static_cast<float>(m_pDX10_Renderer->GetHeight()) - m_uiControllerMissing.GetHeight());
+}
+
+short Application::GetNumberOfConnectedControllers()
+{
+	short count = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		if (m_pContollers[i]->Connected())
+		{
+			count++;
+		}
+	}
+	return count;
 }

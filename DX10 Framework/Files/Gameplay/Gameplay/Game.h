@@ -126,7 +126,7 @@ public:
 	void UpdateClientSize();
 
 	// TO DO - Juran
-	bool AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructions);
+	bool AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI);
 
 private:
 
@@ -173,18 +173,19 @@ private:
 	// Menu Components
 	Menu* m_pPauseMenu;
 	Menu* m_pOptionsMenu;
-	DXSprite* m_pInstructions;
+	
 
 	// UI Components
 	std::vector<DXSprite> m_uiPlayers;
 	std::vector<DXSprite> m_uiVictory;
-	DXSprite m_uiControllerMissing;
+	DXSprite* m_pInstructions;
+	DXSprite* m_uiControllerMissing;
 	DXSprite m_number_first;
 	DXSprite m_number_second;
-	float m_uiScale = 0.5f;
-	float m_uiWidth = 671.0f;
-	float m_uiHeight = 365.0f;
-	float m_uiSpace = 10.0f;
+	float m_uiScale;
+	float m_uiWidth;
+	float m_uiHeight;
+	float m_uiSpace;
 	bool* m_isConnected;
 };
 #endif	//__GAME_H__
