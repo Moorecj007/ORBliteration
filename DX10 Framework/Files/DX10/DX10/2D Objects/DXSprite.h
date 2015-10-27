@@ -154,6 +154,14 @@ class DXSprite
 		void SetLooped(bool _looped);
 
 		/*******************
+		* SetScale: Sets the scale of the object.
+		* @author: Juran Griffith.
+		* @parameter: _scale: The scale amount.
+		* @return: void.
+		********************/
+		void SetScale(float _scale);
+
+		/*******************
 		* IsAtLastFrame: Checks to see if we have reached the last frame.
 		* @author: Juran Griffith.
 		* @return: bool: True if we are at the last frame.
@@ -231,6 +239,7 @@ class DXSprite
 		float					m_offsetImageHeight;
 		float					m_offsetU;
 		float					m_offsetV;
+		float					m_scale;
 
 		DX10_Renderer*				m_pDX10_Renderer;
 		ID3D10ShaderResourceView*	m_pTex;
