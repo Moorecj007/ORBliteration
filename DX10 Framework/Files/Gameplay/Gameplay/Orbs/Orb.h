@@ -156,6 +156,21 @@ public:
 	bool GetPhase(){ return m_phase; };
 
 	/***********************
+	* GetScore: Returns the Orbs Current Score
+	* @author: Jc Fowles
+	* @return: int : The Orbs Current Score
+	********************/
+	int GetScore(){ return m_score; };
+
+	/***********************
+	* SetScore: Sets the Orbs Current Score
+	* @author: Jc Fowles
+	* @parmater: _score: The amount to set score to
+	* @return: void : 
+	********************/
+	void SetScore(int _score){ m_score = _score; };
+
+	/***********************
 	* Boost: Activate the Orbs Boost ablility 
 	* @author: Jc Fowles
 	* @return: void:
@@ -186,6 +201,8 @@ private:
 	v3float m_acceleration;
 	v3float m_velocity;
 	
+	int m_score;
+
 	float m_surfaceFriction;
 	float m_speed;
 

@@ -22,6 +22,7 @@
 Orb::Orb()
 {
 	m_pTile = 0;
+	m_score = 0;
 
 	m_acceleration = {0.0f,0.0f,0.0f};
 	m_velocity = { 0.0f, 0.0f, 0.0f };
