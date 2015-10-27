@@ -246,7 +246,9 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Main Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pKeyDown));
+
+	m_menus.back()->AddController(m_pContollers[0]);
 
 	m_menus.back()->AddSprite("Tron/UI/tron_orbliteration_title.png", 1600, 800);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4); 
@@ -261,7 +263,12 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Match Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pKeyDown));
+
+	m_menus.back()->AddController(m_pContollers[0]);
+	m_menus.back()->AddController(m_pContollers[1]);
+	m_menus.back()->AddController(m_pContollers[2]);
+	m_menus.back()->AddController(m_pContollers[3]);
 
 	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
 	m_menus.back()->AddSprite("Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
@@ -272,7 +279,9 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Options Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pKeyDown));
+
+	m_menus.back()->AddController(m_pContollers[0]);
 
 	m_menus.back()->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
 	m_menus.back()->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
@@ -287,16 +296,19 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 
 	// Initialise Pause Menu
 	m_menus.push_back(new Menu());
-	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pContollers[0], m_pKeyDown));
+	VALIDATE(m_menus.back()->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pKeyDown));
 
-	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill.png", 575, 424, 1, 4);
-	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
-	m_menus.back()->AddSprite("Tron/Button/tron_button_options_fill.png", 669, 424, 1, 4);
-	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4);
+	m_menus.back()->AddController(m_pContollers[0]);
+	m_menus.back()->AddController(m_pContollers[1]);
+	m_menus.back()->AddController(m_pContollers[2]);
+	m_menus.back()->AddController(m_pContollers[3]);
+
+	m_menus.back()->AddSprite("Tron/Button/tron_button_resume_fill_whiteblue.png", 575, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_instructions_fill_whiteblue.png", 1137, 424, 1, 4);
+	m_menus.back()->AddSprite("Tron/Button/tron_button_exit_fill.png", 387, 424, 1, 4); // TO DO - Juran (make quit ui)
 	m_menus.back()->AddButton(MENU_STATE_RESUME, 0, 0.5f);
 	m_menus.back()->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_OPTIONS, 2, 0.5f);
-	m_menus.back()->AddButton(MENU_STATE_EXIT, 3, 0.5f);
+	m_menus.back()->AddButton(MENU_STATE_EXIT, 2, 0.5f);
 
 	float min = static_cast<float>(min(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
 	float max = static_cast<float>(max(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));

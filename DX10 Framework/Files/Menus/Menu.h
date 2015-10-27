@@ -99,12 +99,12 @@ class Menu
 		* @parameter: _pDX10_Renderer: The graphics device.
 		* @parameter: _pShader: The shader object to use for rendering the sprite.
 		* @parameter: _pSoundManager: The sound manager to help play sound effects in the menu.
-		* @parameter: _pGamepad: The gamepad controller to listen to.
+		* @parameter: _pGamepad: The gamepad controller to listen to. TO DO - Juran
 		* @parameter: _pKeyDown
 		* @parameter: _layout: How to layout the menu items.
 		* @return:	bool: Successful or not
 		********************/
-		bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager*	_pSoundManager, InputGamePad* _pGamepad, bool* _pKeyDown, MENU_LAYOUT _layout = MENU_LAYOUT_CENTRE);
+		bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager*	_pSoundManager, bool* _pKeyDown, MENU_LAYOUT _layout = MENU_LAYOUT_CENTRE);
 
 		/*******************
 		* Draw: Draws the object
@@ -231,10 +231,10 @@ class Menu
 		/***********************
 		* SetController: Sets which controller has control of this menu
 		* @author:	Juran Griffith.
-		* @parameter: _pGamepad: Changes who has control over the menu.
+		* @parameter: _index: Set which controller has control over the menu
 		* @return:	void.
 		********************/
-		void SetController(InputGamePad* _pGamepad);
+		//void SetController(UINT _index);
 
 		/***********************
 		* OnResize: This updates the menu items position when the application has been resized.
@@ -243,8 +243,21 @@ class Menu
 		********************/
 		void OnResize();
 
-		// TO DO Juran
-		InputGamePad* GetController() { return m_pGamepad; }
+		/***********************
+		* GetController: Gets controller 
+		* @author:	Juran Griffith.
+		* @parameter: 
+		* @return:	void.
+		********************/
+		//InputGamePad* GetController() { return m_pGamepad; }
+
+		/***********************
+		* AddController: Adds a controller the menu will listen for
+		* @author:	Juran Griffith.
+		* @parameter: _controller: The controller to add.
+		* @return:	void.
+		********************/
+		void AddController(InputGamePad* _controller);
 
 	protected:
 	private:
@@ -270,7 +283,7 @@ class Menu
 		// Input
 		XButtonIDs					m_XButtons;
 		XStickDirectionIDs			m_XStickDirections;
-		InputGamePad*				m_pGamepad;
+		std::vector<InputGamePad*>  m_pContollers;
 
 		// State
 		MENU_STATE					m_state;
