@@ -19,6 +19,7 @@
 
 // Library Includes
 #include <sstream>
+#include <iostream>
 
 // Defines
 #define ReleasePtr(x) { if(x){ delete x; x = 0;} }

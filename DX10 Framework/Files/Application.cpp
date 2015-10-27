@@ -176,9 +176,11 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	m_state = APP_STATE_SPLASH;
+	// TO DO JC: START - Change Back to Defualt
+	m_state = APP_STATE_MAIN_MENU;
 
-	m_isFullscreen = true;
+	// TO DO JC: START - Change Back to Defualt
+	m_isFullscreen = false;
 	m_isSoundOn = true;
 	m_isRumbleOn = true;
 
@@ -195,15 +197,9 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	{
 		m_pContollers.push_back(new InputGamePad());
 		VALIDATE(m_pContollers[i]->Initialise((i + 1), m_isRumbleOn));
-		//m_vibrateTimers[i] = 0.0f;
 	}
-	//m_pGamepadPlayerOne = new InputGamePad();
-	//VALIDATE(m_pGamepadPlayerOne->Initialise(1));
-
+	
 	VALIDATE(Initialise_DX10(_hInstance));
-
-	/*m_pGame = new Game();
-	VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, 2));*/
 
 	m_online = true;
 
@@ -404,14 +400,21 @@ void Application::ExecuteOneFrame()
 		Render();
 		m_deltaTick = 0;
 		m_fps++;
+		
 	}	
 
 	// Reset FPS counters
 	if (m_fpsTimer >= 1.0f)
 	{
+		COORD pos = { 0, 0 };
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleCursorPosition(output, pos);
+		std::cout << "Frames : " << m_fps << std::endl;
 		m_fpsTimer -= 1.0f;
 		m_fps = 0;
 	}
+
+
 }
 
 bool Application::Process(float _dt)
