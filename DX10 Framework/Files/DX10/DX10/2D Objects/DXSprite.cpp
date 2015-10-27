@@ -17,9 +17,10 @@
 // Local Includes
 #include "DXSprite.h"
 
-DXSprite::DXSprite():
-	m_pDX10_Renderer(0),
-	m_pTex(0)
+DXSprite::DXSprite()
+	: m_pDX10_Renderer(0)
+	, m_pTex(0)
+	, m_scale(1.0f)
 {
 	m_offsetScreenWidthPrev = 0.0f;
 	m_offsetScreenHeightPrev = 0.0f;
@@ -166,6 +167,12 @@ void DXSprite::SetSize(float _width, float _height)
 void DXSprite::SetLooped(bool _looped)
 {
 	m_animationLooped = _looped;
+}
+
+void DXSprite::SetScale(float _scale)
+{
+	m_scale = _scale;
+	SetSize(m_imageWidth * _scale, m_imageHeight * _scale);
 }
 
 void DXSprite::IncrementIndex()

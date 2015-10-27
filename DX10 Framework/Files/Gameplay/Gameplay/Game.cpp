@@ -19,7 +19,10 @@
 
 Game::Game()
 {
-
+	m_uiScale = 0.5f;
+	m_uiWidth = 671.0f;
+	m_uiHeight = 365.0f;
+	m_uiSpace = 10.0f;
 }
 
 Game::~Game()
@@ -71,24 +74,21 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	m_pSpriteShader = _pSpriteShader;
 
-	m_uiControllerMissing.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/Controller/controller_connect_an_xbox_control.png", 564, 96);
-	m_uiControllerMissing.SetSize(564 * m_uiScale, 96 * m_uiScale);
-	m_uiControllerMissing.SetPosition(100, 100);
-
 	UINT victoryWidth = 760;
 	UINT victoryHeight = 601;
 	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) / 2.0f;
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) / 2.0f;
 
-	m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
+	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
 	m_number_first.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	//m_number_first.SetScale(m_uiScale);
 	m_number_first.SetPosition(xoffset - 25.0f, 50.0f);
-	m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4);
 
+	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill.png", 1060, 424, 10, 4));
 	m_number_second.SetSize(106.0f * m_uiScale, 106.0f * m_uiScale);
+	//m_number_second.SetScale(m_uiScale);
 	m_number_second.SetPosition(xoffset + 25.0f, 50.0f);
 	
-
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
 	VALIDATE(m_pShader_LitTex->Initialise(m_pDX10_Renderer));
@@ -539,7 +539,7 @@ bool Game::Process(float _dt)
 			case MENU_STATE_INSTRUCTIONS:
 			{
 				m_pPauseMenu->GetController()->PreProcess();
-				if (m_pPauseMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_A))
+				if (m_pPauseMenu->GetController()->GetButtonDown(m_XButtons.ActionButton_B))
 				{
 					m_pPauseMenu->Reset();
 				}
@@ -677,13 +677,19 @@ void Game::Render()
 			switch (m_pPauseMenu->GetMenuState())
 			{
 			case MENU_STATE_INSTRUCTIONS:
-				m_pInstructions->Render();
+				{
+					m_pInstructions->Render();
+				}
 				break;
 			case MENU_STATE_OPTIONS:
-				m_pOptionsMenu->Draw();
+				{
+					m_pOptionsMenu->Draw();
+				}
 				break;
 			default:
-				m_pPauseMenu->Draw();
+				{
+					m_pPauseMenu->Draw();
+				}
 				break;
 			}
 		}
@@ -695,21 +701,21 @@ void Game::Render()
 		break;*/
 		case GAME_STATE_ERROR:
 		{
-			for (int i = 0; i < m_numPlayers; ++i)
+			/*for (int i = 0; i < m_numPlayers; ++i)
 			{
 				if (!m_isConnected[i])
 				{
 					if (i == 0 || i == 2)
 					{
-						m_uiControllerMissing.SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
+						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
 					}
 					else if (i == 1 || i == 3)
 					{
-						m_uiControllerMissing.SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiPlayers[i].GetHeight() - m_uiControllerMissing.GetHeight());
+						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiPlayers[i].GetHeight() - m_uiControllerMissing.GetHeight());
 					}
-					m_uiControllerMissing.Render();
+					m_uiControllerMissing->Render();
 				}
-			}
+			}*/
 		}
 		break;
 		case GAME_STATE_END:
@@ -725,6 +731,22 @@ void Game::Render()
 		}
 		break;
 		default:break;
+	}
+
+	for (int i = 0; i < m_numPlayers; ++i)
+	{
+		if (!m_pContollers[i]->Connected())
+		{
+			if (i == 0 || i == 2)
+			{
+				m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
+			}
+			else if (i == 1 || i == 3)
+			{
+				m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiControllerMissing->GetHeight() - m_uiSpace);
+			}
+			m_uiControllerMissing->Render();
+		}
 	}
 
 	m_pDX10_Renderer->TurnZBufferOn();
@@ -802,14 +824,14 @@ void Game::UpdateClientSize()
 	// TO DO JURAN: Update client size on UI stuff
 }
 
-bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructions)
+bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
 {
-	if (_pPauseMenu && _pOptionsMenu && _pInstructions)
+	if (_pPauseMenu && _pOptionsMenu && _pInstructionsUI && _pControllerUI)
 	{
 		m_pPauseMenu = _pPauseMenu;
 		m_pOptionsMenu = _pOptionsMenu;
-		m_pInstructions = _pInstructions;
-
+		m_pInstructions = _pInstructionsUI;
+		m_uiControllerMissing = _pControllerUI;
 
 		return true;
 	}

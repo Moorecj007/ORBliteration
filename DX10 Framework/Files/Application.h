@@ -206,6 +206,20 @@ private:
 	// TO DO CAL
 	void UpdateClientSize();
 
+	/*******************
+	* ResetsControllerUI: Resets the controller ui to the correct position.
+	* @author:	Juran Griffith.
+	* @return:	void
+	********************/
+	void ResetControllerUI();
+
+	/*******************
+	* GetNumberOfConnectedControllers: Gets the number of connected controllers
+	* @author:	Juran Griffith.
+	* @return:	short: The number of connected controllers.
+	********************/
+	short GetNumberOfConnectedControllers();
+
 private:
 	// Singleton Instance
 	static Application* s_pApp;
@@ -235,7 +249,8 @@ private:
 	// Game Pad Input
 	XButtonIDs m_XButtons;	
 	XStickDirectionIDs m_XStickDirections;
-	InputGamePad* m_pGamepadPlayerOne;
+	//InputGamePad* m_pGamepadPlayerOne;
+	std::vector<InputGamePad*> m_pContollers;
 
 	// Game play Objects
 	Game* m_pGame;
@@ -259,7 +274,8 @@ private:
 	float m_waitTime;
 	bool m_wait;
 
-	DXSprite m_instructions;
+	DXSprite m_uiInstructions;
+	DXSprite m_uiControllerMissing;
 };
 
 #endif // __APPLICATION_H__
