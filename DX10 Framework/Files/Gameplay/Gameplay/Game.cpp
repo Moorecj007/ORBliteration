@@ -455,7 +455,7 @@ bool Game::Process(float _dt)
 	}
 	else
 	{
-		m_gameState = GAME_STATE_ERROR;
+		//m_gameState = GAME_STATE_ERROR;
 	}
 
 	
