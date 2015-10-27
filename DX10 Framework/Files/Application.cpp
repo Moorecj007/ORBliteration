@@ -177,10 +177,10 @@ Application* Application::GetInstance()
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
 	// TO DO JC: START - Change Back to Defualt
-	m_state = APP_STATE_MAIN_MENU;
+	m_state = APP_STATE_SPLASH;
 
 	// TO DO JC: START - Change Back to Defualt
-	m_isFullscreen = false;
+	m_isFullscreen = true;
 	m_isSoundOn = true;
 	m_isRumbleOn = true;
 
