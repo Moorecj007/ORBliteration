@@ -386,17 +386,18 @@ void Application::ExecuteOneFrame()
 	float dt = m_pTimer->GetDeltaTime();
 	m_deltaTick += dt;
 	m_fpsTimer += dt;
-
-	if (Process(dt) == false)
-	{
-		// A process failed to create something
-		m_online = false;
-		return;
-	}
-
+		
 	// Limit to 60 FPS for Renderering
 	if (m_deltaTick > (1.0 / 60.0f))
 	{
+
+		if (Process(m_deltaTick) == false)
+		{
+			// A process failed to create something
+			m_online = false;
+			return;
+		}
+
 		Render();
 		m_deltaTick = 0;
 		m_fps++;
