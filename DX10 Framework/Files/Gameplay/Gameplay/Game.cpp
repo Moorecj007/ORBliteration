@@ -29,7 +29,7 @@ Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
-	ReleasePtr(m_isConnected);
+	ReleasePtrArray(m_isConnected);
 
 	while (m_pContollers.empty() == false)
 	{
@@ -72,10 +72,8 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
 	//m_number_first.SetScale(2.0f); TO Do - Juran Testing
-	m_number_first.SetPosition(xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f));
-
+	
 	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
-	m_number_second.SetPosition(xoffset, 50.0f);
 	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -86,6 +84,9 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	m_pOrbMesh = new DX10_Mesh;
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
+
+	m_isConnected = new bool[m_numPlayers];
+	memset(&m_isConnected, false, m_numPlayers);
 
 	// Create the Controllers and the player orbs
 	std::string temp;
@@ -184,7 +185,13 @@ bool Game::Reset()
 {
 	// Release the arena Floor
 	ReleasePtr(m_pArenaFloor);
-
+	
+	// Set the Timer Positions
+	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
+	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
+	m_number_first.SetPosition(xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f));
+	m_number_second.SetPosition(xoffset, 50.0f);
+		
 	// Set Timers
 	m_matchTimer = 30.0f;
 	m_startCountDown = 3.0f;

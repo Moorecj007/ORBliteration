@@ -144,7 +144,7 @@ private:
 	int m_roundNumber;
 
 	bool m_allConnected;
-
+		
 	// Players
 	int m_numPlayers;
 	int m_numAlivePlayers;
