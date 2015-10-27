@@ -191,10 +191,14 @@ void Menu::Draw()
 		// Draw all the buttons
 		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
 		{
-			/*if (m_sprites.size() == 1) // TO DO - Juran (clean this up, some test code)
+			/*if (m_sprites.size() == 1 && m_buttons.size() > 1)
 			{
-				m_sprites[0]->SetSize(m_buttons[0]->m_pButton->GetWidth(), m_buttons[0]->m_pButton->GetHeight());
+				//m_sprites[0]->SetSize((*button)->m_pButton->GetWidth(), (*button)->m_pButton->GetHeight());
 				m_sprites[0]->SetPosition((*button)->m_pButton->GetPosition().x, (*button)->m_pButton->GetPosition().y);
+			}
+			else
+			{
+				(*button)->m_pButton->Draw();
 			}*/
 			(*button)->m_pButton->Draw();
 		}
