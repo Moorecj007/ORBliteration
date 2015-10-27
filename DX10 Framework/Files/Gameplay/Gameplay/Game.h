@@ -172,8 +172,6 @@ private:
 
 	// Menu Components
 	Menu* m_pPauseMenu;
-	Menu* m_pOptionsMenu;
-	
 
 	// UI Components
 	std::vector<DXSprite> m_uiPlayers;

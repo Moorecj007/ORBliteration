@@ -249,7 +249,6 @@ private:
 	// Game Pad Input
 	XButtonIDs m_XButtons;	
 	XStickDirectionIDs m_XStickDirections;
-	//InputGamePad* m_pGamepadPlayerOne;
 	std::vector<InputGamePad*> m_pContollers;
 
 	// Game play Objects
