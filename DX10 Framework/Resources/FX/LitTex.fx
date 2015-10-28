@@ -15,6 +15,7 @@ cbuffer cbPerFrame
 	Light g_light[MAX_LIGHTS];
 	int g_lightCount;
 	float3 g_eyePosW;
+	float4x4 g_matTex;
 
 	float4x4 g_matView;
 	float4x4 g_matProj;
@@ -22,8 +23,7 @@ cbuffer cbPerFrame
 
 cbuffer cbPerObject
 {
-	float4x4 g_matWorld;
-	float4x4 g_matTex;
+	float4x4 g_matWorld;	
 	float	 g_reduceAlpha;
 };
 

@@ -43,30 +43,22 @@ bool ArenaTile::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Mesh* _pMesh, DX
 	{
 		case BTI_SLIPPERY:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[0]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex));
 		}
 		break;
 		case BTI_ROUGH:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex));
 		}
 		break;
 		case BTI_STANDARD:	// Fall Through
 		default:
 		{
-			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));
+			VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex));
 		}
 	}	// End Switch
 
-	// Create the array of the overlay textures
-	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_Blank.dds", m_pOverlayTex[OTI_BLANK]));
-	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_Confusion.dds", m_pOverlayTex[OTI_POWER_CONFUSION])); 
-	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SizeIncrease.dds", m_pOverlayTex[OTI_POWER_SIZEINCREASE]));
-	VALIDATE(m_pRenderer->CreateTexture("Tile/Powerup_SpeedIncrease.dds", m_pOverlayTex[OTI_POWER_SPEEDINCREASE]));
-
-	m_currentOverlay = OTI_BLANK;
 	m_baseImage = _baseImage;
-	m_currentBaseImage = 0;
 	m_active = true;
 	m_deathTimer = -1.0f;
 	return true;
@@ -104,8 +96,7 @@ void ArenaTile::Render()
 		TLitTex _litTex;
 		_litTex.pMesh = m_pMesh;
 		_litTex.pMatWorld = &m_matWorld;
-		_litTex.pTexBase = m_pBaseTex[m_currentBaseImage];
-		_litTex.pTex2 = m_pOverlayTex[m_currentOverlay];
+		_litTex.pTexBase = m_pBaseTex;
 		_litTex.reduceAlpha = m_reduceAlpha;
 
 		// Set the Shader to Render the Tile
@@ -122,22 +113,22 @@ bool ArenaTile::SetBaseImageEnum(eBaseTileImages _baseImage)
 	{
 	case BTI_SLIPPERY:
 	{
-		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex[0]));
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_blue.png", m_pBaseTex));
 	}
 		break;
 	case BTI_ROUGH:
 	{
-		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex[0]));
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_red.png", m_pBaseTex));
 	}
 		break;
 	case BTI_STANDARD:	// Fall Through
 	default:
 	{
-		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex[0]));
+		VALIDATE(m_pRenderer->CreateTexture("Tron/Tile/tron_tile_white.png", m_pBaseTex));
 	}
 	}	// End Switch
 
-	//succesfull set
+	//successful set
 	return true;
 
 };

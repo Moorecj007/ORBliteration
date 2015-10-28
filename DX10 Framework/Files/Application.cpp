@@ -180,7 +180,7 @@ bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hIn
 	m_state = APP_STATE_SPLASH;
 
 	// TO DO JC: START - Change Back to Defualt
-	m_isFullscreen = true;
+	m_isFullscreen = false;
 	m_isSoundOn = true;
 	m_isRumbleOn = true;
 
@@ -235,6 +235,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_pCamera->SetPostionVec({ 0, 0, -100.0f });
 	m_pCamera->SetTargetVec({ 0, 0, 0 });
 	m_pCamera->SetUpVec({ 0, 1, 0 });
+	m_pCamera->Process();
 
 	// Initialise the sprite shader
 	m_pShader_Sprite = new DX10_Shader_Sprite();
@@ -437,12 +438,8 @@ bool Application::Process(float _dt)
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
-		m_pCamera->Process();
-
-		ProcessShaders();
-
 		m_pShader_Sprite->Update(_dt);
-
+		
 		switch (m_state)
 		{
 		case APP_STATE_SPLASH:

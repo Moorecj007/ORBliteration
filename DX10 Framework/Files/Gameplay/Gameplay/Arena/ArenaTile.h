@@ -30,22 +30,7 @@ enum eBaseTileImages
 {
 	BTI_STANDARD,	
 	BTI_SLIPPERY,	
-	BTI_ROUGH,
-	BTI_STANDARD_DYING,
-	BTI_SLIPPERY_DYING,
-	BTI_ROUGH_DYING
-};
-
-/***********************
-* eOverlayTileImages: The image list of textures that can be overlayed on top of a tile
-* @author: Callan Moore
-********************/
-enum eOverlayTileImages
-{
-	OTI_BLANK,
-	OTI_POWER_CONFUSION,
-	OTI_POWER_SIZEINCREASE,
-	OTI_POWER_SPEEDINCREASE
+	BTI_ROUGH
 };
 
 class ArenaTile :
@@ -109,17 +94,9 @@ public:
 	* SetBaseImageEnum: Sets the Base Image indicator for which image is displayed on the tile
 	* @author: Jc Fowles
 	* @parameter: _baseImage: The new enum to determine the base image
-	* @return: bool: Succesfull set
+	* @return: bool: Successful set
 	********************/
 	bool SetBaseImageEnum(eBaseTileImages _baseImage);
-
-	/***********************
-	* SetOverlayImage: Set the Overlay image to a new one
-	* @author: Callan Moore
-	* @parameter: _overlay: The new enum to determine the Overlay image
-	* @return: void
-	********************/
-	void SetOverlayImage(eOverlayTileImages _overlay) { m_currentOverlay = _overlay; };
 
 	/***********************
 	* SetActive: Set the Active state of the tile
@@ -139,12 +116,9 @@ public:
 
 private:
 	DX10_Shader_LitTex* m_pShader_LitTex;
-	ID3D10ShaderResourceView* m_pBaseTex[11];
-	ID3D10ShaderResourceView* m_pOverlayTex[4];
+	ID3D10ShaderResourceView* m_pBaseTex;
 
 	eBaseTileImages m_baseImage;
-	int m_currentBaseImage;
-	eOverlayTileImages m_currentOverlay;
 
 	bool m_active;
 	float m_deathTimer;
