@@ -79,6 +79,8 @@ public:
 
 		VALIDATE(m_pDX10_Renderer->CreateTexture("defaultSpecular.dds", m_pSpecularTex));
 
+		D3DXMatrixIdentity(&m_D3DXMatrixIdentity);
+
 		return true;
 	}
 	
@@ -96,6 +98,8 @@ public:
 		m_pEyePos->SetRawValue(m_pDX10_Renderer->GetEyePos(), 0, sizeof(D3DXVECTOR3));
 		m_pMatView->SetMatrix((float*)m_pDX10_Renderer->GetViewMatrix());
 		m_pMatProj->SetMatrix((float*)m_pDX10_Renderer->GetProjMatrix());
+		m_pMatTex->SetMatrix((float*)&m_D3DXMatrixIdentity);
+		m_pMapSpecular->SetResource(m_pSpecularTex);
 	}
 	
 	/***********************
@@ -115,10 +119,6 @@ public:
 		m_pDX10_Renderer->SetInputLayout(m_pCurrentVertexLayout);
 		m_pDX10_Renderer->SetPrimitiveTopology(_litTex.pMesh->GetPrimTopology());
 
-		// Don't transform texture coordinates
-		D3DXMATRIX matTex;
-		D3DXMatrixIdentity(&matTex);
-
 		if (m_pCurrentTech != NULL)
 		{
 			D3D10_TECHNIQUE_DESC techDesc;
@@ -126,17 +126,9 @@ public:
 			for (UINT p = 0; p < techDesc.Passes; ++p)
 			{
 				D3DXMATRIX matWorld = *_litTex.pMatWorld;
-
 				m_pMatWorld->SetMatrix((float*)&matWorld);
-				m_pMatTex->SetMatrix((float*)&matTex);
-				m_pMapDiffuse->SetResource(_litTex.pTexBase);
-				m_pMapSpecular->SetResource(m_pSpecularTex);
+				m_pMapDiffuse->SetResource(_litTex.pTexBase);			
 				m_pReduceAlpha->SetRawValue(&_litTex.reduceAlpha, 0, sizeof(float));
-				
-				if (_eTech == TECH_LITTEX_BLENDTEX2)
-				{
-					m_pMapDiffuse2->SetResource(_litTex.pTex2);
-				}
 
 				m_pCurrentTech->GetPassByIndex(p)->Apply(0);
 				_litTex.pMesh->Render();			
@@ -300,6 +292,8 @@ private:
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse;
 	ID3D10EffectShaderResourceVariable* m_pMapDiffuse2;
 	ID3D10EffectShaderResourceVariable* m_pMapSpecular;
+
+	D3DXMATRIX m_D3DXMatrixIdentity;
 };
 
 #endif	// __DX10_SHADER_LITTEX_H__
