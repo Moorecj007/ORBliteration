@@ -49,8 +49,72 @@ enum APP_STATE
 	APP_STATE_MATCH_MENU,
 	APP_STATE_OPTION_MENU,
 	APP_STATE_INSTRUCTIONS_MENU,
-	APP_STATE_PAUSE_MENU,
+	//APP_STATE_PAUSE_MENU,
 	APP_STATE_GAME
+};
+
+struct TLobbyPlayer
+{
+	enum LOBBY_STATE
+	{
+		LOBBY_STATE_NOT_CONNECTED,
+		LOBBY_STATE_NOT_READY,
+		LOBBY_STATE_READY
+	};
+
+	TLobbyPlayer()
+	{
+	}
+	TLobbyPlayer(DXSprite* _sprite, D3DXVECTOR2 _position, UINT _offset = 0)
+		: m_sprite(_sprite)
+		, m_position(_position)
+		, m_offset(_offset)
+	{
+		m_state = LOBBY_STATE_NOT_CONNECTED;
+		UpdateImage();
+		m_ready = false;
+	}
+
+	void SetState(LOBBY_STATE _state)
+	{
+		m_state = _state;
+		m_ready = (m_state == LOBBY_STATE_READY);
+	}
+
+	void UpdateImage()
+	{
+		switch (m_state)
+		{
+			case LOBBY_STATE_NOT_CONNECTED:
+			{
+				m_sprite->SetImageIndex(m_offset);
+			}
+			break;
+			case LOBBY_STATE_NOT_READY:
+			{
+				m_sprite->SetImageIndex(m_offset + 1);
+			}
+			break;
+			case LOBBY_STATE_READY:
+			{
+				m_sprite->SetImageIndex(m_offset + 2);
+			}
+			break;
+		}
+	}
+
+	void Draw()
+	{
+		UpdateImage();
+		m_sprite->SetPosition(m_position.x, m_position.y);
+		m_sprite->Render();
+	}
+
+	bool m_ready;
+	LOBBY_STATE m_state;
+	DXSprite* m_sprite;
+	UINT m_offset;
+	D3DXVECTOR2 m_position;
 };
 
 class Application
@@ -265,7 +329,11 @@ private:
 
 	// 2D Objects
 	DX10_Shader_Sprite*	m_pShader_Sprite;
-	std::vector<Menu*> m_menus;
+	//std::vector<Menu*> m_menus;
+	Menu* m_menuMain;
+	Menu* m_menuOptions;
+	Menu* m_menuPause;
+
 	DXSprite m_splash_ps;
 	DXSprite m_splash_orb;
 	float m_animationTime;
@@ -275,6 +343,12 @@ private:
 
 	DXSprite m_uiInstructions;
 	DXSprite m_uiControllerMissing;
+	DXSprite m_uiPressStart;
+	DXSprite* m_uiLobby;
+
+	std::vector<TLobbyPlayer> m_lobbyPlayers;
+
+	UINT m_playersReady;
 };
 
 #endif // __APPLICATION_H__

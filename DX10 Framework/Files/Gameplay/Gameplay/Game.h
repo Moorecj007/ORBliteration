@@ -66,7 +66,7 @@ public:
 	* @parameter: _AllowVibrate: Allows or dissAllows vibration
 	* @return: bool: Successful or not
 	********************/
-	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown);
+	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, bool _AllowVibrate, bool* _pKeyDown);
 	
 	// TO DO JC:
 	bool Reset();
@@ -131,7 +131,10 @@ public:
 	void UpdateClientSize();
 
 	// TO DO - Juran
-	bool AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI);
+	bool AttachMenuComponents(Menu* _pPauseMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI);
+
+	// TO DO - Juran
+	void AttachGamepad(InputGamePad* _gamePad);
 
 private:
 
@@ -170,10 +173,9 @@ private:
 
 	// Arena
 	ArenaFloor* m_pArenaFloor;
-	
-	SoundManager* m_pSoundManager;
 
-	// TO DO JUR: below code to be removed when UI manager is implemented
+
+	SoundManager* m_pSoundManager;
 	DX10_Shader_Sprite* m_pSpriteShader;
 
 	// Menu Components

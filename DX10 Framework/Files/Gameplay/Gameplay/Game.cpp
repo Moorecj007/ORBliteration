@@ -29,13 +29,13 @@ Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
-	ReleasePtrArray(m_isConnected);
+	ReleasePtr(m_isConnected);
 
-	while (m_pContollers.empty() == false)
+	/*while (m_pContollers.empty() == false)
 	{
 		ReleasePtr(m_pContollers.back());
 		m_pContollers.pop_back();
-	}
+	}*/
 
 	while (m_pOrbs.empty() == false)
 	{
@@ -47,16 +47,21 @@ Game::~Game()
 
 }
 
-bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, int _numPlayers, bool _AllowVibrate, bool* _pKeyDown)
+bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, bool _AllowVibrate, bool* _pKeyDown)
 {
-	if ((_pDX10_Renderer == 0) || (_pSoundManager == 0) || (_pKeyDown == 0))
+	if ((_pDX10_Renderer == 0) || (_pSoundManager == 0) || (_pKeyDown == 0) || (m_pContollers.empty()))
 	{
 		// If the Renderer or the sound manger is NULL the Game cannot be utilized
 		return false;
 	}
 	
-	m_numPlayers = _numPlayers;
-	m_numAlivePlayers = _numPlayers;
+	//m_numPlayers = _numPlayers;
+	//m_numAlivePlayers = _numPlayers;
+
+	m_numPlayers = m_pContollers.size();
+	m_numAlivePlayers = m_numPlayers;
+	
+
 	m_pDX10_Renderer = _pDX10_Renderer;
 	m_pSoundManager = _pSoundManager;
 
@@ -71,9 +76,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
 	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
-	//m_number_first.SetScale(2.0f); TO Do - Juran Testing
-	
-	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
+	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // To IMPROVE - Juran
 	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -86,14 +89,18 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
 	m_isConnected = new bool[m_numPlayers];
-	memset(&m_isConnected, false, m_numPlayers);
+	for (int i = 0; i < m_numPlayers; ++i)
+	{
+		m_isConnected[i] = false;
+	}
 
 	// Create the Controllers and the player orbs
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
 	{
-		m_pContollers.push_back(new InputGamePad());
-		VALIDATE(m_pContollers[i]->Initialise((i + 1), _AllowVibrate));
+		m_pContollers[i]->SetAllowVibrate(_AllowVibrate);
+		//m_pContollers.push_back(new InputGamePad());
+		//VALIDATE(m_pContollers[i]->Initialise((i + 1), _AllowVibrate));
 		m_vibrateTimers[i] = 0.0f;
 
 		m_pOrbs.push_back(new Orb());
@@ -254,6 +261,9 @@ bool Game::Reset()
 
 	// increase the round number
 	m_roundNumber++;
+
+	if (m_pPauseMenu)
+		m_pPauseMenu->Reset();
 	return true;
 }
 
@@ -618,18 +628,24 @@ bool Game::Process(float _dt)
 						if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_B))
 						{
 							m_pPauseMenu->Reset();
+							break;
 						}
 					}
 				}
 				break;
-				case MENU_STATE_OPTIONS:
+				/*case MENU_STATE_OPTIONS:
 				{
 					m_pPauseMenu->Reset();
 				}
-				break;
+				break;*/
 				case MENU_STATE_EXIT:
 				{
 					return false;
+				}
+				break;
+				default:
+				{
+					m_pPauseMenu->Reset();
 				}
 				break;
 			}
@@ -649,6 +665,7 @@ bool Game::Process(float _dt)
 				}
 				m_pContollers[i]->PostProcess();
 			}
+			m_pPauseMenu->Reset();
 		}
 		break;
 		case GAME_STATE_RESTART:
@@ -697,9 +714,7 @@ void Game::Render()
 		m_uiPlayers[i].Render();
 	}
 
-	// TO DO JUR
 	// Draw the 2D UI Assest
-
 	m_pDX10_Renderer->TurnZBufferOff();
 
 	switch (m_gameState)
@@ -717,18 +732,45 @@ void Game::Render()
 		break;
 		case GAME_STATE_ERROR:
 		{
+			float m_uiSpace = 10.0f;
+			float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
+			float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
+
 			for (int i = 0; i < m_numPlayers; ++i)
 			{
 				if (m_isConnected[i] == false)
 				{
-					if (i == 0 || i == 2)
+					switch (i)
+					{
+						case 0:
+						{
+							m_uiControllerMissing->SetPosition(m_uiSpace, m_uiSpace);
+						}
+						break;
+						case 1:
+						{
+							m_uiControllerMissing->SetPosition(width - m_uiControllerMissing->GetWidth() - m_uiSpace, height - m_uiControllerMissing->GetHeight() - m_uiSpace);
+						}
+						break;
+						case 2:
+						{
+							m_uiControllerMissing->SetPosition(width - m_uiControllerMissing->GetWidth() - m_uiSpace, m_uiSpace);
+						}
+						break;
+						case 3:
+						{
+							m_uiControllerMissing->SetPosition(m_uiSpace, height - m_uiControllerMissing->GetHeight() - m_uiSpace);
+						}
+						break;
+					}
+					/*if (i == 0 || i == 2)
 					{
 						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
 					}
 					else if (i == 1 || i == 3)
 					{
 						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiControllerMissing->GetHeight() - m_uiSpace);
-					}
+					}*/
 					m_uiControllerMissing->Render();
 				}
 			}
@@ -827,24 +869,21 @@ void Game::UpdateClientSize()
 {
 	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
 	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
-	//float xoffset = width * 0.5f; TO Do - Juran Testing
-	//float yoffset = height * 0.5f; TO Do - Juran Testing
 
 	m_uiPlayers[1].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 	m_uiPlayers[2].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
 	m_uiPlayers[3].SetPosition(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
-
-	//m_number_first.SetPosition(xoffset - m_number_first.GetWidth(), 50.0f); TO Do - Juran Testing
-	//m_number_second.SetPosition(xoffset, 50.0f); TO Do - Juran Testing
 }
 
-bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
+bool Game::AttachMenuComponents(Menu* _pPauseMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
 {
-	if (_pPauseMenu && _pOptionsMenu && _pInstructionsUI && _pControllerUI)
+	if (_pPauseMenu && _pInstructionsUI && _pControllerUI)
 	{
 		m_pPauseMenu = _pPauseMenu;
 		m_pInstructions = _pInstructionsUI;
 		m_uiControllerMissing = _pControllerUI;
+
+		m_pPauseMenu->FullReset();
 
 		return true;
 	}
@@ -852,3 +891,8 @@ bool Game::AttachMenuComponents(Menu* _pPauseMenu, Menu* _pOptionsMenu, DXSprite
 	return false;
 }
 
+void Game::AttachGamepad(InputGamePad* _gamePad)
+{
+	if (_gamePad != 0)
+		m_pContollers.push_back(_gamePad);
+}
