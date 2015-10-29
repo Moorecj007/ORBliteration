@@ -403,6 +403,14 @@ void Menu::ToggleButton(UINT _index)
 		m_toggleButtons[_index]->SetState(BUTTON_STATE_DEFAULT);
 }
 
+void Menu::FullReset()
+{
+	m_state = MENU_STATE_DEFAULT;
+	m_elaspedTime = 0.0f;
+	m_menuItem = 0;
+	m_exitPushed = false;
+}
+
 void Menu::Reset()
 {
 	m_state = MENU_STATE_DEFAULT;

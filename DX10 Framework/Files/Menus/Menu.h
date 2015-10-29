@@ -37,9 +37,9 @@ enum MENU_STATE
 	MENU_STATE_RUMBLE,
 
 	// Match menu states
-	MENU_STATE_PLAYERS_2,
-	MENU_STATE_PLAYERS_3,
-	MENU_STATE_PLAYERS_4,
+	//MENU_STATE_PLAYERS_2,
+	//MENU_STATE_PLAYERS_3,
+	//MENU_STATE_PLAYERS_4,
 
 	// Pause menu states (reuses the main menu states)
 	MENU_STATE_RESUME,
@@ -212,6 +212,13 @@ class Menu
 		* @return:	void.
 		********************/
 		void SetButtonPosition(UINT _index, v2float _position);
+
+		/***********************
+		* Reset: Resets all variables to default
+		* @author:	Juran Griffith.
+		* @return:	void
+		********************/
+		void FullReset();
 
 		/***********************
 		* Reset: Resets the menu states

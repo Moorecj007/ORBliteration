@@ -51,7 +51,7 @@
     <IncludePath>$(ProjectDir)Libraries\FMOD\include;$(ProjectDir)Libraries\VLD\include;$(ProjectDir)Libraries\Box2D;$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
     <LibraryPath>$(ProjectDir)Libraries\FMOD\lib;$(ProjectDir)Libraries\VLD\lib\Win32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(ProjectDir)Libraries\Box2D</LibraryPath>
     <OutDir>..\Output\Release\</OutDir>
-    <IntDir>..\Output\Debug\</IntDir>
+    <IntDir>..\Output\Release\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
