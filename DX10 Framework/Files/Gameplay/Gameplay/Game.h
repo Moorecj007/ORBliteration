@@ -88,11 +88,11 @@ public:
 	void Render();
 
 	/***********************
-	* HandleInput: Handle the input for the given Orb
-	* @author: Jc Fowles
-	* @return: bool: Whether the contoler passed in is connected
+	* HandleInput: Handle the gampad input
+	* @author: Jc Fowles & Juran
+	* @return: void
 	********************/
-	bool HandleInput(int _playerNum);
+	void HandleInput();
 
 	/***********************
 	* IsOrbsColliding: Checks to see if the two Orbs collide
@@ -130,10 +130,21 @@ public:
 	// TO DO CAL
 	void UpdateClientSize();
 
-	// TO DO - Juran
-	bool AttachMenuComponents(Menu* _pPauseMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI);
+	/***********************
+	* AttachUI: Attachs the instructions and controller ui
+	* @author: Juran Griffith
+	* @parameter: _pInstructionsUI: The instructions UI
+	* @parameter: _pControllerUI: The controller UI
+	* @return: bool: Checks if the parameters are vaild.
+	********************/
+	bool AttachUI(DXSprite* _pInstructionsUI, DXSprite* _pControllerUI);
 
-	// TO DO - Juran
+	/***********************
+	* AttachGamepad: Attachs a gamepad to the game.
+	* @author: Juran Griffith
+	* @parameter: _gamePad: The gamepad
+	* @return: void.
+	********************/
 	void AttachGamepad(InputGamePad* _gamePad);
 
 private:
@@ -174,12 +185,8 @@ private:
 	// Arena
 	ArenaFloor* m_pArenaFloor;
 
-
 	SoundManager* m_pSoundManager;
 	DX10_Shader_Sprite* m_pSpriteShader;
-
-	// Menu Components
-	Menu* m_pPauseMenu;
 
 	// UI Components
 	std::vector<DXSprite> m_uiPlayers;
@@ -192,7 +199,8 @@ private:
 	float m_uiWidth;
 	float m_uiHeight;
 	float m_uiSpace;
-	bool* m_isConnected;
+
+	Menu* m_pPauseMenu;
 };
 #endif	//__GAME_H__
 

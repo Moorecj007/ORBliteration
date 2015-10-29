@@ -62,9 +62,21 @@ struct TLobbyPlayer
 		LOBBY_STATE_READY
 	};
 
+	/***********************
+	* TLobbyPlayer: Default constructor for a lobby player.
+	* @author: Juran Griffith.
+	********************/
 	TLobbyPlayer()
 	{
 	}
+
+	/***********************
+	* TLobbyPlayer: constructor for a lobby player.
+	* @parameter: _sprite: The sprite to render for the lobby player
+	* @parameter: _position: The position to put the UI.
+	* @parameter: _offset: The image offset when using a sprite sheet.
+	* @author: Juran Griffith.
+	********************/
 	TLobbyPlayer(DXSprite* _sprite, D3DXVECTOR2 _position, UINT _offset = 0)
 		: m_sprite(_sprite)
 		, m_position(_position)
@@ -75,12 +87,23 @@ struct TLobbyPlayer
 		m_ready = false;
 	}
 
+	/***********************
+	* SetState: Set the state the lobby player is in.
+	* @parameter: _state: The state for the lobby player.
+	* @author: Juran Griffith.
+	* @return: void.
+	********************/
 	void SetState(LOBBY_STATE _state)
 	{
 		m_state = _state;
 		m_ready = (m_state == LOBBY_STATE_READY);
 	}
 
+	/***********************
+	* UpdateImage: Updates the image based on the state of the lobby player.
+	* @author: Juran Griffith.
+	* @return: void.
+	********************/
 	void UpdateImage()
 	{
 		switch (m_state)
@@ -103,6 +126,11 @@ struct TLobbyPlayer
 		}
 	}
 
+	/***********************
+	* Draw: Draw the lobby player UI.
+	* @author: Juran Griffith.
+	* @return: void.
+	********************/
 	void Draw()
 	{
 		UpdateImage();
@@ -332,7 +360,6 @@ private:
 	//std::vector<Menu*> m_menus;
 	Menu* m_menuMain;
 	Menu* m_menuOptions;
-	Menu* m_menuPause;
 
 	DXSprite m_splash_ps;
 	DXSprite m_splash_orb;

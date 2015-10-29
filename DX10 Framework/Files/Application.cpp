@@ -287,23 +287,6 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menuOptions->AddButton(MENU_STATE_RUMBLE, 3, 0.5f);
 	m_menuOptions->AddToggleButton(m_menuOptions->GetButton(2), 0, m_isRumbleOn);
 
-	// Initialise Pause Menu
-	m_menuPause = new Menu();
-
-	VALIDATE(m_menuPause->Initialise(m_pDX10_Renderer, m_pShader_Sprite, m_pSoundManager, m_pKeyDown));
-
-	m_menuPause->AddController(m_pContollers[0]);
-	m_menuPause->AddController(m_pContollers[1]);
-	m_menuPause->AddController(m_pContollers[2]);
-	m_menuPause->AddController(m_pContollers[3]);
-
-	m_menuPause->AddSprite("Tron/Button/tron_button_resume_fill_whiteblue.png", 575, 424, 1, 4);
-	m_menuPause->AddSprite("Tron/Button/tron_button_instructions_fill_whiteblue.png", 1137, 424, 1, 4);
-	m_menuPause->AddSprite("Tron/Button/tron_button_quit_fill_whiteblue.png", 387, 424, 1, 4);
-	m_menuPause->AddButton(MENU_STATE_RESUME, 0, 0.5f);
-	m_menuPause->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
-	m_menuPause->AddButton(MENU_STATE_EXIT, 2, 0.5f);
-
 	float min = static_cast<float>(min(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
 	float max = static_cast<float>(max(m_pDX10_Renderer->GetWidth(), m_pDX10_Renderer->GetHeight()));
 	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
@@ -385,7 +368,6 @@ void Application::ShutDown()
 		ReleasePtr(m_uiLobby);
 		ReleasePtr(m_menuMain);
 		ReleasePtr(m_menuOptions);
-		ReleasePtr(m_menuPause);
 
 		ReleasePtr(m_pShader_Sprite);
 
@@ -564,12 +546,12 @@ bool Application::Process(float _dt)
 					// Attach the correct gamepads
 					for (UINT i = 0; i < m_pContollers.size(); ++i)
 					{
-						if (m_pContollers[i]->Connected())
+						if (m_pContollers[i]->Connected() && m_lobbyPlayers[i].m_ready)
 							m_pGame->AttachGamepad(m_pContollers[i]);
 					}
 
 					VALIDATE(m_pGame->Initialise(m_pDX10_Renderer, m_pSoundManager, m_pShader_Sprite, m_isRumbleOn, m_pKeyDown));
-					VALIDATE(m_pGame->AttachMenuComponents(m_menuPause, &m_uiInstructions, &m_uiControllerMissing));
+					VALIDATE(m_pGame->AttachUI(&m_uiInstructions, &m_uiControllerMissing));
 					m_state = APP_STATE_GAME;
 					m_playersReady = 0;
 				}
@@ -621,7 +603,6 @@ bool Application::Process(float _dt)
 					ReleasePtr(m_pGame);
 					m_state = APP_STATE_MAIN_MENU;
 					m_menuMain->Reset();
-					m_menuPause->Reset();
 					ResetControllerUI();
 				}
 			}
@@ -960,7 +941,6 @@ void Application::UpdateClientSize()
 
 	m_menuMain->OnResize();
 	m_menuOptions->OnResize();
-	m_menuPause->OnResize();
 
 	ResetControllerUI();
 }

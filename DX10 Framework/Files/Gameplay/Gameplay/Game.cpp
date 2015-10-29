@@ -10,8 +10,10 @@
 * Description : Runs all Game play processes
 * Author :	Callan Moore
 * Author :	Jc Fowles
+* Author :  Juran Griffith
 * Mail :	Callan.Moore@mediadesign.school.nz
 * Mail :	Jc.Fowles@mediadesign.school.nz
+* Mail :	juran.griffith@mediadesignschool.com
 */
 
 // Inclusion Guards
@@ -29,13 +31,8 @@ Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
-	ReleasePtr(m_isConnected);
-
-	/*while (m_pContollers.empty() == false)
-	{
-		ReleasePtr(m_pContollers.back());
-		m_pContollers.pop_back();
-	}*/
+	//ReleasePtr(m_isConnected);
+	ReleasePtr(m_pPauseMenu);
 
 	while (m_pOrbs.empty() == false)
 	{
@@ -54,9 +51,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		// If the Renderer or the sound manger is NULL the Game cannot be utilized
 		return false;
 	}
-	
-	//m_numPlayers = _numPlayers;
-	//m_numAlivePlayers = _numPlayers;
 
 	m_numPlayers = m_pContollers.size();
 	m_numAlivePlayers = m_numPlayers;
@@ -77,6 +71,18 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
 	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // To IMPROVE - Juran
+
+	// Initialise Pause Menu
+	m_pPauseMenu = new Menu();
+
+	VALIDATE(m_pPauseMenu->Initialise(m_pDX10_Renderer, m_pSpriteShader, m_pSoundManager, _pKeyDown));
+
+	m_pPauseMenu->AddSprite("Tron/Button/tron_button_resume_fill_whiteblue.png", 575, 424, 1, 4);
+	m_pPauseMenu->AddSprite("Tron/Button/tron_button_instructions_fill_whiteblue.png", 1137, 424, 1, 4);
+	m_pPauseMenu->AddSprite("Tron/Button/tron_button_quit_fill_whiteblue.png", 387, 424, 1, 4);
+	m_pPauseMenu->AddButton(MENU_STATE_RESUME, 0, 0.5f);
+	m_pPauseMenu->AddButton(MENU_STATE_INSTRUCTIONS, 1, 0.5f);
+	m_pPauseMenu->AddButton(MENU_STATE_EXIT, 2, 0.5f);
 	
 	// Create the Shader for the Game Objects
 	m_pShader_LitTex = new DX10_Shader_LitTex();
@@ -88,24 +94,20 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
-	m_isConnected = new bool[m_numPlayers];
-	for (int i = 0; i < m_numPlayers; ++i)
-	{
-		m_isConnected[i] = false;
-	}
-
 	// Create the Controllers and the player orbs
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
 	{
+		// Add controllers to the pause menu
+		m_pPauseMenu->AddController(m_pContollers[i]);
+
 		m_pContollers[i]->SetAllowVibrate(_AllowVibrate);
-		//m_pContollers.push_back(new InputGamePad());
-		//VALIDATE(m_pContollers[i]->Initialise((i + 1), _AllowVibrate));
+
 		m_vibrateTimers[i] = 0.0f;
 
 		m_pOrbs.push_back(new Orb());
 		
-		switch (i)
+		switch (m_pContollers[i]->GetIndex())
 		{
 			case 0:
 			{
@@ -178,7 +180,7 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 			break;
 		}
 
-		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (i + 1), 1.0f, 0.4f));
+		VALIDATE(m_pOrbs[i]->Initialise(m_pDX10_Renderer, m_pOrbMesh, m_pShader_LitTex, (m_pContollers[i]->GetIndex() + 1), 1.0f, 0.4f));
 	}
 
 	// Reset the game
@@ -221,7 +223,7 @@ bool Game::Reset()
 		//m_pOrbs.push_back(new Orb());
 		int row, col;
 
-		switch (i)
+		switch (m_pContollers[i]->GetIndex())
 		{
 		case 0:
 		{
@@ -455,14 +457,10 @@ void Game::WinCheck()
 				}
 			}
 		}
-
-
 		if (m_gameState != GAME_STATE_END)
 		{
 			m_gameState = GAME_STATE_RESTART;
 		}
-
-
 	}
 }
 
@@ -471,44 +469,7 @@ bool Game::Process(float _dt)
 	// Set up the shader
 	m_pShader_LitTex->SetUpPerFrame();
 
-
 	m_allConnected = true;
-	for (int i = 0; i < m_numPlayers; ++i)
-	{
-		// Process Inputs
-		m_isConnected[i] = HandleInput(i);
-		
-		// Stop a Vibrating controller after half a second if it was vibrating
-		if (m_pContollers[i]->GetVibrate())
-		{
-			m_vibrateTimers[i] += _dt;
-			if (m_vibrateTimers[i] >= 0.5f)
-			{
-				m_pContollers[i]->StopVibrate();
-				m_vibrateTimers[i] = 0.0f;
-			}
-		}
-		
-		// Check the Controllers
-		if (m_isConnected[i] == false)
-		{
-			m_PausedPlayer = i;
-			m_allConnected = false;
-		}
-	}
-
-	// Set the State based on if All the Controllers are connected
-	if (m_allConnected)
-	{
-		if (m_gameState == GAME_STATE_ERROR)
-		{
-			m_gameState = GAME_STATE_PAUSED;
-		}
-	}
-	else
-	{
-		m_gameState = GAME_STATE_ERROR;
-	}
 
 	switch(m_gameState)
 	{
@@ -532,14 +493,79 @@ bool Game::Process(float _dt)
 				float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 				m_gameState = GAME_STATE_PROCESS;
 
-				//m_number_first.SetScale(0.5f); TO Do - Juran Testing
 				m_number_first.SetPosition(xoffset - m_number_first.GetWidth(), 50.0f);
-
 			}
 		}
 		break;
 		case GAME_STATE_PROCESS:
 		{
+			for (int i = 0; i < m_numPlayers; ++i)
+			{
+				m_pContollers[i]->PreProcess();
+				if (m_pContollers[i]->Connected())
+				{
+					// Movement
+					v2float LeftAxis;
+					if (!m_pContollers[i]->LStick_InDeadZone())
+					{
+						LeftAxis = m_pContollers[i]->GetLStickAxis();
+						m_pOrbs[i]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
+					}
+
+					// Boost
+					if (m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_R))
+					{
+						m_pOrbs[i]->Boost();
+					}
+
+
+					if (m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_L))
+					{
+						m_pOrbs[i]->Phase();
+					}
+
+					// Stop a Vibrating controller after half a second if it was vibrating
+					if (m_pContollers[i]->GetVibrate())
+					{
+						m_vibrateTimers[i] += _dt;
+						if (m_vibrateTimers[i] >= 0.5f)
+						{
+							m_pContollers[i]->StopVibrate();
+							m_vibrateTimers[i] = 0.0f;
+						}
+					}
+
+					if (m_pContollers[i]->GetButtonDown(m_XButtons.Start))
+					{
+						m_gameState = GAME_STATE_PAUSED;
+						m_PausedPlayer = i;
+					}
+				}
+				else
+				{
+					m_PausedPlayer = i;
+					m_allConnected = false;
+				}
+				m_pContollers[i]->PostProcess();
+
+				// Set the State based on if All the Controllers are connected
+				if (m_allConnected)
+				{
+					if (m_gameState == GAME_STATE_ERROR)
+					{
+						m_gameState = GAME_STATE_PAUSED;
+					}
+				}
+				else
+				{
+					m_gameState = GAME_STATE_ERROR;
+					break; // Exit for loop
+				}		
+			}
+
+			if (!m_allConnected)
+				break; // Exit switch
+
 			// Process the game time
 			// Alter the Match Timer
 			m_matchTimer -= _dt;
@@ -555,12 +581,8 @@ bool Game::Process(float _dt)
 				// Process the Orbs
 				for (UINT i = 0; i < m_pOrbs.size(); i++)
 				{
-
-
 					if (m_pOrbs[i]->GetAlive())
 					{
-
-
 						// Check Orb Collisions
 
 						for (UINT j = 0; j < m_pOrbs.size(); j++)
@@ -588,7 +610,6 @@ bool Game::Process(float _dt)
 						{
 							m_pOrbs[i]->SetTile(collidingTile);
 							m_pOrbs[i]->Process(1.0f/(60.0f*4.0f));
-
 						}
 						else
 						{
@@ -633,11 +654,10 @@ bool Game::Process(float _dt)
 					}
 				}
 				break;
-				/*case MENU_STATE_OPTIONS:
+				case MENU_STATE_BACK:
 				{
 					m_pPauseMenu->Reset();
 				}
-				break;*/
 				case MENU_STATE_EXIT:
 				{
 					return false;
@@ -645,7 +665,7 @@ bool Game::Process(float _dt)
 				break;
 				default:
 				{
-					m_pPauseMenu->Reset();
+					//m_pPauseMenu->Reset();
 				}
 				break;
 			}
@@ -738,9 +758,9 @@ void Game::Render()
 
 			for (int i = 0; i < m_numPlayers; ++i)
 			{
-				if (m_isConnected[i] == false)
+				if (!m_pContollers[i]->Connected())
 				{
-					switch (i)
+					switch (m_pContollers[i]->GetIndex())
 					{
 						case 0:
 						{
@@ -763,14 +783,6 @@ void Game::Render()
 						}
 						break;
 					}
-					/*if (i == 0 || i == 2)
-					{
-						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y + m_uiPlayers[i].GetHeight());
-					}
-					else if (i == 1 || i == 3)
-					{
-						m_uiControllerMissing->SetPosition(m_uiPlayers[i].GetPosition().x, m_uiPlayers[i].GetPosition().y - m_uiControllerMissing->GetHeight() - m_uiSpace);
-					}*/
 					m_uiControllerMissing->Render();
 				}
 			}
@@ -807,62 +819,9 @@ void Game::Render()
 		break;
 		default:break;
 	}
-	
 
 	m_pDX10_Renderer->TurnZBufferOn();
 
-}
-
-bool Game::HandleInput(int _playerNum)
-{
-
-	if (m_pContollers[_playerNum]->Connected())
-	{
-		if (m_gameState != GAME_STATE_PAUSED)
-		{
-			m_pContollers[_playerNum]->PreProcess();
-
-			if (m_gameState == GAME_STATE_PROCESS)
-			{
-
-				// Movement
-				v2float LeftAxis;
-				if (!m_pContollers[_playerNum]->LStick_InDeadZone())
-				{
-					LeftAxis = m_pContollers[_playerNum]->GetLStickAxis();
-					m_pOrbs[_playerNum]->SetAcceleration({ LeftAxis.x, LeftAxis.y, 0.0f });
-				}
-
-				// Boost
-				if (m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_R))
-				{
-					m_pOrbs[_playerNum]->Boost();
-				}
-
-
-				if (m_pContollers[_playerNum]->GetButtonPressed(m_XButtons.Bumper_L))
-				{
-					m_pOrbs[_playerNum]->Phase();
-				}
-
-			}
-
-			if (m_pContollers[_playerNum]->GetButtonDown(m_XButtons.Start))
-			{
-				m_gameState = GAME_STATE_PAUSED;
-				m_PausedPlayer = _playerNum;
-			}
-
-			m_pContollers[_playerNum]->PostProcess();
-		}
-		// Return true the Controller is Connected
-		return true;
-	}
-	else
-	{
-		// Return false the contoller is Not Connected
-		return false;
-	}
 }
 
 void Game::UpdateClientSize()
@@ -875,16 +834,12 @@ void Game::UpdateClientSize()
 	m_uiPlayers[3].SetPosition(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 }
 
-bool Game::AttachMenuComponents(Menu* _pPauseMenu, DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
+bool Game::AttachUI(DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)
 {
-	if (_pPauseMenu && _pInstructionsUI && _pControllerUI)
+	if (_pInstructionsUI && _pControllerUI)
 	{
-		m_pPauseMenu = _pPauseMenu;
 		m_pInstructions = _pInstructionsUI;
 		m_uiControllerMissing = _pControllerUI;
-
-		m_pPauseMenu->FullReset();
-
 		return true;
 	}
 	

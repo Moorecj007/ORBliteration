@@ -110,73 +110,75 @@ void Menu::Process(float _deltaTime)
 		{
 			m_pContollers[i]->PreProcess();
 
-			// Menu Item Navigation
-			if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Down) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Down) || m_pKeyDown[VK_DOWN])
+			if (m_pContollers[i]->Connected())
 			{
-				m_pKeyDown[VK_DOWN] = false;
-				if (m_menuItem < m_buttons.size() - 1)
+				// Menu Item Navigation
+				if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Down) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Down) || m_pKeyDown[VK_DOWN])
 				{
-					m_pSoundManager->PlayMenuNavigate();
-					if (m_menuItem >= 0)
+					m_pKeyDown[VK_DOWN] = false;
+					if (m_menuItem < m_buttons.size() - 1)
 					{
-						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
-					}
+						m_pSoundManager->PlayMenuNavigate();
+						if (m_menuItem >= 0)
+						{
+							m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
+						}
 
-					m_menuItem++;
-					if (m_menuItem >= 0)
-					{
-						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
-					}
-				}
-			}
-			else if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Up) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Up) || m_pKeyDown[VK_UP])
-			{
-				m_pKeyDown[VK_UP] = false;
-				if (m_menuItem > 0)
-				{
-					m_pSoundManager->PlayMenuNavigate();
-					if (m_menuItem >= 0)
-					{
-						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
-					}
-
-					m_menuItem--;
-					if (m_menuItem >= 0)
-					{
-						m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+						m_menuItem++;
+						if (m_menuItem >= 0)
+						{
+							m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+						}
 					}
 				}
-			}
-
-			// Menu Item Selected
-			if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN]) // Confirm Selection
-			{
-				m_pKeyDown[VK_RETURN] = false;
-				m_state = m_buttons[m_menuItem]->m_option;
-
-				switch (m_state)
+				else if (m_pContollers[i]->GetButtonDown(m_XButtons.DPad_Up) || m_pContollers[i]->GetStickDirectionDown(m_XStickDirections.LStick_Up) || m_pKeyDown[VK_UP])
 				{
-				case MENU_STATE_FULL_SCREEN: // Fall through
-				case MENU_STATE_SOUND: // Fall through
-				case MENU_STATE_RUMBLE: // Fall Through
-					m_pSoundManager->PlayMenuToggles();
-					break;
-				default:
-					m_pSoundManager->PlayMenuAccept();
-					break;
+					m_pKeyDown[VK_UP] = false;
+					if (m_menuItem > 0)
+					{
+						m_pSoundManager->PlayMenuNavigate();
+						if (m_menuItem >= 0)
+						{
+							m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_DEFAULT);
+						}
+
+						m_menuItem--;
+						if (m_menuItem >= 0)
+						{
+							m_buttons[m_menuItem]->m_pButton->SetState(BUTTON_STATE_HOVER);
+						}
+					}
+				}
+
+				// Menu Item Selected
+				if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_A) || m_pKeyDown[VK_RETURN]) // Confirm Selection
+				{
+					m_pKeyDown[VK_RETURN] = false;
+					m_state = m_buttons[m_menuItem]->m_option;
+
+					switch (m_state)
+					{
+					case MENU_STATE_FULL_SCREEN: // Fall through
+					case MENU_STATE_SOUND: // Fall through
+					case MENU_STATE_RUMBLE: // Fall Through
+						m_pSoundManager->PlayMenuToggles();
+						break;
+					default:
+						m_pSoundManager->PlayMenuAccept();
+						break;
+					}
+				}
+				else if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
+				{
+					m_pSoundManager->PlayMenuBack();
+					m_pKeyDown[VK_BACK] = false;
+					if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
+					{
+						m_state = MENU_STATE_EXIT;
+					}
+					m_state = MENU_STATE_BACK;
 				}
 			}
-			else if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_B) || m_pKeyDown[VK_BACK])
-			{
-				m_pSoundManager->PlayMenuBack();
-				m_pKeyDown[VK_BACK] = false;
-				if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
-				{
-					m_state = MENU_STATE_EXIT;
-				}
-				m_state = MENU_STATE_BACK;
-			}
-
 			m_pContollers[i]->PostProcess();
 		}
 	}
