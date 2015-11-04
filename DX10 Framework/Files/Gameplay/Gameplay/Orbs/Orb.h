@@ -185,6 +185,34 @@ public:
 	********************/
 	void Phase();
 
+	/***********************
+	* IsBoost: Checks to see if the orb is in a boost state
+	* @author: Juran Griffith
+	* @return: bool - True if in boost otherwise not.
+	********************/
+	bool IsBoost() { return m_boost; }
+
+	/***********************
+	* IsPhase: Checks to see if the orb is in a phase state
+	* @author: Juran Griffith
+	* @return: bool - True if in phase otherwise not.
+	********************/
+	bool IsPhase() { return m_phase; }
+
+	/***********************
+	* CanBoost: Checks to see if the orb can boost
+	* @author: Juran Griffith
+	* @return: bool - True if in orb can boost otherwise false, it can't.
+	********************/
+	bool CanBoost() { return m_AllowBoost; }
+
+	/***********************
+	* CanPhase: Checks to see if the orb can phase
+	* @author: Juran Griffith
+	* @return: bool - True if in orb can phase otherwise false, it can't.
+	********************/
+	bool CanPhase() { return m_AllowPhase; }
+
 protected:
 private:
 	// Member Variables

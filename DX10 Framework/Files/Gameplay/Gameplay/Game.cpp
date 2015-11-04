@@ -22,7 +22,7 @@
 Game::Game()
 {
 	m_uiScale = 0.5f;
-	m_uiWidth = 671.0f;
+	m_uiWidth = 2820.0f;//671.0f;
 	m_uiHeight = 365.0f;
 	m_uiSpace = 10.0f;
 }
@@ -31,7 +31,6 @@ Game::~Game()
 {
 	ReleasePtr(m_pArenaFloor);
 	ReleasePtr(m_pShader_LitTex);
-	//ReleasePtr(m_isConnected);
 	ReleasePtr(m_pPauseMenu);
 
 	while (m_pOrbs.empty() == false)
@@ -54,7 +53,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 	m_numPlayers = m_pContollers.size();
 	m_numAlivePlayers = m_numPlayers;
-	
 
 	m_pDX10_Renderer = _pDX10_Renderer;
 	m_pSoundManager = _pSoundManager;
@@ -64,13 +62,17 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		
 	m_pSpriteShader = _pSpriteShader;
 
-	UINT victoryWidth = 760;
-	UINT victoryHeight = 601;
 	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
 	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
 	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // To IMPROVE - Juran
+	
+	VALIDATE(m_uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_ss.png", 2000, 2000,2,2));
+	m_uiVictory.SetPosition(xoffset - m_uiVictory.GetWidth() * 0.5f, yoffset - m_uiVictory.GetHeight() * 0.5f);
+	
+	VALIDATE(m_uiRound.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_round_fill_whiteblue.png", 481, 106));
+	m_uiRound.SetPosition(xoffset - m_uiRound.GetWidth() * 0.5f, yoffset - m_uiRound.GetHeight() * 0.5f);
 
 	// Initialise Pause Menu
 	m_pPauseMenu = new Menu();
@@ -103,8 +105,6 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 
 		m_pContollers[i]->SetAllowVibrate(_AllowVibrate);
 
-		m_vibrateTimers[i] = 0.0f;
-
 		m_pOrbs.push_back(new Orb());
 		
 		switch (m_pContollers[i]->GetIndex())
@@ -113,69 +113,45 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 			{
 				DXSprite uiPlayer1;
 
-				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p1.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
+				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p1_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				uiPlayer1.SetScale(m_uiScale);
 				uiPlayer1.SetPosition(m_uiSpace, m_uiSpace);
-				uiPlayer1.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
 				m_uiPlayers.push_back(uiPlayer1);
 
-				DXSprite uiVictory;
-
-				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p1.png", victoryWidth, victoryHeight));
-				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
-				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
-
-				m_uiVictory.push_back(uiVictory);
+				
 			}
 			break;
 			case 1:
 			{
 				DXSprite uiPlayer2;
-				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p2.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
-				uiPlayer2.SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
-				uiPlayer2.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
+				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p2_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				uiPlayer2.SetScale(m_uiScale);
+				uiPlayer2.SetPosition(m_pDX10_Renderer->GetWidth() - uiPlayer2.GetWidth() - m_uiSpace, m_pDX10_Renderer->GetHeight() - uiPlayer2.GetHeight() - m_uiSpace);
 				m_uiPlayers.push_back(uiPlayer2);
 
-				DXSprite uiVictory;
-
-				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p2.png", victoryWidth, victoryHeight));
-				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
-				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
-
-				m_uiVictory.push_back(uiVictory);
+				
 			}
 			break;
 			case 2:
 			{
 				DXSprite uiPlayer3;
-				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p3.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
-				uiPlayer3.SetPosition(m_pDX10_Renderer->GetWidth() - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
-				uiPlayer3.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
+				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p3_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				uiPlayer3.SetScale(m_uiScale);
+				uiPlayer3.SetPosition(m_pDX10_Renderer->GetWidth() - uiPlayer3.GetWidth() - m_uiSpace, m_uiSpace);
 				m_uiPlayers.push_back(uiPlayer3);
 
-				DXSprite uiVictory;
-
-				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p3.png", victoryWidth, victoryHeight));
-				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
-				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
-
-				m_uiVictory.push_back(uiVictory);
+				
 			}
 			break;
 			case 3:
 			{
 				DXSprite uiPlayer4;
-				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_p4.png", (UINT)m_uiWidth, (UINT)m_uiHeight));
-				uiPlayer4.SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - (m_uiHeight * m_uiScale) - m_uiSpace);
-				uiPlayer4.SetSize(m_uiWidth * m_uiScale, m_uiHeight * m_uiScale);
+				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p4_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				uiPlayer4.SetScale(m_uiScale);
+				uiPlayer4.SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - uiPlayer4.GetHeight() - m_uiSpace);
 				m_uiPlayers.push_back(uiPlayer4);
 
-				DXSprite uiVictory;
-
-				VALIDATE(uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_p4.png", victoryWidth, victoryHeight));
-				uiVictory.SetPosition(xoffset - victoryWidth * 0.5f, yoffset - victoryHeight * 0.5f);
-				uiVictory.SetSize((float)victoryWidth, (float)victoryHeight);
-
-				m_uiVictory.push_back(uiVictory);
+				
 			}
 			break;
 		}
@@ -184,14 +160,17 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	}
 
 	// Reset the game
-	Reset();
+	Reset(true);
 
 		
 	return true;
 }
 
-bool Game::Reset()
+bool Game::Reset( bool _full)
 {
+	// Play music
+	m_pSoundManager->PlaySong(1);
+
 	// Release the arena Floor
 	ReleasePtr(m_pArenaFloor);
 	
@@ -200,7 +179,14 @@ bool Game::Reset()
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 	m_number_first.SetPosition(xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f));
 	m_number_second.SetPosition(xoffset, 50.0f);
-		
+	
+	//m_StartTimePos_A = { xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f) };
+	//m_MatchTimePos_tens = { xoffset - m_number_first.GetWidth(), 50.0f }; 
+	//m_MatchTimePos_Units = { xoffset, 50.0f };
+	//m_roundNumPos_tens = { xoffset - m_number_first.GetWidth(), yoffset - m_uiRound.GetHeight() };
+	//m_roundNumPos_Units = { xoffset, yoffset - m_uiRound.GetHeight() };;
+
+
 	// Set Timers
 	m_matchTimer = 30.0f;
 	m_startCountDown = 3.0f;
@@ -218,10 +204,11 @@ bool Game::Reset()
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
 	{
-		m_vibrateTimers[i] = 0.0f;
 
 		//m_pOrbs.push_back(new Orb());
 		int row, col;
+
+		m_pContollers[i]->StopVibrate();
 
 		switch (m_pContollers[i]->GetIndex())
 		{
@@ -259,6 +246,13 @@ bool Game::Reset()
 		m_pOrbs[i]->SetAlive(true);
 		m_pOrbs[i]->SetVelocity({ 0.0f, 0.0f, 0.0f });
 		m_pOrbs[i]->Process(0.016f);
+
+		if (_full)
+		{
+			m_pOrbs[i]->SetScore(0);
+		}
+
+		m_uiPlayers[i].SetImageIndex(m_pOrbs[i]->GetScore());
 	}
 
 	// increase the round number
@@ -418,8 +412,8 @@ void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 				}
 			}
 
-			_pOrbA->SetVelocity(orbNewVelA * orbVelMagB * 3.0f);
-			_pOrbB->SetVelocity(orbNewVelB * orbVelMagA * 3.0f);
+			_pOrbA->SetVelocity(orbNewVelA * orbVelMagB * 2.0f);
+			_pOrbB->SetVelocity(orbNewVelB * orbVelMagA * 2.0f);
 		}
 	}
 }
@@ -450,6 +444,7 @@ void Game::WinCheck()
 
 					if (m_pOrbs[i]->GetScore() >= m_winningScore)
 					{
+						m_uiPlayers[i].SetImageIndex(m_pOrbs[i]->GetScore());
 						m_gameState = GAME_STATE_END;
 					}
 
@@ -515,24 +510,21 @@ bool Game::Process(float _dt)
 					// Boost
 					if (m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_R))
 					{
+						if (m_pOrbs[i]->CanBoost())
+						{
+							m_pSoundManager->PlayPlayerBoost();
+						}
 						m_pOrbs[i]->Boost();
 					}
 
 
 					if (m_pContollers[i]->GetButtonPressed(m_XButtons.Bumper_L))
 					{
-						m_pOrbs[i]->Phase();
-					}
-
-					// Stop a Vibrating controller after half a second if it was vibrating
-					if (m_pContollers[i]->GetVibrate())
-					{
-						m_vibrateTimers[i] += _dt;
-						if (m_vibrateTimers[i] >= 0.5f)
+						if (m_pOrbs[i]->CanPhase())
 						{
-							m_pContollers[i]->StopVibrate();
-							m_vibrateTimers[i] = 0.0f;
+							m_pSoundManager->PlayPlayerPhase();
 						}
+						m_pOrbs[i]->Phase();
 					}
 
 					if (m_pContollers[i]->GetButtonDown(m_XButtons.Start))
@@ -546,7 +538,7 @@ bool Game::Process(float _dt)
 					m_PausedPlayer = i;
 					m_allConnected = false;
 				}
-				m_pContollers[i]->PostProcess();
+				m_pContollers[i]->PostProcess(_dt);
 
 				// Set the State based on if All the Controllers are connected
 				if (m_allConnected)
@@ -639,40 +631,27 @@ bool Game::Process(float _dt)
 					{
 						m_gameState = GAME_STATE_PROCESS;
 					}
-					m_pPauseMenu->Reset();
 				}
-				break;
-				case MENU_STATE_INSTRUCTIONS:
-				{
-					for (UINT i = 0; i < m_pContollers.size(); i++)
-					{
-						if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_B))
-						{
-							m_pPauseMenu->Reset();
-							break;
-						}
-					}
-				}
-				break;
+				// Fall through
 				case MENU_STATE_BACK:
 				{
 					m_pPauseMenu->Reset();
 				}
+				break;
 				case MENU_STATE_EXIT:
 				{
+					m_pPauseMenu->Reset();
 					return false;
 				}
 				break;
-				default:
-				{
-					//m_pPauseMenu->Reset();
-				}
-				break;
+				default:break;
 			}
 		}
 		break;
 		case GAME_STATE_END:
 		{
+			// Play music
+			m_pSoundManager->PlaySong(2);
 			// Process the Inputs for the end state of the game
 			for (UINT i = 0; i < m_pContollers.size(); i++)
 			{
@@ -681,16 +660,22 @@ bool Game::Process(float _dt)
 				if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_A))
 				{
 					// Return the game end
+					m_pContollers[i]->PostProcess(_dt);
 					return false;
 				}
-				m_pContollers[i]->PostProcess();
+				if (m_pContollers[i]->GetButtonPressed(m_XButtons.ActionButton_X))
+				{
+					// Return the game end
+					Reset(true);
+				}
+				m_pContollers[i]->PostProcess(_dt);
 			}
 			m_pPauseMenu->Reset();
 		}
 		break;
 		case GAME_STATE_RESTART:
 		{
-			Reset();
+			Reset(false);
 		}
 		break;
 		default:
@@ -741,6 +726,7 @@ void Game::Render()
 	{
 		case GAME_STATE_START:
 		{
+			m_uiRound.Render();
 			m_number_first.Render();
 		}
 		break;
@@ -811,7 +797,8 @@ void Game::Render()
 			{
 				if (m_pOrbs[i]->GetAlive())
 				{
-					m_uiVictory[i].Render();
+					m_uiVictory.SetImageIndex(i);
+					m_uiVictory.Render();
 					break;
 				}
 			}
@@ -832,6 +819,8 @@ void Game::UpdateClientSize()
 	m_uiPlayers[1].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 	m_uiPlayers[2].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
 	m_uiPlayers[3].SetPosition(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
+
+	m_uiVictory.SetPosition((width - m_uiVictory.GetWidth()) * 0.5f, (height - m_uiVictory.GetHeight()) * 0.5f);
 }
 
 bool Game::AttachUI(DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)

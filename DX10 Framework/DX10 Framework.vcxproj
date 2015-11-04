@@ -94,6 +94,7 @@
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <ObjectFileName>..\Output\Objects\</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

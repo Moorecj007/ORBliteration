@@ -61,6 +61,9 @@ bool InputGamePad::Initialise(int _gamepadIndex, bool _allowVibrate)
 		Gamepad_StickDown[i] = false;
 	}
 
+	m_vibrateTimer = 0.0f;
+	m_vibrateLimit = 0.5f;
+
 	// return succesful initialization
 	return true;
 }
@@ -208,13 +211,22 @@ void InputGamePad::PreProcess()
 	}
 }
 
-void InputGamePad::PostProcess()
+void InputGamePad::PostProcess(float _dt)
 {
 	// Store the current frames button values in previous button states
 	memcpy(Prev_ButtonStates, ButtonStates,	sizeof(Prev_ButtonStates));
 
 	// Store the current frames Stick Direction values in previous button states
 	memcpy(Prev_StickStates, StickStates, sizeof(Prev_StickStates));
+
+	if (GetVibrate())
+	{
+		m_vibrateTimer += _dt;
+		if (m_vibrateTimer >= m_vibrateLimit)
+		{
+			StopVibrate();
+		}
+	}
 }
 
 // Thumbstick Functions
@@ -379,14 +391,16 @@ bool InputGamePad::GetButtonDown(int _button)
 
 // Vibrate Functions
 
-void InputGamePad::Vibrate(float _LMotorSpeed, float _RMotorSpeed)
+void InputGamePad::Vibrate(float _LMotorSpeed, float _RMotorSpeed, float _time)
 {
+	
 	// Check if the controler allows vibrate
 	if (m_allowVibrate)
 	{
 		if ((_LMotorSpeed > 0.0f) || (_RMotorSpeed > 0.0f))
 		{
 			m_vibrating = true;
+			m_vibrateLimit = _time;
 		}
 		else
 		{
@@ -418,6 +432,9 @@ void InputGamePad::StopVibrate()
 {
 	// Call the vibrate function with no vibrations on each motor
 	Vibrate(0.0f, 0.0f);
+
+	m_vibrateTimer = 0.0f;
+	m_vibrateLimit = 0.5f;
 
 	m_vibrating = false;
 }

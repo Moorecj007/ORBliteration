@@ -198,9 +198,10 @@ public:
 	/***********************
 	* RefreshState: Update button states for next frame
 	* @author: Jc Fowles
+	* @parameter: _dt: Delta Tick Time since Last Frame
 	* @return: void:
 	********************/
-	void PostProcess(); 
+	void PostProcess(float _dt);
 	
 	// Thumbstick Functions 
 	
@@ -289,9 +290,10 @@ public:
 	* @author: Jc Fowles
 	* @parameter: _LMotorSpeed: The Speed of the Left Motors Vibrations (0.0f No Vibration, 1.0f Max Vibration)
 	* @parameter: _RMotorSpeed: The Speed of the Right Motors Vibrations (0.0f No Vibration, 1.0f Max Vibration)
+	* @parameter: _time: How long to vibrate for (Defaults to half a second)
 	* @return: void: 
 	********************/
-	void Vibrate(float _LMotorSpeed, float _RMotorSpeed);
+	void Vibrate(float _LMotorSpeed, float _RMotorSpeed, float _time = 0.5f);
 
 	/***********************
 	* StopVibrate: Stop Vibrating the gamepad 
@@ -374,6 +376,9 @@ private:
 
 	bool m_allowVibrate;
 	bool m_vibrating;
+
+	float m_vibrateTimer;
+	float m_vibrateLimit;
 
 };
 

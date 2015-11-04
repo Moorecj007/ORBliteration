@@ -314,7 +314,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_uiPressStart.SetPosition(xoffset - m_uiPressStart.GetWidth() * 0.5f, yoffset - m_uiPressStart.GetHeight() * 0.5f);
 
 	m_uiLobby = new DXSprite();
-	VALIDATE(m_uiLobby->Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_lobby_allplayers.png", 840, 1300, 3, 4));
+	VALIDATE(m_uiLobby->Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_lobby_allplayers_ss.png", 840, 1300, 3, 4));
 
 	float m_uiSpace = 10.0f;
 	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
@@ -325,6 +325,7 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(width - m_uiLobby->GetWidth() - m_uiSpace, m_uiSpace), 6));
 	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(m_uiSpace, height - m_uiLobby->GetHeight() - m_uiSpace), 9));
 	
+	// Play FX
 	if (m_state == APP_STATE_SPLASH)
 	{
 		m_pSoundManager->PlayPhenomenaSplash();
@@ -423,6 +424,8 @@ bool Application::Process(float _dt)
 {
 	VALIDATE(HandleInput());
 
+	m_pSoundManager->Update();
+
 	// Processes to run when using DX10 Renderer
 	if (m_pDX10_Renderer != 0)
 	{		
@@ -466,7 +469,6 @@ bool Application::Process(float _dt)
 				}
 				else if (m_waitTime < m_animationTime)
 				{
-					// To Add - Controller Feedback
 					m_state = APP_STATE_MAIN_MENU;
 
 					// Play Menu Music
@@ -478,12 +480,18 @@ bool Application::Process(float _dt)
 			break;
 		case APP_STATE_MAIN_MENU:
 			{
+				// Play music
+				m_pSoundManager->PlaySong(0);
+
 				m_menuMain->Process(_dt);
 				VALIDATE(UpdateState(m_menuMain->GetMenuState()));
 			}
 			break;
 		case APP_STATE_MATCH_MENU:
 			{
+				// Play music
+				//m_pSoundManager->PlaySong(0);
+
 				if (m_pKeyDown[VK_BACK])
 				{
 					m_pKeyDown[VK_BACK] = false;
@@ -506,17 +514,23 @@ bool Application::Process(float _dt)
 							{
 								m_state = APP_STATE_MAIN_MENU;
 								m_menuMain->Reset();
-								m_pContollers[i]->PostProcess();
+								m_pContollers[i]->PostProcess(_dt);
+								// Play FX
+								m_pSoundManager->PlayMenuBack();
 								break;
 							}
 							else if (m_lobbyPlayers[i].m_state == m_lobbyPlayers[i].LOBBY_STATE_READY)
 							{
 								m_lobbyPlayers[i].SetState(m_lobbyPlayers[i].LOBBY_STATE_NOT_READY);
+								// Play FX
+								m_pSoundManager->PlayMenuBack();
 							}
 						}
 						else if (m_pContollers[i]->GetButtonDown(m_XButtons.ActionButton_A))
 						{
 							m_lobbyPlayers[i].SetState(m_lobbyPlayers[i].LOBBY_STATE_READY);
+							// Play FX
+							m_pSoundManager->PlayMenuNavigate();
 						}
 						
 						if (m_lobbyPlayers[i].m_ready)
@@ -536,7 +550,7 @@ bool Application::Process(float _dt)
 					{
 						m_lobbyPlayers[i].SetState(m_lobbyPlayers[i].LOBBY_STATE_NOT_CONNECTED);
 					}
-					m_pContollers[i]->PostProcess();
+					m_pContollers[i]->PostProcess(_dt);
 				}
 
 				if (m_playersReady >= 2 && isStart)
@@ -554,11 +568,17 @@ bool Application::Process(float _dt)
 					VALIDATE(m_pGame->AttachUI(&m_uiInstructions, &m_uiControllerMissing));
 					m_state = APP_STATE_GAME;
 					m_playersReady = 0;
+					
+					// Play FX
+					m_pSoundManager->PlayMenuAccept();
 				}
 			}
 			break;
 		case APP_STATE_INSTRUCTIONS_MENU:
 			{
+				// Play music
+				//m_pSoundManager->PlaySong(0);
+
 				if (m_pKeyDown[VK_BACK])
 				{
 					m_pKeyDown[VK_BACK] = false;
@@ -579,12 +599,15 @@ bool Application::Process(float _dt)
 							break;
 						}
 					}
-					m_pContollers[i]->PostProcess();
+					m_pContollers[i]->PostProcess(_dt);
 				}
 			}
 			break;
 		case APP_STATE_OPTION_MENU:
 			{
+				// Play music
+				//m_pSoundManager->PlaySong(0);
+
 				m_menuOptions->Process(_dt);
 				VALIDATE(UpdateState(m_menuOptions->GetMenuState()));
 			}
@@ -597,6 +620,8 @@ bool Application::Process(float _dt)
 			break;*/
 		case APP_STATE_GAME:
 			{
+				// Play music
+				//m_pSoundManager->PlaySong(0);
 				if (m_pGame->Process(_dt) == false)
 				{
 					// If the game has ended
@@ -886,6 +911,13 @@ bool Application::UpdateState(MENU_STATE _state)
 			// Toggle
 			m_isRumbleOn = !m_isRumbleOn;
 
+			if (m_isRumbleOn)
+			{
+				for (UINT i = 0; i < m_pContollers.size(); i++)
+				{
+					m_pContollers[i]->Vibrate(1.0f, 1.0f);
+				}
+			}
 			// Update button
 			m_menuOptions->ToggleButton(2);
 			m_menuOptions->Reset();

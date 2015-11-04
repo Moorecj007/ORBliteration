@@ -145,7 +145,7 @@ void Orb::ProcessFriction()
 			break;
 		case BTI_ROUGH:
 		{
-			m_surfaceFriction = 0.01f;
+			m_surfaceFriction = 0.05f;
 		}
 			break;
 		case BTI_STANDARD:

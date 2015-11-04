@@ -109,6 +109,54 @@ struct TSound
 		if (m_pChannel)
 			m_pChannel->setPaused(true);
 	}
+
+	/***********************
+	* Reset: Reset the sound file to the beginning of the track.
+	* @author: Juran Griffith.
+	* @return:	void.
+	********************/
+	void Reset()
+	{
+		if (m_pChannel)
+			m_pChannel->setPosition(0, FMOD_TIMEUNIT_MS);
+	}
+
+	/***********************
+	* IsPlaying: Checks if the sound object is playing or not.
+	* @author: Juran Griffith.
+	* @return:	bool: True if is playing.
+	********************/
+	bool IsPlaying()
+	{
+		bool temp = false;
+
+		if (m_pChannel)
+		{
+			FMOD_RESULT fRes = m_pChannel->isPlaying(&temp);
+			if (fRes == FMOD_ERR_CHANNEL_STOLEN)
+			{
+				std::cout << "IsPlaying - Channel Stolen" << std::endl;
+			}
+			else if (fRes == FMOD_ERR_INVALID_HANDLE)
+			{
+				std::cout << "IsPlaying - Error" << std::endl;
+			}
+		}
+		
+		return temp;
+	}
+
+	/***********************
+	* IsPaused: Checks if the sound object is paused or not.
+	* @author: Juran Griffith.
+	* @return:	bool: True if is paused.
+	********************/
+	bool IsPaused()
+	{
+		bool temp;
+		m_pChannel->getPaused(&temp);
+		return temp;
+	}
 };
 
 class SoundSystem
@@ -133,6 +181,13 @@ class SoundSystem
 		* @return:	bool: Successful or not.
 		********************/
 		bool Initialise();
+
+		/***********************
+		* Update: Updates the sound system class. Must be called every frame.
+		* @author: Juran Griffith.
+		* @return:	void
+		********************/
+		void Update();
 
 		/***********************
 		* LoadFile: Loads a sound file.

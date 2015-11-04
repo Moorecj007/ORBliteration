@@ -77,7 +77,7 @@ bool Menu::Initialise(DX10_Renderer*_pDX10_Renderer, DX10_Shader_Sprite* _pShade
 
 void Menu::Process(float _deltaTime)
 {
-	if (m_state == MENU_STATE_DEFAULT)
+	//if (m_state == MENU_STATE_DEFAULT)
 	{
 		// Update the shader
 		if (m_pShader_Sprite != 0)
@@ -172,14 +172,17 @@ void Menu::Process(float _deltaTime)
 				{
 					m_pSoundManager->PlayMenuBack();
 					m_pKeyDown[VK_BACK] = false;
-					if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
-					{
-						m_state = MENU_STATE_EXIT;
-					}
-					m_state = MENU_STATE_BACK;
+					//if (m_buttons[m_menuItem]->m_option == MENU_STATE_EXIT)
+					//{
+					//	m_state = MENU_STATE_EXIT;
+					//}
+					//else
+					//{
+						m_state = MENU_STATE_BACK;
+					//}
 				}
 			}
-			m_pContollers[i]->PostProcess();
+			m_pContollers[i]->PostProcess(_deltaTime);
 		}
 	}
 }

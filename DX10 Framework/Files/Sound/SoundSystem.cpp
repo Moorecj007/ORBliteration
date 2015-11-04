@@ -34,6 +34,7 @@ bool SoundSystem::Initialise()
 {
 	if (FMOD::System_Create(&m_pSystem) != FMOD_OK)
 	{
+
 		// Report Error
 		return false;
 	}
@@ -46,12 +47,37 @@ bool SoundSystem::Initialise()
 		// Report Error
 		return false;
 	}
-
-	// Initialize our Instance with 36 Channels
-	if (m_pSystem->init(36, FMOD_INIT_NORMAL, NULL) != FMOD_OK)
+	else 
 	{
-		// Report Error
-		return false;
+		char *name = new char[128];
+		FMOD_GUID guid;
+		int systemrate;
+		FMOD_SPEAKERMODE speakermode;
+		int speakermodechannels;
+		
+		COORD pos = { 0, 2 };
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleCursorPosition(output, pos);
+
+		std::cout << "<< Sound Drivers >>\n\n";
+
+		for (int i = 0; i < driverCount; ++i)
+		{
+			
+
+			m_pSystem->setDriver(i);
+			m_pSystem->getDriverInfo(i, name, 128, &guid, &systemrate, &speakermode, &speakermodechannels);
+			std::cout << "Name: " << name << "\n";
+
+			// Initialize our instance with 36 Channels, checking for that the driver can support that
+			FMOD_RESULT fRes = m_pSystem->init(36, FMOD_INIT_NORMAL, NULL);
+			if (fRes == FMOD_OK)
+			{
+				std::cout << "Using - " << name << "\n";
+				break;
+			}
+		}
+		delete name;
 	}
 
 	if (m_pSystem->createChannelGroup(NULL, &m_pChannelMusic) != FMOD_OK)
@@ -67,6 +93,11 @@ bool SoundSystem::Initialise()
 	}
 
 	return true;
+}
+
+void SoundSystem::Update()
+{
+	m_pSystem->update();
 }
 
 bool SoundSystem::LoadFile(TSound* _pTSound, std::string _pFile, SOUND_TYPE _type)

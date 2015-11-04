@@ -39,6 +39,8 @@ enum eGameState
 	GAME_STATE_END
 };
 
+
+
 class Game
 {
 public:
@@ -69,7 +71,7 @@ public:
 	bool Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManager, DX10_Shader_Sprite* _pSpriteShader, bool _AllowVibrate, bool* _pKeyDown);
 	
 	// TO DO JC:
-	bool Reset();
+	bool Reset(bool _full);
 
 
 	/***********************
@@ -176,8 +178,6 @@ private:
 	XStickDirectionIDs m_XStickDirections;
 	std::vector<InputGamePad*> m_pContollers;
 
-	float m_vibrateTimers[4];
-
 	// Player Controller Orbs
 	std::vector<Orb*> m_pOrbs;
 	DX10_Mesh* m_pOrbMesh;
@@ -190,11 +190,20 @@ private:
 
 	// UI Components
 	std::vector<DXSprite> m_uiPlayers;
-	std::vector<DXSprite> m_uiVictory;
+	DXSprite m_uiVictory;
+	DXSprite m_uiRound;
 	DXSprite* m_pInstructions;
 	DXSprite* m_uiControllerMissing;
 	DXSprite m_number_first;
 	DXSprite m_number_second;
+
+	POINT m_StartTimePos_A;
+	POINT m_MatchTimePos_tens;
+	POINT m_MatchTimePos_Units;
+	POINT m_roundNumPos_tens;
+	POINT m_roundNumPos_Units;
+
+
 	float m_uiScale;
 	float m_uiWidth;
 	float m_uiHeight;

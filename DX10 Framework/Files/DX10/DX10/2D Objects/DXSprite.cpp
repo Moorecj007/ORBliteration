@@ -127,12 +127,12 @@ int DXSprite::GetSliceHeight()
 
 float DXSprite::GetWidth()
 {
-	return m_offsetImageWidth;
+	return m_imageWidth;
 }
 
 float DXSprite::GetHeight()
 {
-	return m_offsetImageHeight;
+	return m_imageHeight;
 }
 
 float DXSprite::GetImageWidth()
@@ -163,8 +163,8 @@ void DXSprite::SetSize(float _width, float _height)
 	m_imageWidth = (UINT)_width;
 	m_imageHeight = (UINT)_height;
 
-	m_offsetImageWidth = _width / static_cast<float>(m_sliceWidth);
-	m_offsetImageHeight = _height / static_cast<float>(m_sliceHeight);
+	//m_offsetImageWidth = _width / static_cast<float>(m_sliceWidth);
+	//m_offsetImageHeight = _height / static_cast<float>(m_sliceHeight);
 }
 
 void DXSprite::SetLooped(bool _looped)
