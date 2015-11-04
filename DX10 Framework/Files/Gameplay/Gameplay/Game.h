@@ -63,7 +63,7 @@ public:
 	* @author: Jc Fowles
 	* @parameter: _pDX10_Renderer: The renderer for this Game
 	* @parameter: _pSoundManager: The Sound manager for the Game
-	* @parameter: TO DO JUR: UI Manager
+	* @parameter: _pSpriteShader: The sprite shader
 	* @parameter: _numPlayers: Number of players to play this match
 	* @parameter: _AllowVibrate: Allows or dissAllows vibration
 	* @return: bool: Successful or not
@@ -129,7 +129,11 @@ public:
 	********************/
 	void WinCheck();
 
-	// TO DO CAL
+	/*******************
+	* UpdateClientSize: This updates the client size aswell as all the UI components to reposition them on window resize.
+	* @author:	Juran Griffith.
+	* @return:	void
+	********************/
 	void UpdateClientSize();
 
 	/***********************

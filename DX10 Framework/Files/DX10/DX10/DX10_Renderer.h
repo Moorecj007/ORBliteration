@@ -24,24 +24,15 @@
 #include <fstream>
 
 // Local Includes
-#include "DX10_Utilities.h"
-#include "../../Utility/Utilities.h"
-#include "DX10_Vertex.h"
+//#include "../../Utility/Utilities.h"
 #include "Systems/DX10_Buffer.h"
-
-struct PolygonType
-{
-	int vIndex1, vIndex2, vIndex3;
-	int tIndex1, tIndex2, tIndex3;
-	int nIndex1, nIndex2, nIndex3;
-};
 
 class DX10_Renderer
 {
 public:
 
 	/***********************
-	* CDX10Renderer: Default Constructor for DX10 Renderer class
+	* DX10Renderer: Default Constructor for DX10 Renderer class
 	* @author: Callan Moore
 	********************/
 	DX10_Renderer();
@@ -57,7 +48,7 @@ public:
 	bool Initialise(int _clientWidth, int _clientHeight, HWND _hWND);
 
 	/***********************
-	* ~CDX10Renderer: Default Destructor for DX10 Renderer class
+	* ~DX10Renderer: Default Destructor for DX10 Renderer class
 	* @author: Callan Moore
 	********************/
 	~DX10_Renderer();
@@ -248,7 +239,7 @@ public:
 	* @parameter: _light: The light structure
 	* @return: bool: Successful or not
 	********************/
-	bool AddLight(std::string _lightName, Light* _light);
+	bool AddLight(std::string _lightName, TLight* _light);
 	
 	/***********************
 	* RemoveLight: Remove a light from the Renderer
@@ -263,7 +254,7 @@ public:
 	* @author: Callan Moore
 	* @return: Light*: The current active lights
 	********************/
-	Light* GetActiveLights();
+	TLight* GetActiveLights();
 
 	/***********************
 	* SetPrimitiveTopology: Sets the primitive topology for a Mesh before drawing
@@ -346,8 +337,19 @@ public:
 	********************/
 	int GetLightCount() { return m_lightCount; };
 
-	// TO DO CAL
+	
+	/***********************
+	* GetWidth: Retrieve the current width of the Backbuffer (Screen Size)
+	* @author: Callan Moore
+	* @return: int: Backbuffer width
+	********************/
 	int GetWidth() { return m_clientWidth; };
+	
+	/***********************
+	* GetHeight: Retrieve the current height of the Backbuffer (Screen Size)
+	* @author: Callan Moore
+	* @return: int: Backbuffer height
+	********************/
 	int GetHeight() { return m_clientHeight; };
 
 	/***********************
@@ -404,9 +406,9 @@ private:
 	std::map<std::string, ID3D10ShaderResourceView*> m_textures;
 
 	// Lighting
-	Light m_activeLight;
-	std::map<std::string, Light*> m_mapLights;
-	Light* m_pArrLights;
+	TLight m_activeLight;
+	std::map<std::string, TLight*> m_mapLights;
+	TLight* m_pArrLights;
 	int m_lightCount;
 };
 

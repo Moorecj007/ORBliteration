@@ -41,7 +41,7 @@ bool DX10_Renderer::Initialise(int _clientWidth, int _clientHeight, HWND _hWND)
 	m_nextBufferID = 0;
 	m_nextTextureID = 0;
 
-	Light* pLight = new Light();
+	TLight* pLight = new TLight();
 	pLight->type = LT_DIRECTIONAL;
 	pLight->dir_spotPow = D3DXVECTOR4(0.0f, 0.0f, 1.0f, 0.0f);
 	pLight->ambient = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
@@ -96,7 +96,7 @@ void DX10_Renderer::ShutDown()
 	}
 
 	// Delete the Graphics memory stored as Lights
-	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	std::map<std::string, TLight*>::iterator iterLights = m_mapLights.begin();
 	while (iterLights != m_mapLights.end())
 	{
 		ReleasePtr(iterLights->second);
@@ -628,7 +628,7 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 	v3float* pVertices;
 	v3float* pTexUVs;
 	v3float* pNormals;
-	PolygonType *pPolygons;
+	TPolygonType *pPolygons;
 	std::ifstream fin;
 	int vIndex;
 	int tIndex;
@@ -647,7 +647,7 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 	pNormals = new v3float[normalCount];
 	VALIDATE(pNormals);
 
-	pPolygons = new PolygonType[polygonCount];
+	pPolygons = new TPolygonType[polygonCount];
 	VALIDATE(pPolygons);
 
 	// Create and Initialize the indexes.
@@ -783,20 +783,20 @@ bool DX10_Renderer::LoadMeshObj(std::string _fileName, TVertexNormalUV*& _prVert
 	return true;
 }
 
-bool DX10_Renderer::AddLight(std::string _lightName, Light* _light)
+bool DX10_Renderer::AddLight(std::string _lightName, TLight* _light)
 {
 	// Delete the pointer to current array of lights
 	ReleasePtr(m_pArrLights);
 
 	// Create a pair of the Light name and the Light
-	std::pair<std::string, Light*> pairLight(_lightName, _light);
+	std::pair<std::string, TLight*> pairLight(_lightName, _light);
 
 	// Insert the pair and validate the insertion
 	VALIDATE(m_mapLights.insert(pairLight).second);
 
 	// Re-create the array of lights for passing to shaders
-	m_pArrLights = new Light[m_mapLights.size()];
-	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	m_pArrLights = new TLight[m_mapLights.size()];
+	std::map<std::string, TLight*>::iterator iterLights = m_mapLights.begin();
 	int index = 0;
 	while (iterLights != m_mapLights.end())
 	{
@@ -816,13 +816,13 @@ void DX10_Renderer::RemoveLight(std::string _lightName)
 	m_mapLights.erase(_lightName);
 }
 
-Light* DX10_Renderer::GetActiveLights()
+TLight* DX10_Renderer::GetActiveLights()
 {
 	// Delete the pointer to current array of lights
 	ReleasePtr(m_pArrLights);
 
-	m_pArrLights = new Light[m_mapLights.size()];
-	std::map<std::string, Light*>::iterator iterLights = m_mapLights.begin();
+	m_pArrLights = new TLight[m_mapLights.size()];
+	std::map<std::string, TLight*>::iterator iterLights = m_mapLights.begin();
 	int index = 0;
 	while (iterLights != m_mapLights.end())
 	{

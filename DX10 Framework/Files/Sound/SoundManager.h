@@ -67,21 +67,60 @@ class SoundManager
 		********************/
 		void PlayMenuAccept();
 
-		// TO DO - Juran (make a better system maybe)
+		/***********************
+		* PlayMenuBack: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayMenuBack();
 
+		/***********************
+		* PlayMenuNavigate: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayMenuNavigate();
 
+		/***********************
+		* PlayMenuToggles: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayMenuToggles();
 
+		/***********************
+		* PlayPlayerDeath: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayPlayerDeath();
 
+		/***********************
+		* PlayPlayerHit: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayPlayerHit();
 
+		/***********************
+		* PlayPlayerPhase: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayPlayerPhase();
 
+		/***********************
+		* PlayPlayerBoost: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayPlayerBoost();
 
+		/***********************
+		* PlayPhenomenaSplash: Plays the sound effect.
+		* @author: Juran Griffith.
+		* @return: void
+		********************/
 		void PlayPhenomenaSplash();
 
 		/***********************

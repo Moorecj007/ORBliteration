@@ -21,7 +21,7 @@
 // Local Includes
 #include "DXSprite.h"
 
-enum BUTTON_STATE
+enum eButtonState
 {
 	BUTTON_STATE_DEFAULT,
 	BUTTON_STATE_HOVER,
@@ -69,7 +69,7 @@ class GUI_Button
 		* @author: Juran Griffith.
 		* @return: BUTTON_STATE: The current state the object is in.
 		********************/
-		virtual BUTTON_STATE GetState();
+		virtual eButtonState GetState();
 
 		/*******************
 		* GetSprite: Gets the current sprite.
@@ -113,7 +113,7 @@ class GUI_Button
 		* @parameter: _state: The new state to set the object to.
 		* @return: void.
 		********************/
-		virtual void SetState(BUTTON_STATE _state);
+		virtual void SetState(eButtonState _state);
 
 		/*******************
 		* SetBoundsOffset: Set the bounding box. Currently useful for rectangles. It shrinks the box towards the centre of the object.
@@ -174,7 +174,7 @@ class GUI_Button
 		v2float				m_position;
 		//v2float				m_parentPosition;
 		float				m_boundsOffset;
-		BUTTON_STATE		m_state;
+		eButtonState		m_state;
 
 		float				m_width;
 		float				m_height;

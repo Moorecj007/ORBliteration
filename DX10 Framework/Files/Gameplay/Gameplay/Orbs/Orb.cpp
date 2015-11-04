@@ -50,7 +50,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			texName = "Tron/Orb/tron_orb_player1.png";
 			m_glowName = "zOrbGlow1";
 
-			m_pGlowLight = new Light();
+			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, (108.0f / 255.0f), 0.0f, 1.0f);
@@ -62,7 +62,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			texName = "Tron/Orb/tron_orb_player2.png";
 			m_glowName = "zOrbGlow2";
 
-			m_pGlowLight = new Light();
+			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
@@ -74,7 +74,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			texName = "Tron/Orb/tron_orb_player3.png";
 			m_glowName = "zOrbGlow3";
 
-			m_pGlowLight = new Light();
+			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
@@ -86,7 +86,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			texName = "Tron/Orb/tron_orb_player4.png";
 			m_glowName = "zOrbGlow4";
 
-			m_pGlowLight = new Light();
+			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
 			m_pGlowLight->diffuse = D3DXCOLOR((230.0f / 255.0f), (46.0f / 255.0f), (241.0f / 255.0f), 1.0f);

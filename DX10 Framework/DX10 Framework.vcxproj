@@ -118,7 +118,6 @@
     <ClCompile Include="Files\DX10\DX10\2D Objects\GUI_Button.cpp" />
     <ClCompile Include="Files\DX10\DX10\3D Objects\DX10_Obj_LitTex.cpp" />
     <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.cpp" />
-    <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.cpp" />
     <ClCompile Include="Files\DX10\DX10\DX10_Renderer.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaFloor.cpp" />
     <ClCompile Include="Files\Gameplay\Gameplay\Arena\ArenaTile.cpp" />
@@ -128,8 +127,6 @@
     <ClCompile Include="Files\Menus\Menu.cpp" />
     <ClCompile Include="Files\Sound\SoundManager.cpp" />
     <ClCompile Include="Files\Sound\SoundSystem.cpp" />
-    <ClCompile Include="Files\Utility\DirectInput.cpp" />
-    <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp" />
     <ClCompile Include="Files\Utility\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,10 +137,8 @@
     <ClInclude Include="Files\DX10\DX10\3D Objects\DX10_Obj_Generic.h" />
     <ClInclude Include="Files\DX10\DX10\3D Objects\DX10_Obj_LitTex.h" />
     <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_Debug.h" />
-    <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.h" />
     <ClInclude Include="Files\DX10\DX10\DX10_Renderer.h" />
     <ClInclude Include="Files\DX10\DX10\DX10_Utilities.h" />
-    <ClInclude Include="Files\DX10\DX10\DX10_Vertex.h" />
     <ClInclude Include="Files\DX10\DX10\Meshes\DX10_Mesh.h" />
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_LitTex.h" />
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_Sprite.h" />
@@ -157,8 +152,6 @@
     <ClInclude Include="Files\Menus\Menu.h" />
     <ClInclude Include="Files\Sound\SoundManager.h" />
     <ClInclude Include="Files\Sound\SoundSystem.h" />
-    <ClInclude Include="Files\Utility\DirectInput.h" />
-    <ClInclude Include="Files\Utility\Mutex_Semaphore.h" />
     <ClInclude Include="Files\Utility\Timer.h" />
     <ClInclude Include="Files\Utility\Utilities.h" />
     <ClInclude Include="Files\Utility\Utility_Math.h" />

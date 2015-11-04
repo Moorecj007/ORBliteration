@@ -20,7 +20,7 @@
 #include <fstream>      // std::ifstream
 
 // Local Includes
-#include "../DX10_Utilities.h"
+//#include "../DX10_Utilities.h"
 #include "../DX10_Renderer.h"
 #include "../Shaders/DX10_Shader_Sprite.h"
 
@@ -198,7 +198,7 @@ class DXSprite
 		********************/
 		bool UpdateBuffers();
 
-		/******************* (doesn't work) To Do - Juran
+		/******************* (doesn't work) Note - Juran
 		* GetPngSize: Gets the PNG width and height of the image and updates this sprites width and height variables.
 		* @author: Juran Griffith.
 		* @return: bool: True if the file can be read and the variables are updated.
@@ -217,8 +217,6 @@ class DXSprite
 		v2float					m_position;
 		v2float					m_previousPosition;
 
-		//int						m_screenWidth;
-		//int						m_screenHeight;
 		float					m_offsetScreenWidthPrev;
 		float					m_offsetScreenHeightPrev;
 		UINT					m_imageWidth;

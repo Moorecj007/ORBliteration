@@ -41,7 +41,7 @@
 #include "Gameplay\Gameplay.h"
 #include "Sound\SoundManager.h"
 
-enum APP_STATE
+enum eAppState
 {
 	APP_STATE_SPLASH,
 	APP_STATE_TITLE,
@@ -49,13 +49,12 @@ enum APP_STATE
 	APP_STATE_MATCH_MENU,
 	APP_STATE_OPTION_MENU,
 	APP_STATE_INSTRUCTIONS_MENU,
-	//APP_STATE_PAUSE_MENU,
 	APP_STATE_GAME
 };
 
 struct TLobbyPlayer
 {
-	enum LOBBY_STATE
+	enum eLobbyState
 	{
 		LOBBY_STATE_NOT_CONNECTED,
 		LOBBY_STATE_NOT_READY,
@@ -93,7 +92,7 @@ struct TLobbyPlayer
 	* @author: Juran Griffith.
 	* @return: void.
 	********************/
-	void SetState(LOBBY_STATE _state)
+	void SetState(eLobbyState _state)
 	{
 		m_state = _state;
 		m_ready = (m_state == LOBBY_STATE_READY);
@@ -139,7 +138,7 @@ struct TLobbyPlayer
 	}
 
 	bool m_ready;
-	LOBBY_STATE m_state;
+	eLobbyState m_state;
 	DXSprite* m_sprite;
 	UINT m_offset;
 	D3DXVECTOR2 m_position;
@@ -293,9 +292,13 @@ private:
 	* @author:	Juran Griffith.
 	* @return:	bool: Successful or not
 	********************/
-	bool UpdateState(MENU_STATE _state);
+	bool UpdateState(eMenuState _state);
 
-	// TO DO CAL
+	/*******************
+	* UpdateClientSize: This updates the client size aswell as all the UI components to reposition them on window resize.
+	* @author:	Juran Griffith.
+	* @return:	void
+	********************/
 	void UpdateClientSize();
 
 	/*******************
@@ -347,7 +350,7 @@ private:
 	Game* m_pGame;
 
 	// App State
-	APP_STATE m_state;
+	eAppState m_state;
 	bool m_isFullscreen;
 	bool m_isSoundOn;
 	bool m_isRumbleOn;

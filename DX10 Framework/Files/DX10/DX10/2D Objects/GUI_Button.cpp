@@ -65,7 +65,7 @@ v2float GUI_Button::GetPosition()
 	return m_position;
 }
 
-BUTTON_STATE GUI_Button::GetState()
+eButtonState GUI_Button::GetState()
 {
 	return m_state;
 }
@@ -104,7 +104,7 @@ void GUI_Button::SetPosition(v2float _position)
 	m_bounds.m_h = m_position.y + m_height - m_boundsOffset;
 }
 
-void GUI_Button::SetState(BUTTON_STATE _state)
+void GUI_Button::SetState(eButtonState _state)
 {
 	m_state = _state;
 }
@@ -133,16 +133,16 @@ void GUI_Button::Draw()
 {
 	switch (m_state)
 	{
-	case BUTTON_STATE::BUTTON_STATE_DEFAULT:
+	case eButtonState::BUTTON_STATE_DEFAULT:
 		m_pSprite->SetImageIndex(m_col + 0);
 		break;
-	case BUTTON_STATE::BUTTON_STATE_HOVER:
+	case eButtonState::BUTTON_STATE_HOVER:
 		m_pSprite->SetImageIndex(m_col + 1 * m_pSprite->GetSliceWidth());
 		break;
-	case BUTTON_STATE::BUTTON_STATE_SELECTED:
+	case eButtonState::BUTTON_STATE_SELECTED:
 		m_pSprite->SetImageIndex(m_col + 2 * m_pSprite->GetSliceWidth());
 		break;
-	case BUTTON_STATE::BUTTON_STATE_DEACTIVATED:
+	case eButtonState::BUTTON_STATE_DEACTIVATED:
 		m_pSprite->SetImageIndex(m_col + 3 * m_pSprite->GetSliceWidth());
 		break;
 	}

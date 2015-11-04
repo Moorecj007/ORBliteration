@@ -34,7 +34,7 @@
 		strStream << "File: " << __FILE__ << "\n";				\
 		strStream << "Function: " << __FUNCTION__ << "\n";		\
 		strStream << "Line: " << __LINE__ << "\n";				\
-		OutputDebugStringA(strStream.str().c_str());				\
+		OutputDebugStringA(strStream.str().c_str());			\
 		return (false);											\
 	}															\
 }
@@ -85,20 +85,19 @@ namespace shape
 {
 	struct Rectangle
 	{
-		/*******************
-		->  Default constructor
-		@author:	Juran Griffith.
-		@parameter:	None.
-		@return:
+		/***********************
+		* Rectangle: Default constructor
+		* @author: Juran Griffith.
 		********************/
 		Rectangle(){}
 
-		/*******************
-		->  Constructor that allows the position and colour to be set for the vertex.
-		@author:	Juran Griffith.
-		@parameter:	_position	- The position of the vertex.
-		@parameter:	_colour		- The colour of the vertex.
-		@return:
+		/***********************
+		* Rectangle: Constructor that allows setting the rectangle.
+		* @author: Juran Griffith.
+		* @parameter: _x: The x position.
+		* @parameter: _y: The y position.
+		* @parameter: _w: The width of the rectangle.
+		* @parameter: _h: The height of the rectangle.
 		********************/
 		Rectangle(float _x, float _y, float _w, float _h) :
 			m_x(_x),

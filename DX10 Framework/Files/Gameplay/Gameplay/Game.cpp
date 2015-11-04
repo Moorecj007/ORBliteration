@@ -321,19 +321,14 @@ bool Game::IsOrbsColliding(Orb* _pOrbA, Orb* _pOrbB)
 
 void Game::HandleCollisions(Orb* _pOrbA, Orb* _pOrbB)
 {
-	// TO DO CAL: COMMENT and clean
-	// 2 functions 
-	// CalcNewVelocity()
-	// RotateRoundZAxis()
-
 	if ((_pOrbA != 0) && (_pOrbB != 0))
 	{
-		if (_pOrbA->m_collidable == true && _pOrbB->m_collidable == true)
+		if (_pOrbA->GetCollidable() == true && _pOrbB->GetCollidable() == true)
 		{
-			_pOrbA->m_collidable = false;
-			_pOrbA->m_collideCountdown = _pOrbA->m_collideStartTime;
-			_pOrbB->m_collidable = false;
-			_pOrbB->m_collideCountdown = _pOrbB->m_collideStartTime;
+			_pOrbA->SetCollidable(false);
+			_pOrbA->StartCollisionTimer();
+			_pOrbB->SetCollidable(false);
+			_pOrbB->StartCollisionTimer();
 
 
 			v3float orbPosA = _pOrbA->GetPosition();

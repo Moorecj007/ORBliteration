@@ -127,12 +127,12 @@ int DXSprite::GetSliceHeight()
 
 float DXSprite::GetWidth()
 {
-	return m_imageWidth;
+	return (float)m_imageWidth;
 }
 
 float DXSprite::GetHeight()
 {
-	return m_imageHeight;
+	return (float)m_imageHeight;
 }
 
 float DXSprite::GetImageWidth()

@@ -93,7 +93,7 @@ public:
 	{
 		int lightCount = m_pDX10_Renderer->GetLightCount();
 
-		m_pLight->SetRawValue(m_pDX10_Renderer->GetActiveLights(), 0, lightCount * sizeof(Light));
+		m_pLight->SetRawValue(m_pDX10_Renderer->GetActiveLights(), 0, lightCount * sizeof(TLight));
 		m_pLightCount->SetInt(lightCount);
 		m_pEyePos->SetRawValue(m_pDX10_Renderer->GetEyePos(), 0, sizeof(D3DXVECTOR3));
 		m_pMatView->SetMatrix((float*)m_pDX10_Renderer->GetViewMatrix());

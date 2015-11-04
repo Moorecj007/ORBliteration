@@ -30,7 +30,7 @@
 // Globals
 #define FILEPATH "Resources/Sound/"
 
-enum SOUND_TYPE
+enum eSoundType
 {
 	SOUND_TYPE_MUSIC,
 	SOUND_TYPE_EFFECT
@@ -197,7 +197,7 @@ class SoundSystem
 		* @parameter: _type: The type of file.
 		* @return:	void.
 		********************/
-		bool LoadFile(TSound* _pTSound, std::string _pFile, SOUND_TYPE _type);
+		bool LoadFile(TSound* _pTSound, std::string _pFile, eSoundType _type);
 
 		/***********************
 		* SetVolumeMusic: Sets the volume of the music.

@@ -176,11 +176,9 @@ Application* Application::GetInstance()
 
 bool Application::Initialise(int _clientWidth, int _clientHeight, HINSTANCE _hInstance)
 {
-	// TO DO JC: START - Change Back to Defualt
 	m_state = APP_STATE_SPLASH;
 
-	// TO DO JC: START - Change Back to Defualt
-	m_isFullscreen = false;
+	m_isFullscreen = true;
 	m_isSoundOn = true;
 	m_isRumbleOn = true;
 	m_playersReady = 0;
@@ -438,7 +436,7 @@ bool Application::Process(float _dt)
 				m_animationTime += _dt;
 				if (!m_splash_ps.IsAtLastFrame())
 				{
-					if (m_animationTime > m_animationSpeed) // TO DO - Juran (Port to the sprite class)
+					if (m_animationTime > m_animationSpeed)
 					{
 						m_splash_ps.IncrementIndex();
 						m_animationTime = 0.0f;
@@ -456,7 +454,7 @@ bool Application::Process(float _dt)
 				m_animationTime += _dt;
 				if (!m_splash_orb.IsAtLastFrame())
 				{
-					if (m_animationTime > m_animationSpeed) // TO DO - Juran (Port to the sprite class)
+					if (m_animationTime > m_animationSpeed)
 					{
 						m_splash_orb.IncrementIndex();
 						m_animationTime = 0.0f;
@@ -814,7 +812,7 @@ void Application::ExitApp()
 	m_online = false;	// Changing this to false will cause the main application loop to end -> quitting the application
 }
 
-bool Application::UpdateState(MENU_STATE _state)
+bool Application::UpdateState(eMenuState _state)
 {
 	switch (_state)
 	{

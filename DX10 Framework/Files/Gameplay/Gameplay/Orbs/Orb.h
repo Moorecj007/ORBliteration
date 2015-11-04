@@ -213,14 +213,32 @@ public:
 	********************/
 	bool CanPhase() { return m_AllowPhase; }
 
+	/***********************
+	* GetCollidable: Retrieve the collidable state of the Orb
+	* @author: Callan Moore
+	* @return: bool: The collidable state of the Orb
+	********************/
+	bool GetCollidable() { return m_collidable; };
+	
+	/***********************
+	* SetCollidable: Set the collidable state of the Orb
+	* @author: Callan Moore
+	* @parameter: _val: The new state
+	* @return: void
+	********************/
+	void SetCollidable(bool _val) { m_collidable = _val; };
+	
+	/***********************
+	* StartCollisionTimer: Starts the timer for the orb to stay uncollidable
+	* @author: Callan Moore
+	* @return: void
+	********************/
+	void StartCollisionTimer() { m_collideCountdown = m_collideStartTime; };
+
 protected:
 private:
 	// Member Variables
 public:
-	bool m_collidable;
-	float m_collideCountdown;
-	float m_collideStartTime;
-
 protected:
 private:
 
@@ -239,6 +257,10 @@ private:
 	float m_radius;
 	bool m_isAlive;
 
+	bool m_collidable;
+	float m_collideCountdown;
+	float m_collideStartTime;
+
 	bool m_boost;
 	bool m_AllowBoost;
 	float m_boostAmount;
@@ -254,7 +276,7 @@ private:
 	float m_phaseActiveTime;
 	float m_phaseCoolDownTime;
 
-	Light* m_pGlowLight;
+	TLight* m_pGlowLight;
 	std::string m_glowName;
 };
 

@@ -22,7 +22,7 @@
 #include "..\Input\InputGamePad.h"
 #include "..\Sound\SoundManager.h"
 
-enum MENU_STATE
+enum eMenuState
 {
 	// Main menu states
 	MENU_STATE_DEFAULT,
@@ -36,11 +36,6 @@ enum MENU_STATE
 	MENU_STATE_SOUND,
 	MENU_STATE_RUMBLE,
 
-	// Match menu states
-	//MENU_STATE_PLAYERS_2,
-	//MENU_STATE_PLAYERS_3,
-	//MENU_STATE_PLAYERS_4,
-
 	// Pause menu states (reuses the main menu states)
 	MENU_STATE_RESUME,
 
@@ -48,7 +43,7 @@ enum MENU_STATE
 	MENU_STATE_BACK
 };
 
-enum MENU_LAYOUT
+enum eMenuLayout
 {
 	MENU_LAYOUT_CENTRE,
 	MENU_LAYOUT_CUSTOM
@@ -61,7 +56,7 @@ struct TButton
 		ReleasePtr(m_pButton);
 	}
 
-	void SetButton(GUI_Button* _pButton, MENU_STATE _option, UINT _index, float _scale, UINT _col, UINT _row)
+	void SetButton(GUI_Button* _pButton, eMenuState _option, UINT _index, float _scale, UINT _col, UINT _row)
 	{
 		m_pButton = _pButton;
 		m_option = _option;
@@ -72,7 +67,7 @@ struct TButton
 	}
 
 	GUI_Button* m_pButton = 0;
-	MENU_STATE m_option = MENU_STATE_DEFAULT;
+	eMenuState m_option = MENU_STATE_DEFAULT;
 	UINT m_index = 0;
 	float m_scale = 1.0f;
 };
@@ -99,12 +94,11 @@ class Menu
 		* @parameter: _pDX10_Renderer: The graphics device.
 		* @parameter: _pShader: The shader object to use for rendering the sprite.
 		* @parameter: _pSoundManager: The sound manager to help play sound effects in the menu.
-		* @parameter: _pGamepad: The gamepad controller to listen to. TO DO - Juran
 		* @parameter: _pKeyDown
 		* @parameter: _layout: How to layout the menu items.
 		* @return:	bool: Successful or not
 		********************/
-		bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager*	_pSoundManager, bool* _pKeyDown, MENU_LAYOUT _layout = MENU_LAYOUT_CENTRE);
+		bool Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_Sprite* _pShader, SoundManager*	_pSoundManager, bool* _pKeyDown, eMenuLayout _layout = MENU_LAYOUT_CENTRE);
 
 		/*******************
 		* Draw: Draws the object
@@ -143,7 +137,7 @@ class Menu
 		* @parameter: _row: The row image index.
 		* @return:	bool: True if added otherwise false.
 		********************/
-		bool AddButton(MENU_STATE _option, UINT _spriteIndex, float _scale = 1.0f, UINT _col = 0, UINT _row = 0);
+		bool AddButton(eMenuState _option, UINT _spriteIndex, float _scale = 1.0f, UINT _col = 0, UINT _row = 0);
 
 		/***********************
 		* AddToggleButton: Adds a new button to the menu. By default it is placed after the last button added.
@@ -172,7 +166,7 @@ class Menu
 		* @parameter: _index: The button index to check.
 		* @return:	BUTTON_STATE: The current buttons state.
 		********************/
-		BUTTON_STATE GetButtonState(UINT _index);
+		eButtonState GetButtonState(UINT _index);
 
 		/***********************
 		* GetButton: Gets the button at the current index.
@@ -194,7 +188,7 @@ class Menu
 		* @author:	Juran Griffith.
 		* @return:	MENU_STATE	- The current menu state
 		********************/
-		MENU_STATE GetMenuState();
+		eMenuState GetMenuState();
 
 		/***********************
 		* SetPosition: Sets the menus position.
@@ -293,8 +287,8 @@ class Menu
 		std::vector<InputGamePad*>  m_pContollers;
 
 		// State
-		MENU_STATE					m_state;
-		MENU_LAYOUT					m_layout;
+		eMenuState					m_state;
+		eMenuLayout					m_layout;
 
 		float						m_elaspedTime;
 		UINT						m_imageIndex;

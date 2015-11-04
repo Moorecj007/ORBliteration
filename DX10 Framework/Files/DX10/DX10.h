@@ -43,7 +43,6 @@
 #include "DX10\Meshes\DX10_Mesh.h"
 
 // Cameras
-#include "DX10\Cameras\DX10_Camera_FirstPerson.h"
 #include "DX10\Cameras\DX10_Camera_Debug.h"
 
 // Shaders

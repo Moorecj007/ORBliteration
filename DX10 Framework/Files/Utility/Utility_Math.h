@@ -423,7 +423,14 @@ struct v3float
 		return (*this);
 	}
 
-	// TO DO CAL
+	
+	/***********************
+	* ApproxEqual: Checks two v3floats to see if they are approximately equal to one another (Difference between them is less than the input approx value)
+	* @author: Callan Moore
+	* @parameter: _v3: Second v3float to compare with
+	* @parameter: _apx: The maximum difference value
+	* @return: bool: If they are approximately equal
+	********************/
 	bool ApproxEqual(const v3float _v3, const float _apx)
 	{
 		if ((abs(_v3.x - x) <= _apx)

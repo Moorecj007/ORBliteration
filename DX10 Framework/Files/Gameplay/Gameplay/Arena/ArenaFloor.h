@@ -25,7 +25,6 @@
 #include "../../../DX10/DX10/DX10_Renderer.h"
 #include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
 #include "ArenaTile.h"
-#include "../../../Utility/Mutex_Semaphore.h"
 
 class ArenaFloor
 {

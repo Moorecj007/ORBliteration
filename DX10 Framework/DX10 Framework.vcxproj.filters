@@ -117,9 +117,6 @@
     <ClInclude Include="Files\DX10\DX10.h">
       <Filter>Header Files\DX10</Filter>
     </ClInclude>
-    <ClInclude Include="Files\Utility\DirectInput.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="Files\Utility\Timer.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
@@ -131,12 +128,6 @@
     </ClInclude>
     <ClInclude Include="Files\DX10\DX10\DX10_Utilities.h">
       <Filter>Header Files\DX10</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\DX10\DX10\DX10_Vertex.h">
-      <Filter>Header Files\DX10</Filter>
-    </ClInclude>
-    <ClInclude Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.h">
-      <Filter>Header Files\DX10\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="Files\DX10\DX10\Shaders\DX10_Shader_LitTex.h">
       <Filter>Header Files\DX10\Shaders</Filter>
@@ -183,9 +174,6 @@
     <ClInclude Include="Files\Menus\Menu.h">
       <Filter>Header Files\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Files\Utility\Mutex_Semaphore.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="Files\Gameplay\Gameplay\Orbs\Orb.h">
       <Filter>Header Files\Gameplay\Orbs</Filter>
     </ClInclude>
@@ -203,17 +191,11 @@
     <ClCompile Include="Files\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Files\Utility\DirectInput.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Files\Utility\Timer.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\DX10_Renderer.cpp">
       <Filter>Source Files\DX10</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\DX10\DX10\Cameras\DX10_Camera_FirstPerson.cpp">
-      <Filter>Source Files\DX10\Cameras</Filter>
     </ClCompile>
     <ClCompile Include="Files\DX10\DX10\3D Objects\DX10_Obj_LitTex.cpp">
       <Filter>Source Files\DX10\3D Objects</Filter>
@@ -241,9 +223,6 @@
     </ClCompile>
     <ClCompile Include="Files\Menus\Menu.cpp">
       <Filter>Source Files\Menus</Filter>
-    </ClCompile>
-    <ClCompile Include="Files\Utility\Mutex_Semaphore.cpp">
-      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="Files\Gameplay\Gameplay\Orbs\Orb.cpp">
       <Filter>Source Files\Gameplay\Orbs</Filter>

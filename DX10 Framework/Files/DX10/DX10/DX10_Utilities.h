@@ -16,7 +16,6 @@
 #pragma once
 #ifndef __DX10_UTILITIES_H__
 #define __DX10_UTILITIES_H__
-//#pragma message("Included DX10_Utilities.h")
 
 // Library Includes
 #include <d3d10.h>
@@ -217,8 +216,8 @@ namespace d3dxColors
 	const D3DXCOLOR YellowGreen = 0xFF9ACD32;
 }
 
-// Enums
-enum LightType
+// Enumerators
+enum eLightType
 {
 	LT_DIRECTIONAL,
 	LT_POINT,
@@ -226,13 +225,26 @@ enum LightType
 	LT_GLOW
 };
 
-// Structs
-struct Light
+enum eVertexType
 {
-	Light()
+	VT_UV,
+	VT_NORMAL_UV
+};
+
+// Structs
+struct TPolygonType
+{
+	int vIndex1, vIndex2, vIndex3;
+	int tIndex1, tIndex2, tIndex3;
+	int nIndex1, nIndex2, nIndex3;
+};
+
+struct TLight
+{
+	TLight()
 	{
 		// Ensure the Memory is zeroed on creation
-		ZeroMemory(this, sizeof(Light));
+		ZeroMemory(this, sizeof(TLight));
 		active = true;
 	}
 
@@ -246,6 +258,27 @@ struct Light
 	bool active;
 	float pad1;
 	float pad2;
+};
+
+/***********************
+* TVertexUV: Basic Vertex with UVs
+* @author: Callan Moore
+********************/
+struct TVertexUV
+{
+	D3DXVECTOR3 pos;
+	v2float		uv;
+};
+
+/***********************
+* TVertexNormalUV: Basic Vertex with Normals and UVs
+* @author: Callan Moore
+********************/
+struct TVertexNormalUV
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 normal;
+	v2float		uv;
 };
 
 

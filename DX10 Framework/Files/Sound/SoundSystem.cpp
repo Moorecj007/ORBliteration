@@ -100,7 +100,7 @@ void SoundSystem::Update()
 	m_pSystem->update();
 }
 
-bool SoundSystem::LoadFile(TSound* _pTSound, std::string _pFile, SOUND_TYPE _type)
+bool SoundSystem::LoadFile(TSound* _pTSound, std::string _pFile, eSoundType _type)
 {
 	std::string soundFilePath = FILEPATH;
 
