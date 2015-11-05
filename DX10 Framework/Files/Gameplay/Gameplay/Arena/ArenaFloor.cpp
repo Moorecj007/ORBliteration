@@ -110,7 +110,7 @@ bool ArenaFloor::Initialise(DX10_Renderer* _pDX10_Renderer, DX10_Shader_LitTex* 
 	// Ensure the Arena size is even for the next calculation
 	(_arenaSize % 2 == 1) ? evenSize = ++_arenaSize : evenSize = _arenaSize;
 	m_layerCount = evenSize / 2;
-	m_destroyOutsideTime = m_matchLength / (float)m_layerCount + 1;
+	m_destroyOutsideTime = m_matchLength / (float)m_layerCount;
 
 	m_destroyedLayers = 0;
 

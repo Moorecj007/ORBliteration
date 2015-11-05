@@ -18,8 +18,8 @@
 #define __DX10_SHADER_LITTEX_H__
 
 // Local Includes
-#include "../../../Utility/Utilities.h"
-#include "../DX10_Utilities.h"
+//#include "../../../Utility/Utilities.h"
+//#include "../DX10_Utilities.h"
 #include "../DX10_Renderer.h"
 
 /***********************

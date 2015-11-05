@@ -18,12 +18,12 @@
 #define __ARENAFLOOR_H__
 
 // Library Includes
-#include <thread>
+//#include <thread>
 
 // Local Includes
-#include "../../../Utility/Utilities.h"
-#include "../../../DX10/DX10/DX10_Renderer.h"
-#include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
+//#include "../../../Utility/Utilities.h"
+//#include "../../../DX10/DX10/DX10_Renderer.h"
+//#include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
 #include "ArenaTile.h"
 
 class ArenaFloor

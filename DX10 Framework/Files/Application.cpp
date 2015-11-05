@@ -253,6 +253,8 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menuMain->AddController(m_pContollers[2]);
 	m_menuMain->AddController(m_pContollers[3]);
 
+	m_menuMain->SetDrawBackground(false);
+
 	m_menuMain->AddSprite("Tron/UI/tron_orbliteration_title.png", 1600, 800);
 	m_menuMain->AddSprite("Tron/Button/tron_button_start_fill.png", 481, 424, 1, 4);
 	m_menuMain->AddSprite("Tron/Button/tron_button_instructions_fill.png", 1137, 424, 1, 4);
@@ -273,6 +275,8 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	m_menuOptions->AddController(m_pContollers[1]);
 	m_menuOptions->AddController(m_pContollers[2]);
 	m_menuOptions->AddController(m_pContollers[3]);
+
+	m_menuOptions->SetDrawBackground(false);
 
 	m_menuOptions->AddSprite("Tron/Button/toggle_button.png", 95, 61, 1, 2);
 	m_menuOptions->AddSprite("Tron/Button/tron_button_fullscreen_fill.png", 945, 424, 1, 4);
@@ -311,17 +315,57 @@ bool Application::Initialise_DX10(HINSTANCE _hInstance)
 	VALIDATE(m_uiPressStart.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_press_start.png", 461, 96));
 	m_uiPressStart.SetPosition(xoffset - m_uiPressStart.GetWidth() * 0.5f, yoffset - m_uiPressStart.GetHeight() * 0.5f);
 
+	VALIDATE(m_uiPressB.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_press_b_goback.png", 431, 96));
+	m_uiPressB.SetPosition(xoffset - m_uiPressB.GetWidth() * 0.5f, m_pDX10_Renderer->GetHeight() - m_uiPressB.GetHeight() - m_uiControllerMissing.GetHeight());
+	
 	m_uiLobby = new DXSprite();
 	VALIDATE(m_uiLobby->Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Controller/controller_lobby_allplayers_ss.png", 840, 1300, 3, 4));
+
+	m_uiPlayer = new DXSprite();
+	VALIDATE(m_uiPlayer->Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/UI/tron_ui_players_ss.png", 2684, 365, 4));
+	m_uiPlayer->SetScale(0.5f);
 
 	float m_uiSpace = 10.0f;
 	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
 	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
 
-	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(m_uiSpace, m_uiSpace)));
-	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(width - m_uiLobby->GetWidth() - m_uiSpace, height - m_uiLobby->GetHeight() - m_uiSpace), 3));
-	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(width - m_uiLobby->GetWidth() - m_uiSpace, m_uiSpace), 6));
-	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, D3DXVECTOR2(m_uiSpace, height - m_uiLobby->GetHeight() - m_uiSpace), 9));
+	// ============== Lobby UI ============== //
+
+	// == Player 1
+
+	// Set the sprite positions
+	m_uiPlayer->SetPosition(m_uiSpace, m_uiSpace);
+	m_uiLobby->SetPosition(m_uiSpace + m_uiPlayer->GetWidth(), m_uiSpace);
+
+	// Create lobby object and push to list
+	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, m_uiPlayer));
+
+	// == Player 2
+
+	// Set the sprite positions
+	m_uiPlayer->SetPosition(width - m_uiPlayer->GetWidth() - m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+	m_uiLobby->SetPosition(width - m_uiPlayer->GetWidth() - m_uiSpace - m_uiLobby->GetWidth(), height - m_uiLobby->GetHeight() - m_uiSpace);
+
+	// Create lobby object and push to list
+	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, m_uiPlayer, 3, 1));
+	
+	// == Player 3
+	
+	// Set the sprite positions
+	m_uiPlayer->SetPosition(width - m_uiPlayer->GetWidth() - m_uiSpace, m_uiSpace);
+	m_uiLobby->SetPosition(width - m_uiPlayer->GetWidth() - m_uiSpace - m_uiLobby->GetWidth(), m_uiSpace);
+
+	// Create lobby object and push to list
+	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, m_uiPlayer, 6, 2));
+
+	// == Player 4
+
+	// Set the sprite positions
+	m_uiPlayer->SetPosition(m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+	m_uiLobby->SetPosition(m_uiSpace + m_uiPlayer->GetWidth(), height - m_uiLobby->GetHeight() - m_uiSpace);
+
+	// Create lobby object and push to list
+	m_lobbyPlayers.push_back(TLobbyPlayer(m_uiLobby, m_uiPlayer, 9, 3));
 	
 	// Play FX
 	if (m_state == APP_STATE_SPLASH)
@@ -365,6 +409,7 @@ void Application::ShutDown()
 
 		// Menu memory release
 		ReleasePtr(m_uiLobby);
+		ReleasePtr(m_uiPlayer);
 		ReleasePtr(m_menuMain);
 		ReleasePtr(m_menuOptions);
 
@@ -685,16 +730,21 @@ void Application::Render()
 					{
 						m_uiPressStart.Render();
 					}
+					m_uiPressB.Render();
 				}
 				break;
 			case APP_STATE_INSTRUCTIONS_MENU:
 				{
 					m_uiInstructions.Render();
+
+					m_uiPressB.Render();
 				}
 				break;
 			case APP_STATE_OPTION_MENU:
 				{
 					m_menuOptions->Draw();
+
+					m_uiPressB.Render();
 				}
 				break;
 			/*case APP_STATE_PAUSE_MENU:
@@ -962,12 +1012,41 @@ void Application::UpdateClientSize()
 
 	float m_uiSpace = 10.0f;
 
-	m_lobbyPlayers[0].m_position = D3DXVECTOR2(m_uiSpace, m_uiSpace);
-	m_lobbyPlayers[1].m_position = D3DXVECTOR2(width - m_uiLobby->GetWidth() - m_uiSpace, height - m_uiLobby->GetHeight() - m_uiSpace);
-	m_lobbyPlayers[2].m_position = D3DXVECTOR2(width - m_uiLobby->GetWidth() - m_uiSpace, m_uiSpace);
-	m_lobbyPlayers[3].m_position = D3DXVECTOR2(m_uiSpace, height - m_uiLobby->GetHeight() - m_uiSpace);
+	m_uiLobby->SetPosition(m_uiPlayer->GetPosition().x + m_uiPlayer->GetWidth(), m_uiPlayer->GetPosition().y);
+
+	if (m_isFullscreen)
+	{
+		m_lobbyPlayers[0].m_positionPlayer = v2float(m_uiSpace, m_uiSpace);
+		m_lobbyPlayers[0].m_positionLobby = v2float(m_uiSpace + m_uiPlayer->GetWidth(), m_uiSpace);
+
+		m_lobbyPlayers[1].m_positionPlayer = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+		m_lobbyPlayers[1].m_positionLobby = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace - m_uiLobby->GetWidth(), height - m_uiLobby->GetHeight() - m_uiSpace);
+
+		m_lobbyPlayers[2].m_positionPlayer = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace, m_uiSpace);
+		m_lobbyPlayers[2].m_positionLobby = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace - m_uiLobby->GetWidth(), m_uiSpace);
+
+		m_lobbyPlayers[3].m_positionPlayer = v2float(m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+		m_lobbyPlayers[3].m_positionLobby = v2float(m_uiSpace + m_uiPlayer->GetWidth(), height - m_uiLobby->GetHeight() - m_uiSpace);
+	}
+	else
+	{
+		m_lobbyPlayers[0].m_positionPlayer = v2float(m_uiSpace, m_uiSpace);
+		m_lobbyPlayers[0].m_positionLobby = v2float(m_uiSpace, m_uiPlayer->GetHeight() - m_uiSpace * 2.0f);
+
+		m_lobbyPlayers[1].m_positionPlayer = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+		m_lobbyPlayers[1].m_positionLobby = v2float(width - m_uiLobby->GetWidth() - m_uiSpace, height - m_uiLobby->GetHeight() - m_uiPlayer->GetHeight() + m_uiSpace);
+
+		m_lobbyPlayers[2].m_positionPlayer = v2float(width - m_uiPlayer->GetWidth() - m_uiSpace, m_uiSpace);
+		m_lobbyPlayers[2].m_positionLobby = v2float(width - m_uiLobby->GetWidth() - m_uiSpace, m_uiPlayer->GetHeight() - m_uiSpace * 2.0f);
+
+		m_lobbyPlayers[3].m_positionPlayer = v2float(m_uiSpace, height - m_uiPlayer->GetHeight() - m_uiSpace);
+		m_lobbyPlayers[3].m_positionLobby = v2float(m_uiSpace, height - m_uiLobby->GetHeight() - m_uiPlayer->GetHeight() + m_uiSpace);
+	}
 
 	m_uiPressStart.SetPosition(width * 0.5f - m_uiPressStart.GetWidth() * 0.5f, height * 0.5f - m_uiPressStart.GetHeight() * 0.5f);
+
+	// TO DO JU
+	//m_uiPressB
 
 	m_menuMain->OnResize();
 	m_menuOptions->OnResize();

@@ -18,9 +18,7 @@
 #define __ARENATILE_H__
 
 // Local Includes
-#include "../../../DX10/DX10/3D Objects/DX10_Obj_Generic.h"
-#include "../../../DX10/DX10/Meshes/DX10_Mesh.h"
-#include "../../../DX10/DX10/Shaders/DX10_Shader_LitTex.h"
+#include "../../../DX10/DX10/3D Objects/DX10_Obj_LitTex.h"
 
 /***********************
 * eBaseTileImages: The image list of textures that can be applied to the base of a tile
@@ -34,7 +32,7 @@ enum eBaseTileImages
 };
 
 class ArenaTile :
-	public DX10_Obj_Generic
+	public DX10_Obj_LitTex
 {
 public:
 
@@ -115,9 +113,6 @@ public:
 	void SetDeathTimer(float _deathTime) { m_deathTimer = 0; m_deathIncrement = _deathTime / 10;};
 
 private:
-	DX10_Shader_LitTex* m_pShader_LitTex;
-	ID3D10ShaderResourceView* m_pBaseTex;
-
 	eBaseTileImages m_baseImage;
 
 	bool m_active;

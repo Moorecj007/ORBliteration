@@ -26,6 +26,7 @@ Menu::Menu()
 	m_elaspedTime = 0.0f;
 	m_imageIndex = 0;
 	m_exitPushed = false;
+	m_drawBackGround = true;
 }
 
 Menu::~Menu()
@@ -66,6 +67,11 @@ bool Menu::Initialise(DX10_Renderer*_pDX10_Renderer, DX10_Shader_Sprite* _pShade
 		m_pSoundManager = _pSoundManager;
 		m_pKeyDown = _pKeyDown;
 		m_layout = _layout;
+
+		m_background;
+
+		VALIDATE(m_background.Initialise(m_pDX10_Renderer, m_pShader_Sprite, "Tron/Button/tron_menu_background.png", 1000, 1000));
+		m_background.SetPosition((m_pDX10_Renderer->GetWidth() - m_background.GetWidth()) * 0.5f, (m_pDX10_Renderer->GetHeight() - m_background.GetHeight()) * 0.5f);
 
 		m_menuItem = 0;
 
@@ -191,8 +197,10 @@ void Menu::Draw()
 {
 	if (m_state == MENU_STATE_DEFAULT)
 	{
-		// Turn the z buffer off
-		//m_pDX10_Renderer->TurnZBufferOff();
+		if (m_drawBackGround)
+		{
+			m_background.Render();
+		}
 
 		// Draw Title
 		if (m_title)
@@ -203,15 +211,6 @@ void Menu::Draw()
 		// Draw all the buttons
 		for (auto button = m_buttons.begin(); button != m_buttons.end(); button++)
 		{
-			/*if (m_sprites.size() == 1 && m_buttons.size() > 1)
-			{
-				//m_sprites[0]->SetSize((*button)->m_pButton->GetWidth(), (*button)->m_pButton->GetHeight());
-				m_sprites[0]->SetPosition((*button)->m_pButton->GetPosition().x, (*button)->m_pButton->GetPosition().y);
-			}
-			else
-			{
-				(*button)->m_pButton->Draw();
-			}*/
 			(*button)->m_pButton->Draw();
 		}
 
@@ -221,9 +220,6 @@ void Menu::Draw()
 			m_sprites[0]->SetPosition((*button)->GetPosition().x, (*button)->GetPosition().y);
 			(*button)->Draw();
 		}
-
-		// Turn the z buffer on
-		//m_pDX10_Renderer->TurnZBufferOn();
 	}
 }
 
@@ -256,13 +252,6 @@ bool Menu::AddButton(eMenuState _option, UINT _spriteIndex, float _scale, UINT _
 		{
 			float m_screenWidth = static_cast<float>(m_pDX10_Renderer->GetWidth());
 			float m_screenHeight = static_cast<float>(m_pDX10_Renderer->GetHeight());
-
-			/*RECT rect;
-			if (GetClientRect(m_pShader_Sprite->GetHWnd(), &rect))
-			{
-				m_screenWidth = static_cast<float>(rect.right - rect.left);
-				m_screenHeight = static_cast<float>(rect.bottom - rect.top);
-			}*/
 
 			m_screenWidth = m_screenWidth * 0.5f - (m_sprites[_spriteIndex]->GetWidth() * 0.25f);
 			m_screenHeight = m_screenHeight * 0.5f;
@@ -393,6 +382,11 @@ void Menu::SetButtonPosition(UINT _index, v2float _position)
 	m_buttons[_index]->m_pButton->SetPosition(_position);
 }
 
+void Menu::SetDrawBackground(bool _flag)
+{
+	m_drawBackGround = _flag;
+}
+
 void Menu::ToggleButton(UINT _index)
 {
 	if (m_toggleButtons[_index]->GetState() == BUTTON_STATE_DEFAULT)
@@ -413,11 +407,6 @@ void Menu::Reset()
 {
 	m_state = MENU_STATE_DEFAULT;
 }
-
-/*void Menu::SetController(InputGamePad* _pGamepad)
-{
-	m_pGamepad = _pGamepad;
-}*/
 
 void Menu::AddController(InputGamePad* _controller)
 {
@@ -491,4 +480,6 @@ void Menu::OnResize()
 		// Note - Juran (this assumes the toggle buttons are index the same as the normal buttons)
 		m_toggleButtons[i]->SetPosition(v2float(m_buttons[i]->m_pButton->GetPosition().x + m_buttons[i]->m_pButton->GetWidth() + m_space, m_buttons[i]->m_pButton->GetPosition().y));
 	}
+
+	m_background.SetPosition((m_pDX10_Renderer->GetWidth() - m_background.GetWidth()) * 0.5f, (m_pDX10_Renderer->GetHeight() - m_background.GetHeight()) * 0.5f);
 }

@@ -208,6 +208,14 @@ class Menu
 		void SetButtonPosition(UINT _index, v2float _position);
 
 		/***********************
+		* SetDrawBackground: Sets the draw backgorund flag for this menu.
+		* @author:	Juran Griffith.
+		* @parameter: _flag: True if you want to draw the background, otherwise false.
+		* @return:	void.
+		********************/
+		void SetDrawBackground(bool _flag);
+
+		/***********************
 		* Reset: Resets all variables to default
 		* @author:	Juran Griffith.
 		* @return:	void
@@ -275,6 +283,8 @@ class Menu
 		// Sprite
 		UINT						m_menuItem;
 		std::vector<DXSprite*>		m_sprites;
+		DXSprite					m_background;
+
 		std::vector<TButton*>		m_buttons;
 		std::vector<GUI_Button*>	m_toggleButtons;
 
@@ -295,6 +305,7 @@ class Menu
 
 		bool*						m_pKeyDown;
 		bool						m_exitPushed;	// For main menu exit button
+		bool						m_drawBackground;
 
 		// Sound
 		SoundManager*				m_pSoundManager;

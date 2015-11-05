@@ -39,7 +39,25 @@ enum eGameState
 	GAME_STATE_END
 };
 
+struct TPlayerUI
+{
+	v2float m_defaultPosition;
+	v2float m_resultsPosition;
+	DXSprite m_sprite;
 
+	void Draw(bool _default)
+	{
+		if (_default)
+		{
+			m_sprite.SetPosition(m_defaultPosition.x, m_defaultPosition.y);
+		}
+		else
+		{
+			m_sprite.SetPosition(m_resultsPosition.x, m_resultsPosition.y);
+		}
+		m_sprite.Render();
+	}
+};
 
 class Game
 {
@@ -193,7 +211,7 @@ private:
 	DX10_Shader_Sprite* m_pSpriteShader;
 
 	// UI Components
-	std::vector<DXSprite> m_uiPlayers;
+	std::vector<TPlayerUI> m_uiPlayers;
 	DXSprite m_uiVictory;
 	DXSprite m_uiRound;
 	DXSprite* m_pInstructions;
@@ -201,12 +219,14 @@ private:
 	DXSprite m_number_first;
 	DXSprite m_number_second;
 
+	DXSprite m_uiPressA;
+	DXSprite m_uiPressX;
+
 	POINT m_StartTimePos_A;
 	POINT m_MatchTimePos_tens;
 	POINT m_MatchTimePos_Units;
 	POINT m_roundNumPos_tens;
 	POINT m_roundNumPos_Units;
-
 
 	float m_uiScale;
 	float m_uiWidth;

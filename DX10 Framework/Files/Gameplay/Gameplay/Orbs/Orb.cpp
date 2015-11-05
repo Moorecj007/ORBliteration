@@ -65,7 +65,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
-			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
 		break;
@@ -77,7 +77,7 @@ bool Orb::Initialise(DX10_Renderer* _pRenderer, DX10_Mesh* _pMesh, DX10_Shader_L
 			m_pGlowLight = new TLight();
 			m_pGlowLight->type = LT_GLOW;
 			m_pGlowLight->pos_range = D3DXVECTOR4(0.0f, 0.0f, 0.0f, 6.0f);
-			m_pGlowLight->diffuse = D3DXCOLOR((47.0f / 255.0f), (241.0f / 46.0f), (108.0f / 255.0f), 1.0f);
+			m_pGlowLight->diffuse = D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f);
 			VALIDATE(_pRenderer->AddLight(m_glowName, m_pGlowLight));
 		}
 		break;

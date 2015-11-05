@@ -66,13 +66,19 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
 	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
-	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // To IMPROVE - Juran
+	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // TO DO Juran (improve)
 	
 	VALIDATE(m_uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_ss.png", 2000, 2000,2,2));
 	m_uiVictory.SetPosition(xoffset - m_uiVictory.GetWidth() * 0.5f, yoffset - m_uiVictory.GetHeight() * 0.5f);
 	
 	VALIDATE(m_uiRound.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_round_fill_whiteblue.png", 481, 106));
 	m_uiRound.SetPosition(xoffset - m_uiRound.GetWidth() * 0.5f, yoffset - m_uiRound.GetHeight() * 0.5f);
+
+	VALIDATE(m_uiPressA.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/Controller/controller_press_a_quit.png", 356, 96));
+	m_uiPressA.SetPosition(xoffset - m_uiPressA.GetWidth(), m_pDX10_Renderer->GetHeight() - m_uiPressA.GetHeight());
+
+	VALIDATE(m_uiPressX.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/Controller/controller_press_x_rematch.png", 443, 96));
+	m_uiPressX.SetPosition(xoffset, m_pDX10_Renderer->GetHeight() - m_uiPressX.GetHeight());
 
 	// Initialise Pause Menu
 	m_pPauseMenu = new Menu();
@@ -96,6 +102,15 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	v3float orbScale = { OrbRadius * 2, OrbRadius * 2, OrbRadius * 2 };
 	VALIDATE(m_pOrbMesh->Initialise(m_pDX10_Renderer, MT_SPHERE, orbScale));
 
+	float tempWidth = (m_uiWidth / 4) * m_uiScale;
+	float tempHeight = m_uiHeight * m_uiScale;
+
+	v2float resultPositions[4];
+	resultPositions[0] = v2float((m_pDX10_Renderer->GetWidth() - tempWidth) * 0.5f - tempWidth * 0.5f, m_pDX10_Renderer->GetHeight() - (tempHeight * 2.5f));
+	resultPositions[1] = v2float((m_pDX10_Renderer->GetWidth() - tempWidth) * 0.5f + tempWidth * 0.5f, m_pDX10_Renderer->GetHeight() - (tempHeight * 2.5f));
+	resultPositions[2] = v2float((m_pDX10_Renderer->GetWidth() - tempWidth) * 0.5f - tempWidth * 0.5f, m_pDX10_Renderer->GetHeight() - (tempHeight * 1.5f));
+	resultPositions[3] = v2float((m_pDX10_Renderer->GetWidth() - tempWidth) * 0.5f + tempWidth * 0.5f, m_pDX10_Renderer->GetHeight() - (tempHeight * 1.5f));
+
 	// Create the Controllers and the player orbs
 	std::string temp;
 	for (int i = 0; i < m_numPlayers; i++)
@@ -111,47 +126,72 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 		{
 			case 0:
 			{
-				DXSprite uiPlayer1;
+				DXSprite temp;
+				VALIDATE(temp.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p1_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				temp.SetScale(m_uiScale);
 
-				VALIDATE(uiPlayer1.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p1_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
-				uiPlayer1.SetScale(m_uiScale);
-				uiPlayer1.SetPosition(m_uiSpace, m_uiSpace);
-				m_uiPlayers.push_back(uiPlayer1);
+				TPlayerUI ui;
+				ui.m_defaultPosition = v2float(m_uiSpace, m_uiSpace);
+				ui.m_resultsPosition = v2float(resultPositions[i]);
+				ui.m_sprite = temp;
 
-				
+				m_uiPlayers.push_back(ui);
 			}
 			break;
 			case 1:
 			{
-				DXSprite uiPlayer2;
-				VALIDATE(uiPlayer2.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p2_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
-				uiPlayer2.SetScale(m_uiScale);
-				uiPlayer2.SetPosition(m_pDX10_Renderer->GetWidth() - uiPlayer2.GetWidth() - m_uiSpace, m_pDX10_Renderer->GetHeight() - uiPlayer2.GetHeight() - m_uiSpace);
-				m_uiPlayers.push_back(uiPlayer2);
+				DXSprite temp;
+				VALIDATE(temp.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p2_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				temp.SetScale(m_uiScale);
 
-				
+				TPlayerUI ui;
+				ui.m_defaultPosition = v2float(m_pDX10_Renderer->GetWidth() - temp.GetWidth() - m_uiSpace, m_pDX10_Renderer->GetHeight() - temp.GetHeight() - m_uiSpace);
+				ui.m_resultsPosition = v2float(resultPositions[i]);
+				ui.m_sprite = temp;
+
+				m_uiPlayers.push_back(ui);
 			}
 			break;
 			case 2:
 			{
-				DXSprite uiPlayer3;
-				VALIDATE(uiPlayer3.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p3_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
-				uiPlayer3.SetScale(m_uiScale);
-				uiPlayer3.SetPosition(m_pDX10_Renderer->GetWidth() - uiPlayer3.GetWidth() - m_uiSpace, m_uiSpace);
-				m_uiPlayers.push_back(uiPlayer3);
+				DXSprite temp;
+				VALIDATE(temp.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p3_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				temp.SetScale(m_uiScale);
 
-				
+				TPlayerUI ui;
+				ui.m_defaultPosition = v2float(m_pDX10_Renderer->GetWidth() - temp.GetWidth() - m_uiSpace, m_uiSpace);
+				if (m_numPlayers == 4)
+				{
+					ui.m_resultsPosition = v2float(resultPositions[2]);
+				}
+				else
+				{
+					ui.m_resultsPosition = v2float(resultPositions[i]);
+				}
+				ui.m_sprite = temp;
+
+				m_uiPlayers.push_back(ui);
 			}
 			break;
 			case 3:
 			{
-				DXSprite uiPlayer4;
-				VALIDATE(uiPlayer4.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p4_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
-				uiPlayer4.SetScale(m_uiScale);
-				uiPlayer4.SetPosition(m_uiSpace, m_pDX10_Renderer->GetHeight() - uiPlayer4.GetHeight() - m_uiSpace);
-				m_uiPlayers.push_back(uiPlayer4);
+				DXSprite temp;
+				VALIDATE(temp.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_ui_player_round_p4_ss.png", (UINT)m_uiWidth, (UINT)m_uiHeight, 4));
+				temp.SetScale(m_uiScale);
 
-				
+				TPlayerUI ui;
+				ui.m_defaultPosition = v2float(m_uiSpace, m_pDX10_Renderer->GetHeight() - temp.GetHeight() - m_uiSpace);
+				if (m_numPlayers == 4)
+				{
+					ui.m_resultsPosition = v2float(resultPositions[3]);
+				}
+				else
+				{
+					ui.m_resultsPosition = v2float(resultPositions[i]);
+				}
+				ui.m_sprite = temp;
+
+				m_uiPlayers.push_back(ui);
 			}
 			break;
 		}
@@ -184,8 +224,7 @@ bool Game::Reset( bool _full)
 	//m_MatchTimePos_tens = { xoffset - m_number_first.GetWidth(), 50.0f }; 
 	//m_MatchTimePos_Units = { xoffset, 50.0f };
 	//m_roundNumPos_tens = { xoffset - m_number_first.GetWidth(), yoffset - m_uiRound.GetHeight() };
-	//m_roundNumPos_Units = { xoffset, yoffset - m_uiRound.GetHeight() };;
-
+	//m_roundNumPos_Units = { xoffset, yoffset - m_uiRound.GetHeight() };
 
 	// Set Timers
 	m_matchTimer = 30.0f;
@@ -252,7 +291,7 @@ bool Game::Reset( bool _full)
 			m_pOrbs[i]->SetScore(0);
 		}
 
-		m_uiPlayers[i].SetImageIndex(m_pOrbs[i]->GetScore());
+		m_uiPlayers[i].m_sprite.SetImageIndex(m_pOrbs[i]->GetScore());
 	}
 
 	// increase the round number
@@ -439,7 +478,7 @@ void Game::WinCheck()
 
 					if (m_pOrbs[i]->GetScore() >= m_winningScore)
 					{
-						m_uiPlayers[i].SetImageIndex(m_pOrbs[i]->GetScore());
+						m_uiPlayers[i].m_sprite.SetImageIndex(m_pOrbs[i]->GetScore());
 						m_gameState = GAME_STATE_END;
 					}
 
@@ -710,8 +749,6 @@ void Game::Render()
 				m_pOrbs[i]->Render();
 			}
 		}
-
-		m_uiPlayers[i].Render();
 	}
 
 	// Draw the 2D UI Assest
@@ -794,12 +831,22 @@ void Game::Render()
 				{
 					m_uiVictory.SetImageIndex(i);
 					m_uiVictory.Render();
+
+					m_uiPressA.Render();
+					m_uiPressX.Render();
+
 					break;
 				}
 			}
 		}
 		break;
 		default:break;
+	}
+
+	// Draw the player UI ontop of everything
+	for (UINT i = 0; i < m_pOrbs.size(); ++i)
+	{
+		m_uiPlayers[i].Draw(m_gameState != GAME_STATE_END);
 	}
 
 	m_pDX10_Renderer->TurnZBufferOn();
@@ -811,11 +858,15 @@ void Game::UpdateClientSize()
 	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
 	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
 
-	m_uiPlayers[1].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
-	m_uiPlayers[2].SetPosition(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
-	m_uiPlayers[3].SetPosition(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
+	m_uiPlayers[1].m_defaultPosition = v2float(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
+	m_uiPlayers[2].m_defaultPosition = v2float(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
+	m_uiPlayers[3].m_defaultPosition = v2float(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 
 	m_uiVictory.SetPosition((width - m_uiVictory.GetWidth()) * 0.5f, (height - m_uiVictory.GetHeight()) * 0.5f);
+
+	// TO DO JU
+	m_uiPressA.SetPosition(width * 0.5f - m_uiPressA.GetWidth(), m_pDX10_Renderer->GetHeight() - m_uiPressA.GetHeight());
+	m_uiPressX.SetPosition(height * 0.5f, m_pDX10_Renderer->GetHeight() - m_uiPressX.GetHeight());
 }
 
 bool Game::AttachUI(DXSprite* _pInstructionsUI, DXSprite* _pControllerUI)

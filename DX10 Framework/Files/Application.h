@@ -35,7 +35,7 @@
 #include "Utility\Utilities.h"
 #include "Utility\Timer.h"
 #include "DX10\DX10.h"
-#include "DX10\DX10\2D Objects\GUI_Button.h"
+//#include "DX10\DX10\2D Objects\GUI_Button.h"
 #include "Input\InputGamePad.h"
 #include "Menus\Menu.h"
 #include "Gameplay\Gameplay.h"
@@ -70,17 +70,21 @@ struct TLobbyPlayer
 	}
 
 	/***********************
-	* TLobbyPlayer: constructor for a lobby player.
-	* @parameter: _sprite: The sprite to render for the lobby player
-	* @parameter: _position: The position to put the UI.
+	* TLobbyPlayer: Constructor for a lobby player. Set the position of the sprite before hand as this updates its positions based on that.
+	* @parameter: _uiLobby: The sprite to render for the lobby UI
+	* @parameter: _uiPlayer: The text sprite to render for the player
 	* @parameter: _offset: The image offset when using a sprite sheet.
 	* @author: Juran Griffith.
 	********************/
-	TLobbyPlayer(DXSprite* _sprite, D3DXVECTOR2 _position, UINT _offset = 0)
-		: m_sprite(_sprite)
-		, m_position(_position)
-		, m_offset(_offset)
+	TLobbyPlayer(DXSprite* _uiLobby, DXSprite* _uiPlayer, UINT _imageOffsetLobby = 0, UINT _imageOffsetPlayer = 0)
+		: m_uiLobby(_uiLobby)
+		, m_uiPlayer(_uiPlayer)
+		, m_imageOffsetLobby(_imageOffsetLobby)
+		, m_imageOffsetPlayer(_imageOffsetPlayer)
 	{
+		m_positionLobby = _uiLobby->GetPosition();
+		m_positionPlayer = _uiPlayer->GetPosition();
+
 		m_state = LOBBY_STATE_NOT_CONNECTED;
 		UpdateImage();
 		m_ready = false;
@@ -109,17 +113,17 @@ struct TLobbyPlayer
 		{
 			case LOBBY_STATE_NOT_CONNECTED:
 			{
-				m_sprite->SetImageIndex(m_offset);
+				m_uiLobby->SetImageIndex(m_imageOffsetLobby);
 			}
 			break;
 			case LOBBY_STATE_NOT_READY:
 			{
-				m_sprite->SetImageIndex(m_offset + 1);
+				m_uiLobby->SetImageIndex(m_imageOffsetLobby + 1);
 			}
 			break;
 			case LOBBY_STATE_READY:
 			{
-				m_sprite->SetImageIndex(m_offset + 2);
+				m_uiLobby->SetImageIndex(m_imageOffsetLobby + 2);
 			}
 			break;
 		}
@@ -133,15 +137,22 @@ struct TLobbyPlayer
 	void Draw()
 	{
 		UpdateImage();
-		m_sprite->SetPosition(m_position.x, m_position.y);
-		m_sprite->Render();
+		m_uiLobby->SetPosition(m_positionLobby.x, m_positionLobby.y);
+		m_uiLobby->Render();
+
+		m_uiPlayer->SetImageIndex(m_imageOffsetPlayer);
+		m_uiPlayer->SetPosition(m_positionPlayer.x, m_positionPlayer.y);
+		m_uiPlayer->Render();
 	}
 
 	bool m_ready;
 	eLobbyState m_state;
-	DXSprite* m_sprite;
-	UINT m_offset;
-	D3DXVECTOR2 m_position;
+	DXSprite* m_uiLobby;
+	DXSprite* m_uiPlayer;
+	UINT m_imageOffsetLobby;
+	UINT m_imageOffsetPlayer;
+	v2float m_positionLobby;
+	v2float m_positionPlayer;
 };
 
 class Application
@@ -360,7 +371,6 @@ private:
 
 	// 2D Objects
 	DX10_Shader_Sprite*	m_pShader_Sprite;
-	//std::vector<Menu*> m_menus;
 	Menu* m_menuMain;
 	Menu* m_menuOptions;
 
@@ -374,7 +384,9 @@ private:
 	DXSprite m_uiInstructions;
 	DXSprite m_uiControllerMissing;
 	DXSprite m_uiPressStart;
+	DXSprite m_uiPressB;
 	DXSprite* m_uiLobby;
+	DXSprite* m_uiPlayer;
 
 	std::vector<TLobbyPlayer> m_lobbyPlayers;
 

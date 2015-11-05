@@ -18,7 +18,7 @@
 #define __DX10_SHADER_SPRITE_H__
 
 // Local Includes
-#include "../DX10_Utilities.h"
+//#include "../DX10_Utilities.h"
 #include "../DX10_Renderer.h"
 
 class DX10_Shader_Sprite
