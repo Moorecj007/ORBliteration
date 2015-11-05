@@ -78,13 +78,13 @@ bool SoundManager::Intialise()
 
 	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_splash_ps, "splash_phenomena.wav", SOUND_TYPE_EFFECT));
 	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_menu_accept, "tron_menuaccept.wav", SOUND_TYPE_EFFECT));
-	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_menu_back, "tron_menuback.wav", SOUND_TYPE_EFFECT));
+	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_menu_back, "tron_menuback_blurp.wav", SOUND_TYPE_EFFECT));
 	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_menu_nav, "tron_menunavigation.wav", SOUND_TYPE_EFFECT));
 	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_menu_tog, "tron_menutoggles.wav", SOUND_TYPE_EFFECT));
 	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_death, "tron_playerdeath.wav", SOUND_TYPE_EFFECT));
-	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_hit, "tron_playerhit_lightsaber.wav", SOUND_TYPE_EFFECT));
-	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_phase, m_pEffect_player_hit->m_filename, SOUND_TYPE_EFFECT));
-	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_boost, m_pEffect_player_hit->m_filename, SOUND_TYPE_EFFECT));
+	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_hit, "tron_playerhit_copperpipe.wav", SOUND_TYPE_EFFECT));
+	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_phase, "tron_playerphase_energyswellfluttering.wav", SOUND_TYPE_EFFECT));
+	VALIDATE(m_pSoundSystem->LoadFile(m_pEffect_player_boost, "tron_playerboost_airburst.wav", SOUND_TYPE_EFFECT));
 
 	return true;
 }

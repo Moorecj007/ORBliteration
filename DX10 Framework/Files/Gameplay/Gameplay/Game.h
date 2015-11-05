@@ -216,17 +216,13 @@ private:
 	DXSprite m_uiRound;
 	DXSprite* m_pInstructions;
 	DXSprite* m_uiControllerMissing;
-	DXSprite m_number_first;
-	DXSprite m_number_second;
+	DXSprite m_uiNumber;				// TO DO JURAN (update UML)
+	//DXSprite m_number_second;			// TO DO JURAN (update UML)
 
 	DXSprite m_uiPressA;
 	DXSprite m_uiPressX;
 
-	POINT m_StartTimePos_A;
-	POINT m_MatchTimePos_tens;
-	POINT m_MatchTimePos_Units;
-	POINT m_roundNumPos_tens;
-	POINT m_roundNumPos_Units;
+	v2float m_numberPosition[5];		// TO DO JURAN (update UML)
 
 	float m_uiScale;
 	float m_uiWidth;

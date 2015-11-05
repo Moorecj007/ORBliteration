@@ -65,14 +65,21 @@ bool Game::Initialise(DX10_Renderer* _pDX10_Renderer, SoundManager* _pSoundManag
 	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
 	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 
-	VALIDATE(m_number_first.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
-	VALIDATE(m_number_second.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4)); // TO DO Juran (improve)
+	VALIDATE(m_uiRound.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_round_fill_whiteblue.png", 481, 106));
+	VALIDATE(m_uiNumber.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_numbers_fill_whiteblue.png", 1060, 424, 10, 4));
+
+	// Set the position of the rounds text
+	m_uiRound.SetPosition(xoffset - m_uiSpace - (m_uiRound.GetWidth() + m_uiNumber.GetWidth() * 2.0f) * 0.5f, m_pDX10_Renderer->GetHeight() * 0.25f);
+
+	// Set the number positions
+	m_numberPosition[0] = v2float(xoffset - m_uiNumber.GetWidth()* 0.5f, yoffset - m_uiNumber.GetHeight() * 0.5f); // Centre
+	m_numberPosition[1] = v2float(xoffset - m_uiNumber.GetWidth(), 50.0f); // Top Centre Left
+	m_numberPosition[2] = v2float(xoffset, 50.0f); // Top Centre Right
+	m_numberPosition[3] = v2float(m_uiRound.GetPosition().x + m_uiRound.GetWidth() + m_uiSpace, m_uiRound.GetPosition().y); // tens
+	m_numberPosition[4] = v2float(m_uiRound.GetPosition().x + m_uiRound.GetWidth() + m_uiSpace + m_uiNumber.GetWidth(), m_uiRound.GetPosition().y); // units
 	
 	VALIDATE(m_uiVictory.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_victory_ss.png", 2000, 2000,2,2));
 	m_uiVictory.SetPosition(xoffset - m_uiVictory.GetWidth() * 0.5f, yoffset - m_uiVictory.GetHeight() * 0.5f);
-	
-	VALIDATE(m_uiRound.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/UI/tron_round_fill_whiteblue.png", 481, 106));
-	m_uiRound.SetPosition(xoffset - m_uiRound.GetWidth() * 0.5f, yoffset - m_uiRound.GetHeight() * 0.5f);
 
 	VALIDATE(m_uiPressA.Initialise(m_pDX10_Renderer, m_pSpriteShader, "Tron/Controller/controller_press_a_quit.png", 356, 96));
 	m_uiPressA.SetPosition(xoffset - m_uiPressA.GetWidth(), m_pDX10_Renderer->GetHeight() - m_uiPressA.GetHeight());
@@ -213,18 +220,6 @@ bool Game::Reset( bool _full)
 
 	// Release the arena Floor
 	ReleasePtr(m_pArenaFloor);
-	
-	// Set the Timer Positions
-	float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
-	float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
-	m_number_first.SetPosition(xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f));
-	m_number_second.SetPosition(xoffset, 50.0f);
-	
-	//m_StartTimePos_A = { xoffset - (m_number_first.GetWidth() * 0.5f), yoffset - (m_number_first.GetHeight() * 0.5f) };
-	//m_MatchTimePos_tens = { xoffset - m_number_first.GetWidth(), 50.0f }; 
-	//m_MatchTimePos_Units = { xoffset, 50.0f };
-	//m_roundNumPos_tens = { xoffset - m_number_first.GetWidth(), yoffset - m_uiRound.GetHeight() };
-	//m_roundNumPos_Units = { xoffset, yoffset - m_uiRound.GetHeight() };
 
 	// Set Timers
 	m_matchTimer = 30.0f;
@@ -478,10 +473,10 @@ void Game::WinCheck()
 
 					if (m_pOrbs[i]->GetScore() >= m_winningScore)
 					{
+						m_roundNumber = 0;
 						m_uiPlayers[i].m_sprite.SetImageIndex(m_pOrbs[i]->GetScore());
 						m_gameState = GAME_STATE_END;
 					}
-
 					break;
 				}
 			}
@@ -514,15 +509,11 @@ bool Game::Process(float _dt)
 				m_firstProcess = false;
 			}
 
-			m_number_first.SetImageIndex((int)(m_startCountDown + 1) + 10);
-
 			if (m_startCountDown <= 0.0f)
 			{
 				float xoffset = static_cast<float>(m_pDX10_Renderer->GetWidth()) * 0.5f;
 				float yoffset = static_cast<float>(m_pDX10_Renderer->GetHeight()) * 0.5f;
 				m_gameState = GAME_STATE_PROCESS;
-
-				m_number_first.SetPosition(xoffset - m_number_first.GetWidth(), 50.0f);
 			}
 		}
 		break;
@@ -595,8 +586,6 @@ bool Game::Process(float _dt)
 			// Process the game time
 			// Alter the Match Timer
 			m_matchTimer -= _dt;
-			m_number_first.SetImageIndex((int)((m_matchTimer + 1) / 10) + 10);
-			m_number_second.SetImageIndex((int)(m_matchTimer + 1) % 10 + 10);
 
 			// Check if the game has been won
 			WinCheck();
@@ -759,13 +748,31 @@ void Game::Render()
 		case GAME_STATE_START:
 		{
 			m_uiRound.Render();
-			m_number_first.Render();
+			// Draw round number
+			m_uiNumber.SetImageIndex((int)((m_roundNumber + 1) / 10) + 10); // tens
+			m_uiNumber.SetPosition(m_numberPosition[3].x, m_numberPosition[3].y);
+			m_uiNumber.Render();
+
+			m_uiNumber.SetImageIndex((int)(m_roundNumber) % 10 + 10); // units
+			m_uiNumber.SetPosition(m_numberPosition[4].x, m_numberPosition[4].y);
+			m_uiNumber.Render();
+
+			// Draw start of match timer
+			m_uiNumber.SetImageIndex((int)(m_startCountDown + 1) + 10);
+			m_uiNumber.SetPosition(m_numberPosition[0].x, m_numberPosition[0].y);
+			m_uiNumber.Render();
 		}
 		break;
 		case GAME_STATE_PROCESS:
 		{
-			m_number_first.Render();
-			m_number_second.Render();
+			// Draw match timer
+			m_uiNumber.SetImageIndex((int)((m_matchTimer + 1) / 10) + 10); // tens
+			m_uiNumber.SetPosition(m_numberPosition[1].x, m_numberPosition[1].y);
+			m_uiNumber.Render();
+
+			m_uiNumber.SetImageIndex((int)(m_matchTimer + 1) % 10 + 10); // units
+			m_uiNumber.SetPosition(m_numberPosition[2].x, m_numberPosition[2].y);
+			m_uiNumber.Render();
 		}
 		break;
 		case GAME_STATE_ERROR:
@@ -850,21 +857,33 @@ void Game::Render()
 	}
 
 	m_pDX10_Renderer->TurnZBufferOn();
-
 }
 
 void Game::UpdateClientSize()
 {
 	float width = static_cast<float>(m_pDX10_Renderer->GetWidth());
 	float height = static_cast<float>(m_pDX10_Renderer->GetHeight());
+	float half_width = width * 0.5f;
 
+	// Set the player UI positions
 	m_uiPlayers[1].m_defaultPosition = v2float(width - (m_uiWidth * m_uiScale) - m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 	m_uiPlayers[2].m_defaultPosition = v2float(width - (m_uiWidth * m_uiScale) - m_uiSpace, m_uiSpace);
 	m_uiPlayers[3].m_defaultPosition = v2float(m_uiSpace, height - (m_uiHeight * m_uiScale) - m_uiSpace);
 
+	// Set the victory position
 	m_uiVictory.SetPosition((width - m_uiVictory.GetWidth()) * 0.5f, (height - m_uiVictory.GetHeight()) * 0.5f);
 
-	// TO DO JU
+	// Set the position of the rounds text
+	m_uiRound.SetPosition(half_width - m_uiSpace - (m_uiRound.GetWidth() + m_uiNumber.GetWidth() * 2.0f) * 0.5f, m_pDX10_Renderer->GetHeight() * 0.25f);
+
+	// Set the number positions
+	m_numberPosition[0] = v2float(half_width - m_uiNumber.GetWidth()* 0.5f, (height - m_uiNumber.GetHeight()) * 0.5f); // Centre
+	m_numberPosition[1] = v2float(half_width - m_uiNumber.GetWidth(), 50.0f); // Top Centre Left
+	m_numberPosition[2] = v2float(half_width, 50.0f); // Top Centre Right
+	m_numberPosition[3] = v2float(m_uiRound.GetPosition().x + m_uiRound.GetWidth() + m_uiSpace, m_uiRound.GetPosition().y); // tens
+	m_numberPosition[4] = v2float(m_uiRound.GetPosition().x + m_uiRound.GetWidth() + m_uiSpace + m_uiNumber.GetWidth(), m_uiRound.GetPosition().y); // units
+
+	// Set the the controller button UI
 	m_uiPressA.SetPosition(width * 0.5f - m_uiPressA.GetWidth(), m_pDX10_Renderer->GetHeight() - m_uiPressA.GetHeight());
 	m_uiPressX.SetPosition(height * 0.5f, m_pDX10_Renderer->GetHeight() - m_uiPressX.GetHeight());
 }

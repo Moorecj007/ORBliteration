@@ -26,7 +26,7 @@ Menu::Menu()
 	m_elaspedTime = 0.0f;
 	m_imageIndex = 0;
 	m_exitPushed = false;
-	m_drawBackGround = true;
+	m_drawBackground = true;
 }
 
 Menu::~Menu()
@@ -197,7 +197,7 @@ void Menu::Draw()
 {
 	if (m_state == MENU_STATE_DEFAULT)
 	{
-		if (m_drawBackGround)
+		if (m_drawBackground)
 		{
 			m_background.Render();
 		}
@@ -384,7 +384,7 @@ void Menu::SetButtonPosition(UINT _index, v2float _position)
 
 void Menu::SetDrawBackground(bool _flag)
 {
-	m_drawBackGround = _flag;
+	m_drawBackground = _flag;
 }
 
 void Menu::ToggleButton(UINT _index)
